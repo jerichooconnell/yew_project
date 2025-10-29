@@ -1,0 +1,154 @@
+Zone	BEC Unit	Subzone name	Variant name
+Alpine Tundra		
+ATun	Undifferentiated	–
+Bunch Grass		
+BG xh 1	Very Dry Hot	Okanagan
+BG xh 2	Very Dry Hot	Thompson
+BG xh 3	Very Dry Hot	Fraser
+BG xw 1	Very Dry Warm	Nicola
+BG xw 2	Very Dry Warm	Alkali
+Boreal Black and White Spruce		
+BWBS dk 1	Dry Cool	Stikine
+BWBS dk 2	Dry Cool	Liard
+BWBS mw 1	Moist Warm	Peace
+BWBS mw 2	Moist Warm	Fort Nelson
+BWBS vk	Very Wet Cool	–
+BWBS wk 1	Wet Cool	Murray
+BWBS wk 2	Wet Cool	Graham
+BWBS wk 3	Wet Cool	Kledo
+Coastal Douglas-fir		
+CDF mm	Moist Maritime	–
+Coastal Western Hemlock		
+CWH dm	Dry Maritime	–
+CWH ds 1	Dry Submaritime	Southern
+CWH ds 2	Dry Submaritime	Central
+CWH mm1	Moist Maritime	Submontane
+CWH mm2	Moist Maritime	Montane
+CWH ms 1	Moist Submaritime	Southern
+CWH ms 2	Moist Submaritime	Central
+CWH vh 1	Very Wet Hypermaritime	Southern
+CWH vh 2	Very Wet Hypermaritime	Central
+CWH vm	Very Wet Maritime	–
+CWH vm 1	Very Wet Maritime	Submontane
+CWH vm 2	Very Wet Maritime	Montane
+CWH vm 3	Very Wet Maritime	Central
+CWH wh 1	Wet Hypermaritime	Submontane
+CWH wh 2	Wet Hypermaritime	Montane
+CWH wm	Wet Maritime	–
+CWH ws 1	Wet Submaritime	Submontane
+CWH ws 2	Wet Submaritime	Montane
+CWH xm1	Very Dry Maritime	Eastern
+CWH xm2	Very Dry Maritime	Western
+Engelmann Spruce – Subapline Fir		
+ESSF dc 1	Dry Cold	Okanagan
+ESSF dc 2	Dry Cold	Thompson
+ESSF dk	Dry Cool	–
+ESSF dkp	Dry Cool Parkland	–
+ESSF dv	Dry Very Cold	–
+ESSF mc	Moist Cold	–
+ESSF mk	Moist Cool	–
+ESSF mm	Moist Mild	Raush
+ESSF mv 1	Moist Very Cold	Nechako
+ESSF mv 2	Moist Very Cold	Bullmoose
+ESSF mv 3	Moist Very Cold	Omineca
+ESSF mv 4	Moist Very Cold	Graham
+ESSF mw	Moist Warm	–
+ESSF vc	Very Wet Cold	–
+ESSF vcp	Very Wet Cold Parkland	–
+ESSF wc 1	Wet Cold	Columbia
+ESSF wc 2	Wet Cold	Northern Monashee
+ESSF wc 3	Wet Cold	Cariboo
+ESSF wc 4	Wet Cold	Selkirk
+ESSF wcp	Wet Cold Parkland	–
+ESSF wk 1	Wet Cool	Cariboo
+ESSF wk 2	Wet Cool	Misinchinka
+ESSF wm	Wet Mild	–
+ESSF wmp	Wet Mild Parkland	–
+ESSF wv	Wet Very Cold	–
+ESSF xc	Very Dry Cold	–
+ESSF xv 1	Very Dry Very Cold	West Chilcotin
+ESSF xv 2	Very Dry Very Cold	Big Creek
+Interior Cedar – Hemlock		
+ICH dk	Dry Cool	–
+ICH dw	Dry Warm	West Kootenay
+ICH mc 1	Moist Cold	Nass
+ICH mc 2	Moist Cold	Hazelton
+ICH mk 1	Moist Cool	Kootenay
+ICH mk 2	Moist Cool	Thompson
+ICH mk 3	Moist Cool	Horsefly
+ICH mm	Moist Mild	–
+ICH mw 1	Moist Warm	Golden
+ICH mw 2	Moist Warm	Columbia-Shuswap
+ICH mw 3	Moist Warm	Thompson
+ICH vc	Very Wet Cold	–
+ICH vk 1	Very Wet Cool	Mica
+ICH vk 2	Very Wet Cool	Slim
+ICH wc	Wet Cold	–
+ICH wk 1	Wet Cool	Wells Gray
+ICH wk 2	Wet Cool	Quesnel
+ICH wk 3	Wet Cool	Goat
+ICH wk 4	Wet Cool	Cariboo
+ICH xw	Very Dry Warm	–
+Interior Douglas-fir		
+IDF dk 1	Dry Cool	Thompson
+IDF dk 2	Dry Cool	Cascade
+IDF dk 3	Dry Cool	Fraser
+IDF dk 4	Dry Cool	Chilcotin
+IDF dm 1	Dry Mild	Kettle
+IDF dm 2	Dry Mild	Kootenay
+IDF dw	Dry Warm	–
+IDF mw 1	Moist Warm	Okanagan
+IDF mw 2	Moist Warm	Thompson
+IDF ww	Wet Warm	–
+IDF xh 1	Very Dry Hot	Okanagan
+IDF xh 2	Very Dry Hot	Thompson
+IDF xm	Very Dry Mild	–
+IDF xw	Very Dry Warm	–
+Mountain Hemlock		
+MH mm 1	Moist Maritime	Windward
+MH mm 2	Moist Maritime	Leeward
+MH wh	Wet Hypermaritime	Windward
+Montane Spruce		
+MS dc 1	Dry Cold	Bridge
+MS dc 2	Dry Cold	Tatlayoko
+MS dk	Dry Cool	–
+MS dm 1	Dry Mild	Okanagan
+MS dm 2	Dry Mild	Thompson
+MS dv	Dry Very Cold	–
+MS xk	Very Dry Cool	–
+MS xv	Very Dry Very Cold	–
+Ponderosa Pine		
+PP dh 1	Dry Hot	Kettle
+PP dh 2	Dry Hot	Kootenay
+PP xh 1	Very Dry Hot	Okanagan
+PP xh 2	Very Dry Hot	Thompson
+Sub-boreal Pine – Spruce		
+SBPS dc	Dry Cold	–
+SBPS mc	Moist Cold	–
+SBPS mk	Moist Cool	–
+SBPS xc	Very Dry Cold	–
+Sub-Boreal – Spruce		
+SBS dh 1	DryHot	McLennan
+SBS dh 2	Dry Hot	Robson
+SBS dk	Dry Cool	–
+SBS dw 1	Dry Warm	Horsefly
+SBS dw 2	Dry Warm	Blackwater
+SBS dw 3	Dry Warm	Stuart
+SBS mc 1	Moist Cold	Moffat
+SBS mc 2	Moist Cold	Babine
+SBS mc 3	Moist Cold	Kluskus
+SBS mh	Moist Hot	–
+SBS mk 1	Moist Cool	Mossvale
+SBS mk 2	Moist Cool	Williston
+SBS mm	Moist Mild	–
+SBS mw	Moist Warm	–
+SBS un	Undifferentiated	–
+SBS vk	Very Wet Cool	–
+SBS wk 1	Wet Cool	Willow
+SBS wk 2	Wet Cool	Finlay-Peace
+SBS wk 3	Wet Cool	Takla
+Spruce – Willow – Birch		
+SWB dk	DryCool	–
+SWB mk	Moist Cool	–
+SWB un	Undifferentiated	–
+SWB vk	Very Wet Cool	–

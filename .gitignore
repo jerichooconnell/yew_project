@@ -1,0 +1,86 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+ENV/
+env/
+.venv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# PyTorch
+*.pth
+*.pt
+!models/checkpoints/*.pth  # Keep model checkpoints
+
+# Data
+*.csv
+!data/lookup_tables/*.txt  # Keep lookup tables
+data/raw/
+data/processed/
+
+# Models
+*.pkl
+!models/artifacts/*.pkl  # Keep model artifacts
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Conda
+*.conda
+*.tar.bz2
+
+# Logs
+*.log
+logs/
+
+# Results (optional - comment out if you want to track)
+results/figures/*.png
+results/tables/*.csv
+
+# Temporary files
+*.tmp
+*.bak
+.cache/
+
+# Earth Engine
+ee-credentials/
+.ee/
+
+# Large files
+*.tif
+*.tiff
+*.geotiff
+*.h5
+*.hdf5

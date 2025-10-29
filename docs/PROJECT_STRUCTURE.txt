@@ -1,0 +1,64 @@
+.
+├── config
+│   ├── cleanup_conda.sh
+│   ├── setup_yew_env_minimal.sh
+│   ├── setup_yew_env.sh
+│   ├── test_environment.py
+│   └── yew_pytorch_env.yml
+├── data
+│   ├── lookup_tables
+│   │   ├── biogeoclimactic_zone_keys.txt
+│   │   └── tree_name_keys.txt
+│   ├── processed
+│   │   ├── pacific_yew_associations.csv
+│   │   ├── pacific_yew_bec_subzones.csv
+│   │   ├── pacific_yew_bec_variants.csv
+│   │   ├── pacific_yew_bec_zones_active.csv
+│   │   ├── pacific_yew_bec_zones.csv
+│   │   ├── pacific_yew_bec_zones_inactive.csv
+│   │   ├── pacific_yew_temporal_analysis.csv
+│   │   ├── yew_categorical_correlations.csv
+│   │   ├── yew_numerical_correlations.csv
+│   │   └── yew_statistical_comparison.csv
+│   └── raw
+│       ├── bc_sample_data-2025-10-09
+│       ├── faib_compiled_smeries_ht.csv
+│       ├── faib_header.csv
+│       ├── faib_plot_header.csv
+│       └── faib_tree_detail.csv
+├── docs
+│   ├── ENVIRONMENT_SETUP.md
+│   ├── PROJECT_STRUCTURE.txt
+│   └── QUICK_REFERENCE.md
+├── models
+│   ├── artifacts
+│   │   ├── yew_feature_info.pkl
+│   │   └── yew_preprocessor.pkl
+│   └── checkpoints
+│       ├── best_yew_density_model.pth
+│       └── yew_density_model_final.pth
+├── README.md
+├── results
+│   ├── figures
+│   │   ├── pacific_yew_analysis.png
+│   │   ├── pacific_yew_bec_details.png
+│   │   ├── pacific_yew_correlations.png
+│   │   ├── pacific_yew_detailed_histograms.png
+│   │   ├── pacific_yew_numerical_histograms.png
+│   │   └── yew_training_history.png
+│   ├── reports
+│   │   └── yew_correlations_summary.md
+│   └── tables
+└── scripts
+    ├── analysis
+    │   ├── analyze_pacific_yew_bc_sample.py
+    │   ├── analyze_pacific_yew.py
+    │   └── analyze_yew_correlations.py
+    ├── geotess_ex.py
+    ├── preprocessing
+    ├── training
+    │   └── yew_density_model.py
+    └── visualization
+        └── detailed_yew_histograms.py
+
+19 directories, 42 files

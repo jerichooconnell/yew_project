@@ -1,0 +1,21 @@
+{
+  "extraction_date": "20251016_215214",
+  "num_plots": 10,
+  "success_rate": 0.0,
+  "columns": [
+    "plot_id",
+    "x",
+    "y",
+    "lon",
+    "lat",
+    "year",
+    "success",
+    "error"
+  ],
+  "bands_extracted": [
+    "blue",
+    "green",
+    "red",
+    "nir"
+  ]
+}

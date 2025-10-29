@@ -1,0 +1,85 @@
+Common Name Scientific Name Codes
+Cedar Thuja C
+western redcedar Thuja plicata Cw
+Cypress Chamaecyparis Y
+yellow-cedar C. nootkatensis Yc
+Douglas-fir Pseudotsuga F
+Douglas-fir P. menziesii Fd
+coastal Douglas-fir P. menziesii var. menziesii Fdc
+interior Douglas-fir P. menziesii var. glauca Fdi
+Fir (Balsam) Abies B
+amabilis fir A. amabilis Ba
+grand fir A. grandis Bg
+subalpine fir A. lasiocarpa Bl
+Hemlock Tsuga H
+mountain hemlock T. mertensiana Hm
+western hemlock T. heterophylla Hw
+mountain x western hemlock 
+hybrid
+T. mertensiana x heterophylla Hxm
+Juniper Juniperus J
+Rocky Mtn. juniper J. scopulorum Jr
+Larch Larix L
+alpine larch L. lyallii La
+tamarack L. laricina Lt
+western larch L. occidentalis Lw
+Pine Pinus P
+jack pine P. banksiana Pj
+limber pine P. flexilis Pf
+Common Name Scientific Name Codes
+lodgepole pine P. contorta Pl
+lodgepole pine P. contorta var. latifolia Pli
+lodgepole x jack pine hybrid P. x murraybanksiana Pxj
+ponderosa pine P. ponderosa Py
+shore pine P. contorta var. contorta Plc
+western white pine P. monticola Pw
+whitebark pine P. albicaulis Pa
+Spruce Picea S
+black spruce P. mariana Sb
+Engelmann spruce P. engelmannii Se
+Sitka spruce P. sitchensis Ss
+white spruce P. glauca Sw
+spruce hybrid Picea cross Sx
+Engelmann x white P. engelmannii x glauca Sxw
+Sitka x white P. x lutzii Sxl
+Sitka x unknown hybrid P. sitchensis x ? Sxs
+Yew Taxus T
+western yew Taxus brevifolia Tw
+NATIVE HARDWOODS
+Alder Alnus D
+red alder A. rubra Dr
+Apple Malus U
+Pacific crab apple Malus fusca Up
+Aspen, Cottonwood or Poplar Populus A
+poplar P. balsamifera Ac
+balsam poplar P. b. ssp. balsamifera Acb
+black cottonwood P. b. ssp. trichocarpa Act
+hybrid poplars P. spp. Ax
+trembling aspen P. tremuloides At
+Arbutus Arbutus R
+Arbutus Arbutus menziesii Ra
+Birch Betula E
+Alaska paper birch B. neoalaskana Ea
+Alaska x paper birch hybrid B. x winteri Exp
+paper birch B. papyrifera Ep
+water birch B. occidentalis Ew
+Cascara Rhamnus K
+cascara R. purshiana Kc
+Cherry Prunus V
+bitter cherry P. emarginata Vb
+choke cherry P. virginiana Vv
+pin cherry P. pensylvanica Vp
+Dogwood Cornus G
+Pacific dogwood Cornus nuttallii Gp
+Maple Acer M
+bigleaf maple A. macrophyllum Mb
+vine maple A. circinatum Mv
+Oak Quercus Q
+Garry oak Q. garryana Qg
+Willow Salix spp. W
+Bebb's willow S. bebbiana Wb
+Pacific willow S. lucida Wp
+peachleaf willow S. amygdaloides Wa
+pussy willow S. discolor Wd
+Scouler's willow S. scouleriana Ws
+Sitka willow S. sitchensis W

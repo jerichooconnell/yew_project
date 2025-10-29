@@ -1,0 +1,24 @@
+{
+  "extraction_date": "20251027_110213",
+  "num_plots": 67,
+  "success_count": 67,
+  "columns": [
+    "plot_id",
+    "x",
+    "y",
+    "lon",
+    "lat",
+    "measurement_year",
+    "imagery_period",
+    "blue",
+    "green",
+    "red",
+    "nir",
+    "ndvi",
+    "evi",
+    "elevation",
+    "slope",
+    "aspect",
+    "success"
+  ]
+}
