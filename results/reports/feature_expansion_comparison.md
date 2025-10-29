@@ -7,7 +7,7 @@ The original minimal baseline (26.1% recall) outperformed all expanded feature s
 
 ## Results Comparison
 
-### 1. Minimal Features - BEST (9 features)
+### 1. Minimal Features - BEST ✅ (9 features)
 **Features:** 6 numerical + 3 categorical
 - **Numerical:** BA_HA_LS, STEMS_HA_LS, VHA_WSV_LS, SI_M_TLSO, HT_TLSO, AGEB_TLSO
 - **Categorical:** BEC_ZONE, TSA_DESC, SAMPLE_ESTABLISHMENT_TYPE
@@ -19,7 +19,19 @@ The original minimal baseline (26.1% recall) outperformed all expanded feature s
 - **Test F1: 0.0379**
 - Overfitting: Train AUC 0.9996, Val AUC 0.8854 (moderate)
 
-### 2. All Features with Spatial Coords - WORST (33 features)
+### 2. Original 9 + BECLABEL - CATASTROPHIC (10 features)
+**Added:** BECLABEL (65 categories - detailed biogeoclimatic label)
+
+**Performance:**
+- **Test ROC AUC: 0.581** (↓ 0.298 - barely better than random!)
+- **Test Recall: 4.35%** (↓ 21.75%)
+- **Test Precision: 0.12%**
+- **Test F1: 0.0024**
+- Training stopped at iteration 0 (best score achieved immediately)
+
+**Problem:** BECLABEL with 65 categories dominated feature importance (27%) and caused catastrophic overfitting. The model couldn't learn generalizable patterns.
+
+### 3. All Features with Spatial Coords - WORST (33 features)
 **Added:** 13 numerical + 11 categorical
 - Dead stand metrics, temporal, spatial coordinates, high-cardinality categoricals
 
@@ -55,7 +67,17 @@ The original minimal baseline (26.1% recall) outperformed all expanded feature s
 - **Test Recall: 13.0%** at threshold 0.5 (↓ 13.1% vs baseline)
 - Overfitting: Still present
 
-**Problem:** Even dead stand metrics and temporal features cause overfitting with extreme class imbalance
+**Problem:** Dead stand metrics, temporal features, and low-cardinality categoricals still caused overfitting
+
+## Summary Table
+
+| Model | Features | Test Recall | Test AUC | Test F1 | Status |
+|-------|----------|-------------|----------|---------|---------|
+| **Original 9** | 9 | **26.1%** | **0.879** | **0.0379** | ✅ **BEST** |
+| 9 + BECLABEL | 10 | 4.35% | 0.581 | 0.0024 | ❌ Catastrophic |
+| All + Spatial | 33 | 0.0% | 0.894 | 0.0 | ❌ Complete failure |
+| No Spatial | 30 | 17.4% | 0.910 | 0.0386 | ❌ Worse than baseline |
+| Conservative | 21 | 0-13% | 0.896 | 0.0 | ❌ Much worse |
 
 ## Key Insights
 
@@ -68,11 +90,13 @@ With only 234 yew-present plots out of 61,801 total:
 This is insufficient data to learn reliable patterns from 30+ features.
 
 ### 2. Feature Types That Cause Overfitting
+- ❌ **BECLABEL alone:** Adding just this one 65-category feature to baseline → 26.1% to 4.35% recall, AUC 0.879 to 0.581 (catastrophic!)
 - ❌ **Spatial coordinates:** Perfect memorization of specific locations
 - ❌ **High-cardinality categoricals:** 65 BEC labels, 22 species → memorize specific combinations
 - ❌ **Temporal features:** MEAS_YR, VISIT_NUMBER → memorize specific time periods
 - ❌ **Dead stand metrics:** Limited signal with sparse positive examples
 - ✓ **Core inventory metrics:** BA, stems, volume, site index, height, age → generalizable
+- ✓ **Low-cardinality categoricals:** BEC_ZONE (4 cats), SAMPLE_TYPE (6 cats) → generalizable patterns
 
 ### 3. ROC AUC is Misleading
 All expanded models improved ROC AUC (0.879 → 0.894 → 0.910) but **recall got worse**:

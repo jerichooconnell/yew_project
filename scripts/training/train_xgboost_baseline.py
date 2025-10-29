@@ -73,44 +73,22 @@ def spatial_train_test_split_simple(coordinates, test_size=0.2, val_size=0.1, ra
 
 
 def prepare_inventory_only_features(df):
-    """Prepare features using ALL available forest inventory data (no satellite)."""
-    print("\nPreparing inventory-only features (ALL AVAILABLE)...")
+    """Prepare features using 6 numerical + BEC_ZONE only."""
+    print("\nPreparing inventory-only features (7 FEATURES - 6 NUMERICAL + BEC_ZONE)...")
     
-    # ALL forest inventory numerical features (excluding IDs, coordinates, and metadata)
-    # Live stand metrics
+    # Original 6 numerical features from baseline
     inventory_numerical = [
         'BA_HA_LS',      # Basal area per hectare - live stand
         'STEMS_HA_LS',   # Stems per hectare - live stand
         'VHA_WSV_LS',    # Volume per hectare, whole stem volume - live stand
-        'VHA_NTWB_LS',   # Volume per hectare, net timber with bark - live stand
         'SI_M_TLSO',     # Site index in meters - top live standing only
         'HT_TLSO',       # Height - top live standing only
-        'AGEB_TLSO',     # Age breast height - top live standing only
-        'AGET_TLSO',     # Age total - top live standing only
-        # Dead stand metrics
-        'BA_HA_DS',      # Basal area per hectare - dead stand
-        'STEMS_HA_DS',   # Stems per hectare - dead stand
-        'VHA_WSV_DS',    # Volume per hectare, whole stem volume - dead stand
-        'VHA_NTWB_DS',   # Volume per hectare, net timber with bark - dead stand
-        # Plot/measurement info
-        'MEAS_YR',       # Measurement year
-        'VISIT_NUMBER',  # Visit number
-        'NO_PLOTS',      # Number of plots
-        'UTIL'           # Utilization level
-        # Removed spatial coordinates: IP_EAST, IP_NRTH, IP_UTM (cause memorization/overfitting)
+        'AGEB_TLSO'      # Age breast height - top live standing only
     ]
     
-    # Categorical features (keeping only low-cardinality ones to reduce overfitting)
+    # Only BEC_ZONE categorical
     categorical_cols = [
-        'BEC_ZONE',                  # Biogeoclimatic zone (4 categories)
-        'TSA_DESC',                  # Timber supply area (31 categories)
-        'SAMPLE_ESTABLISHMENT_TYPE', # Sample type (6 categories)
-        'YSM_MAIN_FM',              # Years since main fire/management (2 categories)
-        'MAT_MAIN_FM'               # Management activity type (2 categories)
-        # Removed high-cardinality categoricals that cause overfitting:
-        # 'BECLABEL' (65 categories), 'SPC_LIVE_1' (22 categories),
-        # 'TFL' (26 categories), 'OWN_SCHED_DESCRIP' (24 categories),
-        # 'GRID_SIZE', 'GRID_BASE', 'UTM_SOURCE', 'PSP_STATUS', 'SAMP_TYP' (metadata)
+        'BEC_ZONE'  # Biogeoclimatic zone (4 categories)
     ]
     
     # Filter to valid columns that exist in dataframe
