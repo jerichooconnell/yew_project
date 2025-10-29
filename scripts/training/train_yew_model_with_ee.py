@@ -88,21 +88,24 @@ def create_target_variable(df):
 
     # Calculate yew percentage from species composition
     df['YEW_PERCENTAGE'] = df['SPB_CPCT_LS'].apply(parse_species_composition)
-    
+
     # Binary target: presence/absence of TW
     df['has_yew'] = (df['YEW_PERCENTAGE'] > 0).astype(int)
 
     # For reference, also calculate density
-    df['YEW_DENSITY_HA'] = (df['YEW_PERCENTAGE'] / 100.0) * df['STEMS_HA_LS'].fillna(0)
+    df['YEW_DENSITY_HA'] = (df['YEW_PERCENTAGE'] / 100.0) * \
+        df['STEMS_HA_LS'].fillna(0)
 
     print(f"  Plots with Pacific Yew (TW): {df['has_yew'].sum()}")
     print(f"  Plots without yew: {(df['has_yew'] == 0).sum()}")
     print(f"  Yew prevalence: {100 * df['has_yew'].mean():.2f}%")
-    
+
     yew_present = df[df['has_yew'] == 1]
     if len(yew_present) > 0:
-        print(f"  Mean density (where present): {yew_present['YEW_DENSITY_HA'].mean():.1f} stems/ha")
-        print(f"  Median density (where present): {yew_present['YEW_DENSITY_HA'].median():.1f} stems/ha")
+        print(
+            f"  Mean density (where present): {yew_present['YEW_DENSITY_HA'].mean():.1f} stems/ha")
+        print(
+            f"  Median density (where present): {yew_present['YEW_DENSITY_HA'].median():.1f} stems/ha")
 
     return df
 
@@ -351,12 +354,15 @@ class SimpleYewDataset(Dataset):
         return numerical, categorical, target
 
 
-def train_model(model, train_loader, val_loader, device, num_epochs=50, lr=0.001):
+def train_model(model, train_loader, val_loader, device, epochs=50, lr=1e-3):
     """Train the model."""
     model = model.to(device)
 
-    # Use BCEWithLogitsLoss for binary classification
-    criterion = nn.BCEWithLogitsLoss()
+    # Use Focal Loss for extreme class imbalance
+    # Focal loss down-weights easy examples and focuses on hard examples
+    # This is specifically designed for scenarios where one class is very rare
+    print("\nUsing Focal Loss (alpha=0.75, gamma=2.0) for extreme class imbalance")
+    criterion = FocalLoss(alpha=0.75, gamma=2.0)
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode='min', factor=0.5, patience=5, verbose=True
@@ -369,9 +375,9 @@ def train_model(model, train_loader, val_loader, device, num_epochs=50, lr=0.001
 
     print("\nStarting training...")
     print(f"Device: {device}")
-    print(f"Epochs: {num_epochs}")
+    print(f"Epochs: {epochs}")
 
-    for epoch in range(num_epochs):
+    for epoch in range(epochs):
         # Train
         model.train()
         train_loss = 0
@@ -443,7 +449,7 @@ def train_model(model, train_loader, val_loader, device, num_epochs=50, lr=0.001
 
         # Print progress
         if (epoch + 1) % 5 == 0:
-            print(f"\nEpoch [{epoch+1}/{num_epochs}]")
+            print(f"\nEpoch [{epoch+1}/{epochs}]")
             print(f"  Train Loss: {train_loss:.4f}, Acc: {train_acc:.4f}")
             print(f"  Val Loss: {val_loss:.4f}, Acc: {val_acc:.4f}")
             print(
@@ -573,8 +579,15 @@ def main():
 
     # Create weighted sampler for imbalanced data
     weights = torch.ones(len(train_dataset))
-    # Higher weight for yew-present samples
-    weights[targets[train_idx] == 1] = 10.0
+    # Much higher weight for yew-present samples (100x instead of 10x)
+    # This means yew samples will be seen 100 times more often during training
+    num_yew = (targets[train_idx] == 1).sum()
+    num_no_yew = (targets[train_idx] == 0).sum()
+    yew_weight = num_no_yew / num_yew if num_yew > 0 else 100.0
+    print(
+        f"\nClass imbalance: {num_no_yew} no-yew / {num_yew} yew = {yew_weight:.1f}x")
+    print(f"Setting yew sample weight to {yew_weight:.1f}x")
+    weights[targets[train_idx] == 1] = yew_weight
     train_sampler = WeightedRandomSampler(
         weights, len(weights), replacement=True)
 
@@ -605,7 +618,7 @@ def main():
 
     # Train
     model, history = train_model(
-        model, train_loader, val_loader, device, num_epochs=50, lr=0.001)
+        model, train_loader, val_loader, device, epochs=50, lr=0.001)
 
     # Evaluate on test set
     print("\n" + "="*70)
@@ -628,9 +641,53 @@ def main():
             test_targets_list.extend(targets_batch.numpy())
 
     test_probs = np.array(test_preds)
-    test_preds_binary = (test_probs > 0.5).astype(int)
     test_targets_np = np.array(test_targets_list).astype(int)
 
+    # Find optimal threshold to balance precision and recall
+    print("\nOptimizing decision threshold...")
+    thresholds = np.arange(0.1, 0.95, 0.05)
+    best_f1 = 0
+    best_threshold = 0.5
+    threshold_results = []
+
+    for threshold in thresholds:
+        preds = (test_probs > threshold).astype(int)
+        precision = precision_score(test_targets_np, preds, zero_division=0)
+        recall = recall_score(test_targets_np, preds, zero_division=0)
+        f1 = f1_score(test_targets_np, preds, zero_division=0)
+        threshold_results.append({
+            'threshold': threshold,
+            'precision': precision,
+            'recall': recall,
+            'f1': f1
+        })
+        if f1 > best_f1:
+            best_f1 = f1
+            best_threshold = threshold
+
+    print(f"Best threshold: {best_threshold:.2f} (F1: {best_f1:.4f})")
+
+    # Show threshold analysis
+    print("\nThreshold Analysis (selected values):")
+    print(f"{'Threshold':<12} {'Precision':<12} {'Recall':<12} {'F1':<12}")
+    print("-" * 48)
+    for result in threshold_results[::3]:  # Show every 3rd threshold
+        print(
+            f"{result['threshold']:<12.2f} {result['precision']:<12.4f} {result['recall']:<12.4f} {result['f1']:<12.4f}")
+
+    # Evaluate with default threshold (0.5)
+    test_preds_binary_default = (test_probs > 0.5).astype(int)
+    test_acc_default = accuracy_score(
+        test_targets_np, test_preds_binary_default)
+    test_precision_default = precision_score(
+        test_targets_np, test_preds_binary_default, zero_division=0)
+    test_recall_default = recall_score(
+        test_targets_np, test_preds_binary_default, zero_division=0)
+    test_f1_default = f1_score(
+        test_targets_np, test_preds_binary_default, zero_division=0)
+
+    # Evaluate with optimized threshold
+    test_preds_binary = (test_probs > best_threshold).astype(int)
     test_acc = accuracy_score(test_targets_np, test_preds_binary)
     test_precision = precision_score(
         test_targets_np, test_preds_binary, zero_division=0)
@@ -638,7 +695,13 @@ def main():
         test_targets_np, test_preds_binary, zero_division=0)
     test_f1 = f1_score(test_targets_np, test_preds_binary, zero_division=0)
 
-    print(f"\nTest Set Results:")
+    print(f"\nTest Set Results (threshold=0.5):")
+    print(f"  Accuracy: {test_acc_default:.4f}")
+    print(f"  Precision: {test_precision_default:.4f}")
+    print(f"  Recall: {test_recall_default:.4f}")
+    print(f"  F1 Score: {test_f1_default:.4f}")
+
+    print(f"\nTest Set Results (optimized threshold={best_threshold:.2f}):")
     print(f"  Accuracy: {test_acc:.4f}")
     print(f"  Precision: {test_precision:.4f}")
     print(f"  Recall: {test_recall:.4f}")

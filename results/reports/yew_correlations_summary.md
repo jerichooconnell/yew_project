@@ -8,7 +8,7 @@ Analysis of 32,125 forest sample sites in BC found that Pacific Yew (Taxus brevi
 ### 1. **Leading Tree Species (SPC_LIVE_1)** - Strongest Predictor
 - **Cramér's V: 0.133** (medium effect size)
 - **Top Species Associated with Yew:**
-  - **MB (Mountain Birch): 4.3% yew presence** - Highest correlation
+  - **MB (Big leaf maple): 4.3% yew presence** - Highest correlation
   - **CW (Western Red Cedar): 3.2% yew presence** - Strong forest association
   - **YC (Yellow Cedar): 1.7% yew presence** - Coastal cedar forests
 
