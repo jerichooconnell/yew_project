@@ -151,9 +151,10 @@ def main():
     print("="*80)
     print()
 
+    base_dir = Path('data/ee_imagery/image_patches_64x64')
+    
     # Convert yew images
-    yew_dir = Path('data/ee_imagery/image_patches_64x64/yew')
-
+    yew_dir = base_dir / 'yew'
     if yew_dir.exists():
         print("Converting yew images...")
         convert_all_npy_files(
@@ -161,10 +162,25 @@ def main():
             output_dir=yew_dir / 'png',
             create_false_color=True
         )
+        print()
     else:
         print(f"✗ Directory not found: {yew_dir}")
+        print()
+    
+    # Convert non-yew images
+    no_yew_dir = base_dir / 'no_yew'
+    if no_yew_dir.exists():
+        print("Converting non-yew images...")
+        convert_all_npy_files(
+            no_yew_dir,
+            output_dir=no_yew_dir / 'png',
+            create_false_color=True
+        )
+        print()
+    else:
+        print(f"✗ Directory not found: {no_yew_dir}")
+        print()
 
-    print()
     print("✓ Done!")
 
 
