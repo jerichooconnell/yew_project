@@ -1,0 +1,646 @@
+{
+  "false_positives": [
+    {
+      "index": 327,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.9498183131217957,
+      "prob_yew": 0.9498183131217957,
+      "prob_not_yew": 0.050181690603494644,
+      "metadata": {
+        "image_path": "no_yew/2128272.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 327
+      }
+    },
+    {
+      "index": 307,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.9137798547744751,
+      "prob_yew": 0.9137798547744751,
+      "prob_not_yew": 0.08622012287378311,
+      "metadata": {
+        "image_path": "no_yew/4043313.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 307
+      }
+    },
+    {
+      "index": 284,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.9002008438110352,
+      "prob_yew": 0.9002008438110352,
+      "prob_not_yew": 0.09979911148548126,
+      "metadata": {
+        "image_path": "no_yew/4042372.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 284
+      }
+    },
+    {
+      "index": 360,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.8832273483276367,
+      "prob_yew": 0.8832273483276367,
+      "prob_not_yew": 0.11677264422178268,
+      "metadata": {
+        "image_path": "no_yew/4042376.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 360
+      }
+    },
+    {
+      "index": 212,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.861997663974762,
+      "prob_yew": 0.861997663974762,
+      "prob_not_yew": 0.13800236582756042,
+      "metadata": {
+        "image_path": "no_yew/4042200.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 212
+      }
+    },
+    {
+      "index": 321,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.8543742895126343,
+      "prob_yew": 0.8543742895126343,
+      "prob_not_yew": 0.14562569558620453,
+      "metadata": {
+        "image_path": "no_yew/4041679.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 321
+      }
+    },
+    {
+      "index": 240,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.837119996547699,
+      "prob_yew": 0.837119996547699,
+      "prob_not_yew": 0.16287998855113983,
+      "metadata": {
+        "image_path": "no_yew/6001895.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 240
+      }
+    },
+    {
+      "index": 247,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.8076725006103516,
+      "prob_yew": 0.8076725006103516,
+      "prob_not_yew": 0.19232751429080963,
+      "metadata": {
+        "image_path": "no_yew/6007564.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 247
+      }
+    },
+    {
+      "index": 403,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.7344642281532288,
+      "prob_yew": 0.7344642281532288,
+      "prob_not_yew": 0.265535831451416,
+      "metadata": {
+        "image_path": "no_yew/6000703.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 403
+      }
+    },
+    {
+      "index": 258,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.7029886245727539,
+      "prob_yew": 0.7029886245727539,
+      "prob_not_yew": 0.2970113754272461,
+      "metadata": {
+        "image_path": "no_yew/6003143.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 258
+      }
+    },
+    {
+      "index": 370,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.6998081207275391,
+      "prob_yew": 0.6998081207275391,
+      "prob_not_yew": 0.30019187927246094,
+      "metadata": {
+        "image_path": "no_yew/6004347.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 370
+      }
+    },
+    {
+      "index": 251,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.6836555600166321,
+      "prob_yew": 0.6836555600166321,
+      "prob_not_yew": 0.3163444995880127,
+      "metadata": {
+        "image_path": "no_yew/1403701.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 251
+      }
+    },
+    {
+      "index": 273,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.6772774457931519,
+      "prob_yew": 0.6772774457931519,
+      "prob_not_yew": 0.32272258400917053,
+      "metadata": {
+        "image_path": "no_yew/6002979.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 273
+      }
+    },
+    {
+      "index": 379,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.6771268844604492,
+      "prob_yew": 0.6771268844604492,
+      "prob_not_yew": 0.3228730857372284,
+      "metadata": {
+        "image_path": "no_yew/6003770.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 379
+      }
+    },
+    {
+      "index": 408,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.6761335134506226,
+      "prob_yew": 0.6761335134506226,
+      "prob_not_yew": 0.32386651635169983,
+      "metadata": {
+        "image_path": "no_yew/4002547.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 408
+      }
+    },
+    {
+      "index": 455,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.6715839505195618,
+      "prob_yew": 0.6715839505195618,
+      "prob_not_yew": 0.32841604948043823,
+      "metadata": {
+        "image_path": "no_yew/4042299.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 455
+      }
+    },
+    {
+      "index": 483,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.662237823009491,
+      "prob_yew": 0.662237823009491,
+      "prob_not_yew": 0.3377622067928314,
+      "metadata": {
+        "image_path": "no_yew/6004308.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 483
+      }
+    },
+    {
+      "index": 376,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.6375582814216614,
+      "prob_yew": 0.6375582814216614,
+      "prob_not_yew": 0.36244168877601624,
+      "metadata": {
+        "image_path": "no_yew/4001717.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 376
+      }
+    },
+    {
+      "index": 223,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.6332341432571411,
+      "prob_yew": 0.6332341432571411,
+      "prob_not_yew": 0.3667658567428589,
+      "metadata": {
+        "image_path": "no_yew/6000694.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 223
+      }
+    },
+    {
+      "index": 293,
+      "true_label": 0,
+      "pred_label": 1,
+      "confidence": 0.6103690266609192,
+      "prob_yew": 0.6103690266609192,
+      "prob_not_yew": 0.3896310031414032,
+      "metadata": {
+        "image_path": "no_yew/6003540.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": NaN,
+        "source_dataset": null,
+        "index": 293
+      }
+    }
+  ],
+  "false_negatives": [
+    {
+      "index": 47,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9917962551116943,
+      "prob_yew": 0.008203724399209023,
+      "prob_not_yew": 0.9917962551116943,
+      "metadata": {
+        "image_path": "inat_yew/inat_16003666.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 16003666.0,
+        "source_dataset": null,
+        "index": 47
+      }
+    },
+    {
+      "index": 44,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9636737108230591,
+      "prob_yew": 0.03632630407810211,
+      "prob_not_yew": 0.9636737108230591,
+      "metadata": {
+        "image_path": "inat_yew/inat_20335301.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 20335301.0,
+        "source_dataset": null,
+        "index": 44
+      }
+    },
+    {
+      "index": 186,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9582952260971069,
+      "prob_yew": 0.04170471802353859,
+      "prob_not_yew": 0.9582952260971069,
+      "metadata": {
+        "image_path": "inat_yew/inat_15119406.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 15119406.0,
+        "source_dataset": null,
+        "index": 186
+      }
+    },
+    {
+      "index": 207,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9547394514083862,
+      "prob_yew": 0.045260507613420486,
+      "prob_not_yew": 0.9547394514083862,
+      "metadata": {
+        "image_path": "inat_yew/inat_133243157.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 133243157.0,
+        "source_dataset": null,
+        "index": 207
+      }
+    },
+    {
+      "index": 190,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9494836330413818,
+      "prob_yew": 0.050516437739133835,
+      "prob_not_yew": 0.9494836330413818,
+      "metadata": {
+        "image_path": "inat_yew/inat_21094392.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 21094392.0,
+        "source_dataset": null,
+        "index": 190
+      }
+    },
+    {
+      "index": 141,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9471043348312378,
+      "prob_yew": 0.05289565771818161,
+      "prob_not_yew": 0.9471043348312378,
+      "metadata": {
+        "image_path": "inat_yew/inat_19800690.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 19800690.0,
+        "source_dataset": null,
+        "index": 141
+      }
+    },
+    {
+      "index": 179,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.944024384021759,
+      "prob_yew": 0.055975668132305145,
+      "prob_not_yew": 0.944024384021759,
+      "metadata": {
+        "image_path": "inat_yew/inat_248660275.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 248660275.0,
+        "source_dataset": null,
+        "index": 179
+      }
+    },
+    {
+      "index": 7,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.943170964717865,
+      "prob_yew": 0.05682903155684471,
+      "prob_not_yew": 0.943170964717865,
+      "metadata": {
+        "image_path": "inat_yew/inat_74485061.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 74485061.0,
+        "source_dataset": null,
+        "index": 7
+      }
+    },
+    {
+      "index": 37,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9419224858283997,
+      "prob_yew": 0.05807749181985855,
+      "prob_not_yew": 0.9419224858283997,
+      "metadata": {
+        "image_path": "inat_yew/inat_83448816.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 83448816.0,
+        "source_dataset": null,
+        "index": 37
+      }
+    },
+    {
+      "index": 18,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9403582811355591,
+      "prob_yew": 0.059641722589731216,
+      "prob_not_yew": 0.9403582811355591,
+      "metadata": {
+        "image_path": "inat_yew/inat_94788391.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 94788391.0,
+        "source_dataset": null,
+        "index": 18
+      }
+    },
+    {
+      "index": 151,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.93455970287323,
+      "prob_yew": 0.06544025987386703,
+      "prob_not_yew": 0.93455970287323,
+      "metadata": {
+        "image_path": "inat_yew/inat_237059004.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 237059004.0,
+        "source_dataset": null,
+        "index": 151
+      }
+    },
+    {
+      "index": 94,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9307110905647278,
+      "prob_yew": 0.06928892433643341,
+      "prob_not_yew": 0.9307110905647278,
+      "metadata": {
+        "image_path": "inat_yew/inat_238154502.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 238154502.0,
+        "source_dataset": null,
+        "index": 94
+      }
+    },
+    {
+      "index": 9,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9263786673545837,
+      "prob_yew": 0.07362136989831924,
+      "prob_not_yew": 0.9263786673545837,
+      "metadata": {
+        "image_path": "inat_yew/inat_161828441.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 161828441.0,
+        "source_dataset": null,
+        "index": 9
+      }
+    },
+    {
+      "index": 108,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9203983545303345,
+      "prob_yew": 0.07960162311792374,
+      "prob_not_yew": 0.9203983545303345,
+      "metadata": {
+        "image_path": "inat_yew/inat_87501819.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 87501819.0,
+        "source_dataset": null,
+        "index": 108
+      }
+    },
+    {
+      "index": 19,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9202479720115662,
+      "prob_yew": 0.07975198328495026,
+      "prob_not_yew": 0.9202479720115662,
+      "metadata": {
+        "image_path": "inat_yew/inat_190123105.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 190123105.0,
+        "source_dataset": null,
+        "index": 19
+      }
+    },
+    {
+      "index": 21,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9158405661582947,
+      "prob_yew": 0.08415943384170532,
+      "prob_not_yew": 0.9158405661582947,
+      "metadata": {
+        "image_path": "inat_yew/inat_8478056.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 8478056.0,
+        "source_dataset": null,
+        "index": 21
+      }
+    },
+    {
+      "index": 111,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9096525311470032,
+      "prob_yew": 0.09034747630357742,
+      "prob_not_yew": 0.9096525311470032,
+      "metadata": {
+        "image_path": "inat_yew/inat_180077117.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 180077117.0,
+        "source_dataset": null,
+        "index": 111
+      }
+    },
+    {
+      "index": 88,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.9021257162094116,
+      "prob_yew": 0.09787426143884659,
+      "prob_not_yew": 0.9021257162094116,
+      "metadata": {
+        "image_path": "inat_yew/inat_22059226.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 22059226.0,
+        "source_dataset": null,
+        "index": 88
+      }
+    },
+    {
+      "index": 126,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.882749617099762,
+      "prob_yew": 0.11725039035081863,
+      "prob_not_yew": 0.882749617099762,
+      "metadata": {
+        "image_path": "inat_yew/inat_163726691.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 163726691.0,
+        "source_dataset": null,
+        "index": 126
+      }
+    },
+    {
+      "index": 101,
+      "true_label": 1,
+      "pred_label": 0,
+      "confidence": 0.8773866891860962,
+      "prob_yew": 0.12261330336332321,
+      "prob_not_yew": 0.8773866891860962,
+      "metadata": {
+        "image_path": "inat_yew/inat_169328535.npy",
+        "latitude": null,
+        "longitude": null,
+        "observation_id": 169328535.0,
+        "source_dataset": null,
+        "index": 101
+      }
+    }
+  ]
+}

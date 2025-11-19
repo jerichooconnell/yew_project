@@ -1,0 +1,14 @@
+{
+  "timestamp": "20251119_141418",
+  "model_path": "models/checkpoints/resnet18_20251119_121738_best.pth",
+  "region": {
+    "lat_min": 48.44,
+    "lat_max": 48.47,
+    "lon_min": -124.11,
+    "lon_max": -124.0
+  },
+  "grid_spacing": 0.002,
+  "total_points": 880,
+  "successful_predictions": 880,
+  "device": "cuda"
+}

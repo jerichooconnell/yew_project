@@ -152,11 +152,11 @@ def main():
     print()
 
     base_dir = Path('data/ee_imagery/image_patches_64x64')
-    
-    # Convert yew images
+
+    # Convert forestry yew images
     yew_dir = base_dir / 'yew'
     if yew_dir.exists():
-        print("Converting yew images...")
+        print("Converting forestry yew images...")
         convert_all_npy_files(
             yew_dir,
             output_dir=yew_dir / 'png',
@@ -166,11 +166,25 @@ def main():
     else:
         print(f"✗ Directory not found: {yew_dir}")
         print()
-    
+
+    # Convert iNaturalist yew images
+    inat_yew_dir = base_dir / 'inat_yew'
+    if inat_yew_dir.exists():
+        print("Converting iNaturalist yew images...")
+        convert_all_npy_files(
+            inat_yew_dir,
+            output_dir=inat_yew_dir / 'png',
+            create_false_color=True
+        )
+        print()
+    else:
+        print(f"✗ Directory not found: {inat_yew_dir}")
+        print()
+
     # Convert non-yew images
     no_yew_dir = base_dir / 'no_yew'
     if no_yew_dir.exists():
-        print("Converting non-yew images...")
+        print("Converting non-yew (forestry) images...")
         convert_all_npy_files(
             no_yew_dir,
             output_dir=no_yew_dir / 'png',

@@ -1,0 +1,222 @@
+================================================================================
+MISCLASSIFICATION ANALYSIS REPORT
+================================================================================
+
+FALSE POSITIVES: 20
+(Model predicted YEW, but actually NOT YEW)
+--------------------------------------------------------------------------------
+
+1. Confidence: 95.0%
+   P(yew) = 0.950
+   Image: no_yew/2128272.npy
+
+2. Confidence: 91.4%
+   P(yew) = 0.914
+   Image: no_yew/4043313.npy
+
+3. Confidence: 90.0%
+   P(yew) = 0.900
+   Image: no_yew/4042372.npy
+
+4. Confidence: 88.3%
+   P(yew) = 0.883
+   Image: no_yew/4042376.npy
+
+5. Confidence: 86.2%
+   P(yew) = 0.862
+   Image: no_yew/4042200.npy
+
+6. Confidence: 85.4%
+   P(yew) = 0.854
+   Image: no_yew/4041679.npy
+
+7. Confidence: 83.7%
+   P(yew) = 0.837
+   Image: no_yew/6001895.npy
+
+8. Confidence: 80.8%
+   P(yew) = 0.808
+   Image: no_yew/6007564.npy
+
+9. Confidence: 73.4%
+   P(yew) = 0.734
+   Image: no_yew/6000703.npy
+
+10. Confidence: 70.3%
+   P(yew) = 0.703
+   Image: no_yew/6003143.npy
+
+11. Confidence: 70.0%
+   P(yew) = 0.700
+   Image: no_yew/6004347.npy
+
+12. Confidence: 68.4%
+   P(yew) = 0.684
+   Image: no_yew/1403701.npy
+
+13. Confidence: 67.7%
+   P(yew) = 0.677
+   Image: no_yew/6002979.npy
+
+14. Confidence: 67.7%
+   P(yew) = 0.677
+   Image: no_yew/6003770.npy
+
+15. Confidence: 67.6%
+   P(yew) = 0.676
+   Image: no_yew/4002547.npy
+
+16. Confidence: 67.2%
+   P(yew) = 0.672
+   Image: no_yew/4042299.npy
+
+17. Confidence: 66.2%
+   P(yew) = 0.662
+   Image: no_yew/6004308.npy
+
+18. Confidence: 63.8%
+   P(yew) = 0.638
+   Image: no_yew/4001717.npy
+
+19. Confidence: 63.3%
+   P(yew) = 0.633
+   Image: no_yew/6000694.npy
+
+20. Confidence: 61.0%
+   P(yew) = 0.610
+   Image: no_yew/6003540.npy
+
+
+FALSE NEGATIVES: 20
+(Model predicted NOT YEW, but actually YEW)
+--------------------------------------------------------------------------------
+
+1. Confidence: 99.2%
+   P(not yew) = 0.992
+   Image: inat_yew/inat_16003666.npy
+   iNaturalist ID: 16003666.0
+   URL: https://www.inaturalist.org/observations/16003666.0
+
+2. Confidence: 96.4%
+   P(not yew) = 0.964
+   Image: inat_yew/inat_20335301.npy
+   iNaturalist ID: 20335301.0
+   URL: https://www.inaturalist.org/observations/20335301.0
+
+3. Confidence: 95.8%
+   P(not yew) = 0.958
+   Image: inat_yew/inat_15119406.npy
+   iNaturalist ID: 15119406.0
+   URL: https://www.inaturalist.org/observations/15119406.0
+
+4. Confidence: 95.5%
+   P(not yew) = 0.955
+   Image: inat_yew/inat_133243157.npy
+   iNaturalist ID: 133243157.0
+   URL: https://www.inaturalist.org/observations/133243157.0
+
+5. Confidence: 94.9%
+   P(not yew) = 0.949
+   Image: inat_yew/inat_21094392.npy
+   iNaturalist ID: 21094392.0
+   URL: https://www.inaturalist.org/observations/21094392.0
+
+6. Confidence: 94.7%
+   P(not yew) = 0.947
+   Image: inat_yew/inat_19800690.npy
+   iNaturalist ID: 19800690.0
+   URL: https://www.inaturalist.org/observations/19800690.0
+
+7. Confidence: 94.4%
+   P(not yew) = 0.944
+   Image: inat_yew/inat_248660275.npy
+   iNaturalist ID: 248660275.0
+   URL: https://www.inaturalist.org/observations/248660275.0
+
+8. Confidence: 94.3%
+   P(not yew) = 0.943
+   Image: inat_yew/inat_74485061.npy
+   iNaturalist ID: 74485061.0
+   URL: https://www.inaturalist.org/observations/74485061.0
+
+9. Confidence: 94.2%
+   P(not yew) = 0.942
+   Image: inat_yew/inat_83448816.npy
+   iNaturalist ID: 83448816.0
+   URL: https://www.inaturalist.org/observations/83448816.0
+
+10. Confidence: 94.0%
+   P(not yew) = 0.940
+   Image: inat_yew/inat_94788391.npy
+   iNaturalist ID: 94788391.0
+   URL: https://www.inaturalist.org/observations/94788391.0
+
+11. Confidence: 93.5%
+   P(not yew) = 0.935
+   Image: inat_yew/inat_237059004.npy
+   iNaturalist ID: 237059004.0
+   URL: https://www.inaturalist.org/observations/237059004.0
+
+12. Confidence: 93.1%
+   P(not yew) = 0.931
+   Image: inat_yew/inat_238154502.npy
+   iNaturalist ID: 238154502.0
+   URL: https://www.inaturalist.org/observations/238154502.0
+
+13. Confidence: 92.6%
+   P(not yew) = 0.926
+   Image: inat_yew/inat_161828441.npy
+   iNaturalist ID: 161828441.0
+   URL: https://www.inaturalist.org/observations/161828441.0
+
+14. Confidence: 92.0%
+   P(not yew) = 0.920
+   Image: inat_yew/inat_87501819.npy
+   iNaturalist ID: 87501819.0
+   URL: https://www.inaturalist.org/observations/87501819.0
+
+15. Confidence: 92.0%
+   P(not yew) = 0.920
+   Image: inat_yew/inat_190123105.npy
+   iNaturalist ID: 190123105.0
+   URL: https://www.inaturalist.org/observations/190123105.0
+
+16. Confidence: 91.6%
+   P(not yew) = 0.916
+   Image: inat_yew/inat_8478056.npy
+   iNaturalist ID: 8478056.0
+   URL: https://www.inaturalist.org/observations/8478056.0
+
+17. Confidence: 91.0%
+   P(not yew) = 0.910
+   Image: inat_yew/inat_180077117.npy
+   iNaturalist ID: 180077117.0
+   URL: https://www.inaturalist.org/observations/180077117.0
+
+18. Confidence: 90.2%
+   P(not yew) = 0.902
+   Image: inat_yew/inat_22059226.npy
+   iNaturalist ID: 22059226.0
+   URL: https://www.inaturalist.org/observations/22059226.0
+
+19. Confidence: 88.3%
+   P(not yew) = 0.883
+   Image: inat_yew/inat_163726691.npy
+   iNaturalist ID: 163726691.0
+   URL: https://www.inaturalist.org/observations/163726691.0
+
+20. Confidence: 87.7%
+   P(not yew) = 0.877
+   Image: inat_yew/inat_169328535.npy
+   iNaturalist ID: 169328535.0
+   URL: https://www.inaturalist.org/observations/169328535.0
+
+================================================================================
+
+KEY INSIGHTS:
+--------------------------------------------------------------------------------
+• Review false positives for common visual features
+• Check if false negatives have poor image quality
+• Look for geographic patterns in misclassifications
+• Consider excluding problematic samples from training
+
