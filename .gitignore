@@ -28,22 +28,31 @@ env/
 
 # Jupyter Notebook
 .ipynb_checkpoints
-*.ipynb
 
-# PyTorch
-*.pth
-*.pt
-!models/checkpoints/*.pth  # Keep model checkpoints
+# PyTorch Models - exclude all checkpoints (too large for git)
+# If you want to include the latest model, comment out the line below:
+models/checkpoints/
 
-# Data
-*.csv
-!data/lookup_tables/*.txt  # Keep lookup tables
+
+# Data - exclude large raw/processed data but keep small files
 data/raw/
+data/inat_observations/
 data/processed/
+!data/processed/global_normalization_stats.json
+!data/processed/*.txt
+data/ee_imagery/image_patches_*/*
+data/ee_imagery/*.csv
+data/ee_imagery/temp_*.csv
+!data/ee_imagery/*_metadata.json
+data/ee_imagery/*
+
+# Model artifacts (large pickle files)
+models/artifacts/
 
 # Models
 *.pkl
 !models/artifacts/*.pkl  # Keep model artifacts
+*.pth
 
 # IDE
 .vscode/
@@ -65,9 +74,15 @@ desktop.ini
 *.log
 logs/
 
-# Results (optional - comment out if you want to track)
-results/figures/*.png
-results/tables/*.csv
+# Results - exclude large prediction caches and high-res figures
+results/predictions/*/tile_cache/
+results/predictions/*/predictions_*.csv
+results/predictions/*/*_overlay_high_res.png
+results/predictions/*/*_satellite_overlay.png
+!results/predictions/*/metadata_*.json
+!results/predictions/*/*.png
+results/figures/*_high_res.png
+!results/figures/README.md
 
 # Temporary files
 *.tmp

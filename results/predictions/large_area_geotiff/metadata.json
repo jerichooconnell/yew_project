@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-01-14T16:35:09.792783",
+  "method": "aligned_chunks_crs_transform",
+  "bbox": {
+    "lat_min": 48.44,
+    "lat_max": 48.47,
+    "lon_min": -124.11,
+    "lon_max": -124.002
+  },
+  "year": 2024,
+  "scale_m": 10,
+  "grid": {
+    "width": 796,
+    "height": 334,
+    "crs_transform": [
+      0.0001358398575979347,
+      0,
+      -124.11,
+      0,
+      -9.009009009009009e-05,
+      48.47
+    ]
+  },
+  "prob_grid_shape": [
+    334,
+    796
+  ],
+  "embedding_shape": [
+    334,
+    796,
+    64
+  ],
+  "rgb_shape": [
+    334,
+    796,
+    3
+  ],
+  "model": {
+    "type": "SVM with StandardScaler",
+    "kernel": "rbf",
+    "training_samples": 2439,
+    "validation_accuracy": 0.9425051334702259,
+    "validation_f1": 0.9320388349514563,
+    "validation_roc_auc": 0.9896091811414391
+  },
+  "statistics": {
+    "mean": 0.31979477405548096,
+    "median": 0.245931938290596,
+    "std": 0.27362489700317383,
+    "min": 0.004555924329906702,
+    "max": 0.9999968409538269,
+    "pixels_above_30": 116695,
+    "pixels_above_50": 68133,
+    "pixels_above_70": 33274,
+    "pixels_above_90": 11041
+  }
+}

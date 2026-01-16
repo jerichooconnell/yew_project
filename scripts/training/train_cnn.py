@@ -408,6 +408,11 @@ def main():
                         help='Random seed')
     parser.add_argument('--use-filtered', action='store_true',
                         help='Use filtered dataset (CA removed, only "good" samples)')
+    parser.add_argument('--use-global-norm', action='store_true',
+                        help='Use global normalization (preserves reflectance scale)')
+    parser.add_argument('--global-stats', type=str,
+                        default='data/processed/global_normalization_stats.json',
+                        help='Path to global statistics JSON file')
 
     args = parser.parse_args()
 
@@ -426,7 +431,9 @@ def main():
         'early_stopping_patience': args.early_stopping,
         'num_workers': args.num_workers,
         'random_seed': args.seed,
-        'use_filtered': args.use_filtered
+        'use_filtered': args.use_filtered,
+        'use_global_norm': args.use_global_norm,
+        'global_stats_path': args.global_stats if args.use_global_norm else None
     }
 
     # Data paths
@@ -442,13 +449,21 @@ def main():
         image_base_dir = 'data/ee_imagery/image_patches_64x64'
 
     # Create dataloaders
+    if args.use_global_norm:
+        print(f"\n*** Using GLOBAL normalization (preserves reflectance scale) ***")
+        print(f"    Stats file: {args.global_stats}\n")
+    else:
+        print("\n*** Using PER-IMAGE percentile normalization ***\n")
+
     print("Loading datasets...")
     train_loader, val_loader, dataset_info = get_dataloaders(
         yew_metadata, no_yew_metadata, image_base_dir,
         batch_size=args.batch_size,
         val_split=args.val_split,
         num_workers=args.num_workers,
-        random_seed=args.seed
+        random_seed=args.seed,
+        global_stats_path=config['global_stats_path'],
+        use_global_norm=args.use_global_norm
     )
 
     print(f"\nDataset Summary:")

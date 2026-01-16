@@ -160,8 +160,15 @@ def extract_sentinel2_patch(lat, lon, patch_size=64, scale=10, cache_dir=None):
         return None
 
 
-def preprocess_image(image):
-    """Preprocess image for model input."""
+def preprocess_image(image, use_global_norm=False, global_mean=None, global_std=None):
+    """Preprocess image for model input.
+
+    Args:
+        image: Raw image data (4, 64, 64)
+        use_global_norm: Whether to use global normalization
+        global_mean: Global mean for each channel (array of 4 values)
+        global_std: Global std for each channel (array of 4 values)
+    """
     if image is None:
         return None
 
@@ -172,20 +179,27 @@ def preprocess_image(image):
     # Convert to (H, W, C) for preprocessing
     img = np.transpose(image, (1, 2, 0))  # (64, 64, 4)
 
-    # Normalize to [0, 1] using percentile clipping
     img_normalized = np.zeros_like(img, dtype=np.float32)
-    for i in range(4):
-        band = img[:, :, i]
-        p_low = np.percentile(band, 2)
-        p_high = np.percentile(band, 98)
-        band_clipped = np.clip(band, p_low, p_high)
-        band_min = band_clipped.min()
-        band_max = band_clipped.max()
-        if band_max > band_min:
+
+    if use_global_norm and global_mean is not None and global_std is not None:
+        # Global normalization: (pixel - mean) / std
+        for i in range(4):
             img_normalized[:, :, i] = (
-                band_clipped - band_min) / (band_max - band_min)
-        else:
-            img_normalized[:, :, i] = 0.0
+                img[:, :, i] - global_mean[i]) / global_std[i]
+    else:
+        # Per-image normalization: percentile clipping then min-max to [0, 1]
+        for i in range(4):
+            band = img[:, :, i]
+            p_low = np.percentile(band, 2)
+            p_high = np.percentile(band, 98)
+            band_clipped = np.clip(band, p_low, p_high)
+            band_min = band_clipped.min()
+            band_max = band_clipped.max()
+            if band_max > band_min:
+                img_normalized[:, :, i] = (
+                    band_clipped - band_min) / (band_max - band_min)
+            else:
+                img_normalized[:, :, i] = 0.0
 
     # Convert to tensor and add batch dimension
     img_tensor = torch.from_numpy(img_normalized).permute(2, 0, 1).unsqueeze(0)
@@ -518,8 +532,32 @@ def main():
                         help='Output directory')
     parser.add_argument('--no-cache', action='store_true',
                         help='Disable tile caching (re-extract all tiles)')
+    parser.add_argument('--use-global-norm', action='store_true',
+                        help='Use global normalization (preserves reflectance scale)')
+    parser.add_argument('--global-stats', type=str,
+                        default='data/processed/global_normalization_stats.json',
+                        help='Path to global normalization statistics JSON file')
 
     args = parser.parse_args()
+
+    # Load global normalization statistics if needed
+    global_mean = None
+    global_std = None
+    if args.use_global_norm:
+        stats_path = Path(args.global_stats)
+        if stats_path.exists():
+            with open(stats_path, 'r') as f:
+                stats = json.load(f)
+            global_mean = np.array(stats['mean'])
+            global_std = np.array(stats['std'])
+            print(
+                f"✓ Loaded global normalization statistics from: {stats_path}")
+            print(f"  Mean: {global_mean}")
+            print(f"  Std:  {global_std}")
+        else:
+            print(f"✗ Global stats file not found: {stats_path}")
+            print("  Falling back to per-image normalization")
+            args.use_global_norm = False
 
     # Setup
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -562,7 +600,8 @@ def main():
 
         if image is not None:
             # Preprocess
-            img_tensor = preprocess_image(image)
+            img_tensor = preprocess_image(
+                image, args.use_global_norm, global_mean, global_std)
 
             if img_tensor is not None:
                 batch_images.append(img_tensor)

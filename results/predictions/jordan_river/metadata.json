@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-01-15T13:45:24.942942",
+  "method": "single_export_by_bands",
+  "bbox": {
+    "lat_min": 48.380546139412935,
+    "lat_max": 48.487335210862845,
+    "lon_min": -124.08772973263717,
+    "lon_max": -123.83728529551638
+  },
+  "year": 2024,
+  "scale_m": 10,
+  "prob_grid_shape": [
+    1191,
+    2789
+  ],
+  "embedding_shape": [
+    1191,
+    2789,
+    64
+  ],
+  "rgb_shape": [
+    1191,
+    2789,
+    3
+  ],
+  "model": {
+    "type": "SVM with StandardScaler",
+    "kernel": "rbf",
+    "training_samples": 2439,
+    "validation_accuracy": 0.9425051334702259,
+    "validation_f1": 0.9320388349514563,
+    "validation_roc_auc": 0.9896091811414391
+  },
+  "statistics": {
+    "mean": 0.32790082693099976,
+    "median": 0.20427961647510529,
+    "std": 0.3061569035053253,
+    "min": 0.0036922581493854523,
+    "max": 0.9999990463256836,
+    "pixels_above_30": 1360803,
+    "pixels_above_50": 918713,
+    "pixels_above_70": 574528,
+    "pixels_above_90": 263220
+  }
+}

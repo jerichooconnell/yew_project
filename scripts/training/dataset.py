@@ -9,6 +9,7 @@ Author: GitHub Copilot
 Date: November 14, 2025
 """
 
+import json
 import numpy as np
 import pandas as pd
 import torch
@@ -21,15 +22,33 @@ from albumentations.pytorch import ToTensorV2
 class SatelliteImageDataset(Dataset):
     """Dataset for loading satellite images with 4 channels (B, G, R, NIR)."""
 
-    def __init__(self, metadata_files, image_base_dir, transform=None, augment=False):
+    def __init__(self, metadata_files, image_base_dir, transform=None, augment=False,
+                 global_stats_path=None, use_global_norm=False):
         """
         Args:
             metadata_files: List of metadata CSV paths or single path
             image_base_dir: Base directory containing image subdirectories
             transform: Albumentations transform pipeline
             augment: Whether to apply data augmentation
+            global_stats_path: Path to global statistics JSON file
+            use_global_norm: If True, use global statistics; otherwise use per-image normalization
         """
         self.image_base_dir = Path(image_base_dir)
+        self.use_global_norm = use_global_norm
+
+        # Load global statistics if provided
+        if use_global_norm and global_stats_path:
+            with open(global_stats_path, 'r') as f:
+                stats = json.load(f)
+            self.global_mean = np.array(stats['mean'], dtype=np.float32)
+            self.global_std = np.array(stats['std'], dtype=np.float32)
+            print(
+                f"Loaded global normalization statistics from: {global_stats_path}")
+            print(f"  Mean: {self.global_mean}")
+            print(f"  Std:  {self.global_std}")
+        else:
+            self.global_mean = None
+            self.global_std = None
 
         # Load metadata
         if isinstance(metadata_files, (list, tuple)):
@@ -76,20 +95,28 @@ class SatelliteImageDataset(Dataset):
         # Convert to (H, W, C) for albumentations
         img = np.transpose(img, (1, 2, 0))  # (64, 64, 4)
 
-        # Normalize to [0, 1] using percentile clipping
+        # Normalize based on selected method
         img_normalized = np.zeros_like(img, dtype=np.float32)
-        for i in range(4):
-            band = img[:, :, i]
-            p_low = np.percentile(band, 2)
-            p_high = np.percentile(band, 98)
-            band_clipped = np.clip(band, p_low, p_high)
-            band_min = band_clipped.min()
-            band_max = band_clipped.max()
-            if band_max > band_min:
+
+        if self.use_global_norm and self.global_mean is not None:
+            # Global normalization: preserves relative reflectance
+            for i in range(4):
                 img_normalized[:, :, i] = (
-                    band_clipped - band_min) / (band_max - band_min)
-            else:
-                img_normalized[:, :, i] = 0.0
+                    img[:, :, i] - self.global_mean[i]) / self.global_std[i]
+        else:
+            # Per-image percentile normalization: original method
+            for i in range(4):
+                band = img[:, :, i]
+                p_low = np.percentile(band, 2)
+                p_high = np.percentile(band, 98)
+                band_clipped = np.clip(band, p_low, p_high)
+                band_min = band_clipped.min()
+                band_max = band_clipped.max()
+                if band_max > band_min:
+                    img_normalized[:, :, i] = (
+                        band_clipped - band_min) / (band_max - band_min)
+                else:
+                    img_normalized[:, :, i] = 0.0
 
         # Apply transforms
         if self.transform:
@@ -131,7 +158,8 @@ def custom_collate_fn(batch):
 
 
 def get_dataloaders(yew_metadata, no_yew_metadata, image_base_dir,
-                    batch_size=16, val_split=0.2, num_workers=4, random_seed=42):
+                    batch_size=16, val_split=0.2, num_workers=4, random_seed=42,
+                    global_stats_path=None, use_global_norm=False):
     """
     Create train and validation dataloaders with balanced classes.
 
@@ -143,6 +171,8 @@ def get_dataloaders(yew_metadata, no_yew_metadata, image_base_dir,
         val_split: Fraction of data for validation
         num_workers: Number of data loading workers
         random_seed: Random seed for reproducibility
+        global_stats_path: Path to global statistics JSON file
+        use_global_norm: If True, use global statistics normalization
 
     Returns:
         train_loader, val_loader, dataset_info dict
@@ -189,13 +219,17 @@ def get_dataloaders(yew_metadata, no_yew_metadata, image_base_dir,
     train_dataset = SatelliteImageDataset(
         'data/processed/train_split.csv',
         image_base_dir,
-        augment=True
+        augment=True,
+        global_stats_path=global_stats_path,
+        use_global_norm=use_global_norm
     )
 
     val_dataset = SatelliteImageDataset(
         'data/processed/val_split.csv',
         image_base_dir,
-        augment=False
+        augment=False,
+        global_stats_path=global_stats_path,
+        use_global_norm=use_global_norm
     )
 
     # Create dataloaders with custom collate function
