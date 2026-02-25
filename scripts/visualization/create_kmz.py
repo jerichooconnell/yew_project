@@ -155,6 +155,73 @@ def create_legend_image():
     return img
 
 
+def _remove_tile_duplicates(prob_grid, tile_info_path):
+    """Remove duplicate boundary pixels from a stitched tile grid.
+
+    When GEE tiles are downloaded with adjacent bboxes (tile-N east == tile-N+1
+    west), GEE includes the boundary pixel in BOTH downloads.  Naïve
+    concatenation therefore duplicates one column at each vertical boundary and
+    one row at each horizontal boundary.
+
+    This function removes those duplicates so that every pixel in the output
+    maps to a unique geographic position.
+
+    Returns (deduped_grid, n_tile_rows, n_tile_cols) or the original grid
+    unchanged if tile_info is not available.
+    """
+    if not Path(tile_info_path).exists():
+        return prob_grid, 1, 1
+
+    with open(tile_info_path) as f:
+        tile_info = json.load(f)
+
+    n_tile_rows = tile_info.get('n_rows', 1)
+    n_tile_cols = tile_info.get('n_cols', 1)
+    tiles = tile_info['tiles']
+
+    if n_tile_rows <= 1 and n_tile_cols <= 1:
+        return prob_grid, 1, 1
+
+    # Build list of per-tile pixel heights/widths (from tile_info shapes)
+    tile_shapes = {}
+    for t in tiles:
+        r, c = t['row'], t['col']
+        tile_shapes[(r, c)] = tuple(t['shape'])  # (rows, cols)
+
+    h, w = prob_grid.shape
+
+    # --- Remove duplicate columns (vertical boundaries) ---
+    # Each tile in a row contributes its full width.  At boundary between
+    # col c and col c+1 there is 1 shared column.  We strip the LAST column
+    # of every tile except the rightmost one.
+    if n_tile_cols > 1:
+        col_widths = [tile_shapes.get((0, c), (0, 0))[1] for c in range(n_tile_cols)]
+        keep_cols = np.ones(w, dtype=bool)
+        offset = 0
+        for c in range(n_tile_cols - 1):  # skip last tile
+            offset += col_widths[c]
+            # The last column of this tile (= first column of next tile) is
+            # at index offset-1 in the stitched array.
+            if offset - 1 < w:
+                keep_cols[offset - 1] = False
+        prob_grid = prob_grid[:, keep_cols]
+
+    h, w = prob_grid.shape
+
+    # --- Remove duplicate rows (horizontal boundaries) ---
+    if n_tile_rows > 1:
+        row_heights = [tile_shapes.get((r, 0), (0, 0))[0] for r in range(n_tile_rows)]
+        keep_rows = np.ones(h, dtype=bool)
+        offset = 0
+        for r in range(n_tile_rows - 1):  # skip last tile
+            offset += row_heights[r]
+            if offset - 1 < h:
+                keep_rows[offset - 1] = False
+        prob_grid = prob_grid[keep_rows, :]
+
+    return prob_grid, n_tile_rows, n_tile_cols
+
+
 def create_kmz(input_dir, output_path=None, threshold=0.0, name=None):
     """Create KMZ file from prediction results."""
     input_dir = Path(input_dir)
@@ -162,40 +229,150 @@ def create_kmz(input_dir, output_path=None, threshold=0.0, name=None):
     # Load data
     print("Loading data...")
     prob_grid = np.load(input_dir / 'prob_grid.npy')
-    print(f"  Probability grid: {prob_grid.shape}")
+    print(f"  Probability grid (raw stitched): {prob_grid.shape}")
     
     with open(input_dir / 'metadata.json', 'r') as f:
         metadata = json.load(f)
     
     bbox = metadata.get('bbox', {})
-    lat_min = bbox.get('lat_min', 0)
-    lat_max = bbox.get('lat_max', 0)
-    lon_min = bbox.get('lon_min', 0)
-    lon_max = bbox.get('lon_max', 0)
+    # Support both metadata formats (SVM uses lat_min/lon_min, GPU uses south/north/west/east)
+    if 'lat_min' in bbox:
+        lat_min, lat_max = bbox['lat_min'], bbox['lat_max']
+        lon_min, lon_max = bbox['lon_min'], bbox['lon_max']
+    else:
+        lat_min, lat_max = bbox.get('south', 0), bbox.get('north', 0)
+        lon_min, lon_max = bbox.get('west', 0), bbox.get('east', 0)
     
-    print(f"  Bounds: {lat_min:.4f}°N to {lat_max:.4f}°N, {lon_min:.4f}°W to {lon_max:.4f}°W")
-    
+    print(f"  Requested bbox: {lat_min:.6f}°N to {lat_max:.6f}°N, "
+          f"{lon_min:.6f}°E to {lon_max:.6f}°E")
+
+    # ----------------------------------------------------------------
+    # Remove duplicate boundary pixels from tile stitching.
+    #
+    # When GEE tiles are downloaded with adjacent bboxes, the pixel at
+    # the shared boundary is included in BOTH tiles.  Naïve concatenation
+    # duplicates these pixels.  For a 4×7 tile grid, that's 6 extra
+    # columns and 3 extra rows.  At ~10 m/pixel this causes ~40 m of
+    # cumulative stretch error in the KMZ overlay.
+    # ----------------------------------------------------------------
+    # Try to find tile_info.json in the source prediction directory
+    tile_info_path = None
+    for candidate in [input_dir / 'tile_info.json',
+                      input_dir.parent / input_dir.name.replace('_forestry', '') / 'tile_info.json']:
+        if candidate.exists():
+            tile_info_path = candidate
+            break
+    # Also check metadata for tile_info_dir hint
+    if tile_info_path is None:
+        src = metadata.get('source_dir', '')
+        if src:
+            candidate = Path(src) / 'tile_info.json'
+            if candidate.exists():
+                tile_info_path = candidate
+
+    raw_h, raw_w = prob_grid.shape
+    if tile_info_path and tile_info_path.exists():
+        prob_grid, n_tile_rows, n_tile_cols = _remove_tile_duplicates(
+            prob_grid, tile_info_path)
+        dup_rows = raw_h - prob_grid.shape[0]
+        dup_cols = raw_w - prob_grid.shape[1]
+        if dup_rows > 0 or dup_cols > 0:
+            print(f"  Removed {dup_rows} duplicate rows, {dup_cols} duplicate cols "
+                  f"from tile stitching")
+            print(f"  Deduplicated grid: {prob_grid.shape}")
+    else:
+        print(f"  tile_info.json not found — assuming no tile duplicates")
+
+    h, w = prob_grid.shape
+
+    # ----------------------------------------------------------------
+    # Compute GEE EPSG:4326 edge-to-edge bounding box.
+    #
+    # GEE uses a fixed global pixel grid with WGS84-exact spacing:
+    #   px_deg = scale_m / (2π × 6378137 / 360)
+    # Pixel edges at n * px_deg, centres at (n + 0.5) * px_deg.
+    #
+    # GEE includes pixels whose centres fall inside [west..east] ×
+    # [south..north] (inclusive, with small floating-point tolerance).
+    # The KML LatLonBox needs the outer EDGES, not centres, so we
+    # expand by half a pixel on every side.
+    # ----------------------------------------------------------------
+    import math
+    scale_m = metadata.get('scale_m', 10)
+    WGS84_R = 6378137.0
+    px_deg = scale_m / (2.0 * math.pi * WGS84_R / 360.0)  # 0.0000898315284...°
+
+    # Use the IMAGE DIMENSIONS to compute the edge-to-edge extent.
+    # The NW pixel centre is the first GEE pixel inside the requested bbox.
+    # Snap to GEE's global grid: centres at (n + 0.5) * px_deg.
+    #
+    # GEE has ~1 m tolerance at boundaries, so use floor/ceil with a tiny
+    # nudge (1 m ≈ 1e-5°) to match GEE's inclusive behaviour.
+    tol = 1e-5  # ~1 m tolerance in degrees
+    n_west  = math.ceil ((lon_min - tol) / px_deg - 0.5)   # westernmost pixel index
+    n_north = math.floor((lat_max + tol) / px_deg - 0.5)   # northernmost pixel index
+
+    # The image has h rows and w cols; the SE pixel index follows directly:
+    n_east  = n_west + (w - 1)
+    n_south = n_north - (h - 1)
+
+    # Pixel centres
+    nw_lon = (n_west  + 0.5) * px_deg
+    nw_lat = (n_north + 0.5) * px_deg
+    se_lon = (n_east  + 0.5) * px_deg
+    se_lat = (n_south + 0.5) * px_deg
+
+    # Edge-to-edge bbox
+    half_px = px_deg / 2.0
+    edge_lon_min = nw_lon - half_px  # west
+    edge_lon_max = se_lon + half_px  # east
+    edge_lat_max = nw_lat + half_px  # north
+    edge_lat_min = se_lat - half_px  # south
+
+    mid_lat = (lat_min + lat_max) / 2.0
+    lon_m_per_deg = 111320 * math.cos(math.radians(mid_lat))
+    print(f"  WGS84 pixel size: {px_deg:.14f}° ({scale_m} m)")
+    print(f"  Deduped grid: {h} rows × {w} cols")
+    print(f"  NW pixel centre: lon={nw_lon:.10f}, lat={nw_lat:.10f}")
+    print(f"  SE pixel centre: lon={se_lon:.10f}, lat={se_lat:.10f}")
+    print(f"  Edge-to-edge bbox: N={edge_lat_max:.10f}, S={edge_lat_min:.10f}, "
+          f"W={edge_lon_min:.10f}, E={edge_lon_max:.10f}")
+    print(f"  Shift from request: "
+          f"N={(edge_lat_max - lat_max) * 111320:+.1f} m, "
+          f"S={(edge_lat_min - lat_min) * 111320:+.1f} m, "
+          f"W={(edge_lon_min - lon_min) * lon_m_per_deg:+.1f} m, "
+          f"E={(edge_lon_max - lon_max) * lon_m_per_deg:+.1f} m")
+
     # Create colormap and apply
     print("Creating probability overlay...")
     cmap = create_probability_colormap()
     rgba = apply_colormap_with_threshold(prob_grid, cmap, threshold)
-    
+
     # Convert to PIL Image
     prob_img = Image.fromarray(rgba, 'RGBA')
+
+    # Downsample if very large (Google Earth handles ~4096px well, >10K can be slow)
+    max_dim = 8192
+    if max(h, w) > max_dim:
+        scale_factor = max_dim / max(h, w)
+        new_w = int(w * scale_factor)
+        new_h = int(h * scale_factor)
+        print(f"  Downscaling for KMZ: {w}×{h} → {new_w}×{new_h}")
+        prob_img = prob_img.resize((new_w, new_h), Image.LANCZOS)
     
     # Create legend
     print("Creating legend...")
     legend_img = create_legend_image()
     
-    # Create KML
+    # Create KML  (use corrected edge-to-edge bbox)
     area_name = name or input_dir.name
     kml_content = create_kml(
         name=f"Yew Probability - {area_name}",
         description=f"Pacific Yew detection probability map. Threshold: {threshold}",
-        lat_min=lat_min,
-        lat_max=lat_max,
-        lon_min=lon_min,
-        lon_max=lon_max,
+        lat_min=edge_lat_min,
+        lat_max=edge_lat_max,
+        lon_min=edge_lon_min,
+        lon_max=edge_lon_max,
         image_filename="overlay.png"
     )
     
@@ -206,14 +383,15 @@ def create_kmz(input_dir, output_path=None, threshold=0.0, name=None):
         output_path = Path(output_path)
     
     print(f"Creating KMZ: {output_path}")
+    print(f"  Encoding overlay PNG ({prob_img.size[0]}x{prob_img.size[1]})...")
     
     with zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED) as kmz:
         # Add KML
         kmz.writestr('doc.kml', kml_content)
         
-        # Add overlay image
+        # Add overlay image (optimize PNG for speed)
         img_buffer = io.BytesIO()
-        prob_img.save(img_buffer, format='PNG')
+        prob_img.save(img_buffer, format='PNG', optimize=False, compress_level=1)
         kmz.writestr('overlay.png', img_buffer.getvalue())
         
         # Add legend

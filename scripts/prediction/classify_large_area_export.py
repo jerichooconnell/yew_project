@@ -76,6 +76,12 @@ def parse_args():
                         help='Force re-download even if cached')
     parser.add_argument('--max-bytes', type=int, default=48000000,
                         help='Max bytes for direct download (default: 48MB)')
+    parser.add_argument('--class-weight-ratio', type=float, default=None,
+                        help='Weight ratio for non-yew class (e.g., 5 means non-yew weighted 5x)')
+    parser.add_argument('--model-path', type=str, default=None,
+                        help='Path to pre-trained SVM model (.pkl). If provided, skips training.')
+    parser.add_argument('--scaler-path', type=str, default=None,
+                        help='Path to pre-trained scaler (.pkl). Required if --model-path is provided.')
     return parser.parse_args()
 
 
@@ -296,8 +302,16 @@ def extract_features_from_split(df, emb_dir):
     return np.array(features), np.array(labels)
 
 
-def train_svm_with_validation(train_csv, val_csv, emb_dir):
-    """Train SVM classifier with StandardScaler."""
+def train_svm_with_validation(train_csv, val_csv, emb_dir, class_weight_ratio=None):
+    """Train SVM classifier with StandardScaler.
+    
+    Args:
+        train_csv: Path to training CSV
+        val_csv: Path to validation CSV  
+        emb_dir: Directory with embedding patches
+        class_weight_ratio: If set, weight non-yew class by this factor relative to yew
+                           e.g., class_weight_ratio=5 means non-yew weighted 5x more
+    """
     print("Training SVM classifier with StandardScaler...")
     
     emb_dir = Path(emb_dir)
@@ -330,7 +344,16 @@ def train_svm_with_validation(train_csv, val_csv, emb_dir):
     
     print(f"  ✓ StandardScaler fitted")
     
-    clf = SVC(kernel='rbf', probability=True, random_state=42)
+    # Set up class weights if specified
+    if class_weight_ratio is not None:
+        # Weight non-yew (class 0) more heavily to reduce false positives
+        # This simulates having more non-yew training data
+        class_weight = {0: class_weight_ratio, 1: 1.0}
+        print(f"  Using class weights: non-yew={class_weight_ratio}, yew=1.0")
+    else:
+        class_weight = None
+    
+    clf = SVC(kernel='rbf', probability=True, random_state=42, class_weight=class_weight)
     clf.fit(X_all_scaled, y_all)
     print(f"  ✓ SVM trained on {len(X_all)} samples")
     
@@ -344,6 +367,7 @@ def train_svm_with_validation(train_csv, val_csv, emb_dir):
         'roc_auc': float(roc_auc_score(y_val, y_val_prob)),
         'n_train': int(len(X_all)),
         'n_val': int(len(X_val)),
+        'class_weight_ratio': class_weight_ratio,
     }
     
     print(f"\n  Validation Performance:")
@@ -435,9 +459,10 @@ def create_visualizations(prob_grid, rgb_image, output_dir,
     axes[2].set_xlabel('Longitude')
     plt.colorbar(im2, ax=axes[2], fraction=0.046, label='P(yew)')
     
+    model_info = f'Val Accuracy: {metrics["accuracy"]:.1%}' if 'accuracy' in metrics else 'Pre-trained tuned model'
     plt.suptitle(f'Yew Detection: {lat_min:.4f}°N to {lat_max:.4f}°N, '
                  f'{abs(lon_min):.4f}°W to {abs(lon_max):.4f}°W\n'
-                 f'Model: SVM with StandardScaler (Val Accuracy: {metrics["accuracy"]:.1%})',
+                 f'Model: SVM with StandardScaler ({model_info})',
                  fontsize=12, fontweight='bold')
     plt.tight_layout()
     plt.savefig(figures_dir / 'three_panel_view.png', dpi=300, bbox_inches='tight')
@@ -497,10 +522,10 @@ def save_results(prob_grid, rgb_image, embedding_image, output_dir,
         'model': {
             'type': 'SVM with StandardScaler',
             'kernel': 'rbf',
-            'training_samples': metrics['n_train'],
-            'validation_accuracy': metrics['accuracy'],
-            'validation_f1': metrics['f1_score'],
-            'validation_roc_auc': metrics['roc_auc'],
+            'training_samples': metrics.get('n_train', 'pre-trained'),
+            'validation_accuracy': metrics.get('accuracy', 'pre-trained'),
+            'validation_f1': metrics.get('f1_score', 'pre-trained'),
+            'validation_roc_auc': metrics.get('roc_auc', 'pre-trained'),
         },
         'statistics': {
             'mean': float(valid_probs.mean()),
@@ -617,11 +642,23 @@ def main():
         else:
             print(f"✓ Dimensions match: {embedding_image.shape[0]}×{embedding_image.shape[1]}\n")
     
-    # Step 3: Train SVM
+    # Step 3: Load or Train SVM
     print("-" * 60)
-    clf, scaler, metrics = train_svm_with_validation(
-        args.train_csv, args.val_csv, args.embedding_dir
-    )
+    if args.model_path and args.scaler_path:
+        print("Loading pre-trained model...")
+        import pickle
+        with open(args.model_path, 'rb') as f:
+            clf = pickle.load(f)
+        with open(args.scaler_path, 'rb') as f:
+            scaler = pickle.load(f)
+        print(f"  ✓ Loaded model: {args.model_path}")
+        print(f"  ✓ Loaded scaler: {args.scaler_path}")
+        metrics = {'note': 'Using pre-trained model'}
+    else:
+        clf, scaler, metrics = train_svm_with_validation(
+            args.train_csv, args.val_csv, args.embedding_dir,
+            class_weight_ratio=args.class_weight_ratio
+        )
     print("-" * 60 + "\n")
     
     # Step 4: Classify
