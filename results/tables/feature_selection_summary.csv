@@ -1,0 +1,16 @@
+Feature,Importance,Status,Reason
+red,0.7541039509681307,Keep,Selected
+green,0.6624470093236078,Remove,Redundant (highly correlated)
+SI_M_TLSO,0.6441849022944582,Keep,Selected
+blue,0.5655897854758205,Remove,Redundant (highly correlated)
+BA_HA_LS,0.5633204647244178,Keep,Selected
+elevation,0.4886850433860195,Keep,Selected
+HT_TLSO,0.4849048984645032,Keep,Selected
+VHA_WSV_LS,0.4775751112810717,Remove,Redundant (highly correlated)
+AGEB_TLSO,0.4544873984355149,Keep,Selected
+ndvi,0.4139862746981357,Keep,Selected
+STEMS_HA_LS,0.3588848314619197,Keep,Selected
+aspect,0.3264452629617196,Keep,Selected
+nir,0.2801536557967132,Remove,Low importance
+slope,0.2128426433495782,Remove,Low importance
+evi,0.0763152482617003,Remove,Low importance
