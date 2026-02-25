@@ -54,6 +54,9 @@ models/artifacts/
 !models/artifacts/*.pkl  # Keep model artifacts
 *.pth
 
+# Model directories (large binary files)
+models/svm_tuned/
+
 # IDE
 .vscode/
 .idea/
@@ -74,13 +77,10 @@ desktop.ini
 *.log
 logs/
 
-# Results - exclude large prediction caches and high-res figures
-results/predictions/*/tile_cache/
-results/predictions/*/predictions_*.csv
-results/predictions/*/*_overlay_high_res.png
-results/predictions/*/*_satellite_overlay.png
-!results/predictions/*/metadata_*.json
-!results/predictions/*/*.png
+# Results - exclude large binary/output data
+results/predictions/
+results/analysis/
+results/misclassifications/
 results/figures/*_high_res.png
 !results/figures/README.md
 
@@ -99,3 +99,19 @@ ee-credentials/
 *.geotiff
 *.h5
 *.hdf5
+*.npy
+*.kmz
+*.gdb
+*.gpkg
+
+# Large HTML maps
+results/**/*.html
+
+# Notebooks (contain output cells)
+*.ipynb
+
+# Embedding ML classifier (legacy)
+embedding_ml_classifier/
+
+# Misc scratch files
+Untitled-*.py
