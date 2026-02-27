@@ -283,19 +283,21 @@ def load_annotation_features(annotations_csv, tile_cache, tile_info, weight=3):
     return X, y
 
 
-def load_gee_negatives(csv_path, weight=2):
+def load_gee_negatives(csv_path, weight=1, val_fraction=0.0, seed=42):
     """Load GEE-extracted non-yew negative embeddings.
-    
-    These come from generate_cwh_negatives.py: high-probability CWH sample
-    points that are far from known yew — identified as false positives.
     
     Args:
         csv_path: Path to CSV with emb_0..emb_63, lat, lon columns
-        weight: Number of times to repeat (default: 2)
+        weight: Number of times to repeat (default: 1)
+        val_fraction: Fraction to hold out for validation (0.0 = no split)
+        seed: Random seed for splitting
     
     Returns:
-        X: (N*weight, 64) feature array
-        y: (N*weight,) label array (all zeros)
+        If val_fraction == 0:
+            X: (N*weight, 64) feature array
+            y: (N*weight,) label array (all zeros)
+        If val_fraction > 0:
+            X_train, y_train, X_val, y_val
     """
     df = pd.read_csv(csv_path)
     emb_cols = [c for c in df.columns if c.startswith('emb_')]
@@ -309,16 +311,38 @@ def load_gee_negatives(csv_path, weight=2):
     valid = np.any(X != 0, axis=1)
     X = X[valid]
     
-    y = np.zeros(len(X), dtype=np.int32)  # All non-yew
-    
-    if weight > 1:
-        X = np.tile(X, (weight, 1))
-        y = np.tile(y, weight)
-        print(f"  GEE negatives: {valid.sum()} valid × {weight} = {len(y)} samples")
+    print(f"  GEE negatives: {valid.sum()} valid embeddings from {csv_path}")
+
+    if val_fraction > 0:
+        # Split into train and val
+        rng = np.random.RandomState(seed)
+        n = len(X)
+        n_val = int(n * val_fraction)
+        indices = rng.permutation(n)
+        val_idx = indices[:n_val]
+        train_idx = indices[n_val:]
+        
+        X_train = X[train_idx]
+        X_val = X[val_idx]
+        y_train = np.zeros(len(X_train), dtype=np.int32)
+        y_val = np.zeros(len(X_val), dtype=np.int32)
+        
+        if weight > 1:
+            X_train = np.tile(X_train, (weight, 1))
+            y_train = np.tile(y_train, weight)
+        
+        print(f"  Split: {len(X_train)} train ({len(train_idx)} unique × {weight}), "
+              f"{len(X_val)} val")
+        return X_train, y_train, X_val, y_val
     else:
-        print(f"  GEE negatives: {valid.sum()} samples")
-    
-    return X, y
+        y = np.zeros(len(X), dtype=np.int32)
+        if weight > 1:
+            X = np.tile(X, (weight, 1))
+            y = np.tile(y, weight)
+            print(f"  Total: {valid.sum()} valid × {weight} = {len(y)} samples")
+        else:
+            print(f"  Total: {valid.sum()} samples")
+        return X, y
 
 
 # =============================================================================
@@ -539,19 +563,40 @@ def main():
             X_all = np.nan_to_num(X_all, nan=0.0, posinf=0.0, neginf=0.0)
             print(f"  After:  {len(X_all)} samples ({y_all.sum()} yew, {len(y_all)-y_all.sum()} non-yew)")
 
-    # Load GEE-extracted negatives if provided
+    # Load GEE-extracted negatives if provided (e.g., FAIB tree inventory)
     if args.gee_negatives:
         print(f"\nLoading GEE negatives from {args.gee_negatives}")
-        X_neg, y_neg = load_gee_negatives(
-            args.gee_negatives, weight=args.gee_negatives_weight
+        # Always split negatives for validation if val set has no negatives
+        has_val_negatives = (y_val == 0).sum() > 0
+        val_frac = 0.2 if not has_val_negatives else 0.0
+        
+        result = load_gee_negatives(
+            args.gee_negatives, weight=args.gee_negatives_weight,
+            val_fraction=val_frac
         )
-        if len(X_neg) > 0:
-            print(f"  Adding {len(X_neg)} GEE negative samples to training data")
-            print(f"  Before: {len(X_all)} samples ({y_all.sum()} yew, {len(y_all)-y_all.sum()} non-yew)")
-            X_all = np.vstack([X_all, X_neg])
-            y_all = np.concatenate([y_all, y_neg])
-            X_all = np.nan_to_num(X_all, nan=0.0, posinf=0.0, neginf=0.0)
-            print(f"  After:  {len(X_all)} samples ({y_all.sum()} yew, {len(y_all)-y_all.sum()} non-yew)")
+        
+        if val_frac > 0:
+            X_neg_train, y_neg_train, X_neg_val, y_neg_val = result
+            if len(X_neg_train) > 0:
+                print(f"  Adding {len(X_neg_train)} GEE neg train + {len(X_neg_val)} val samples")
+                print(f"  Before: {len(X_all)} train ({y_all.sum()} yew, {len(y_all)-y_all.sum()} non-yew)")
+                X_all = np.vstack([X_all, X_neg_train])
+                y_all = np.concatenate([y_all, y_neg_train])
+                X_val = np.vstack([X_val, X_neg_val])
+                y_val = np.concatenate([y_val, y_neg_val])
+                X_all = np.nan_to_num(X_all, nan=0.0, posinf=0.0, neginf=0.0)
+                X_val = np.nan_to_num(X_val, nan=0.0, posinf=0.0, neginf=0.0)
+                print(f"  After:  {len(X_all)} train ({y_all.sum()} yew, {len(y_all)-y_all.sum()} non-yew)")
+                print(f"  Val:    {len(X_val)} ({y_val.sum()} yew, {len(y_val)-y_val.sum()} non-yew)")
+        else:
+            X_neg, y_neg = result
+            if len(X_neg) > 0:
+                print(f"  Adding {len(X_neg)} GEE negative samples to training data")
+                print(f"  Before: {len(X_all)} samples ({y_all.sum()} yew, {len(y_all)-y_all.sum()} non-yew)")
+                X_all = np.vstack([X_all, X_neg])
+                y_all = np.concatenate([y_all, y_neg])
+                X_all = np.nan_to_num(X_all, nan=0.0, posinf=0.0, neginf=0.0)
+                print(f"  After:  {len(X_all)} samples ({y_all.sum()} yew, {len(y_all)-y_all.sum()} non-yew)")
 
     scaler = StandardScaler()
     scaler.fit(X_all)

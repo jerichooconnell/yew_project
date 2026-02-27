@@ -60,13 +60,10 @@ def classify_polygons(gdf):
       - OPENING_IND: polygon is an opening (cutblock)
     
     Returns a column 'yew_suitability' with values:
-        0.0  = Definitely no yew (water, rock, recently logged)
-        0.05 = Very recently logged (< 20 years, or cutblock age class 1)
-        0.15 = Logged 20-40 years ago (or cutblock age class 2)
-        0.3  = Unlikely yew (young plantation/cutblock, 40-60 years)
-        0.5  = Possible yew (managed forest cutblock, 60-80 years)
-        0.7  = Some recovery possible (logged > 80 years ago)
-        1.0  = Good potential (old growth, unlogged, > 80 years)
+        0.0  = Definitely no yew (water, rock, logged <60 years ago)
+        0.5  = Partial recovery (logged 60-80 years ago)
+        0.7  = Some recovery (logged >80 years ago)
+        1.0  = Good potential (old growth, unlogged, >120 years)
     """
     print("\nClassifying polygons for yew suitability...")
     
@@ -86,10 +83,8 @@ def classify_polygons(gdf):
     gdf.loc[water, 'yew_suitability'] = 0.0
     gdf.loc[water, 'mask_reason'] = 'water'
     
-    # Non-treed vegetated (shrub, herb) → 0.1
-    non_treed = (gdf['BCLCS_LEVEL_1'] == 'V') & (gdf['BCLCS_LEVEL_2'] == 'N')
-    gdf.loc[non_treed, 'yew_suitability'] = 0.1
-    gdf.loc[non_treed, 'mask_reason'] = 'non_treed_vegetation'
+    # Non-treed vegetated (shrub, herb) — leave at 1.0
+    # Yew can exist in non-treed/shrub areas, so no penalty applied
     
     # =====================================================================
     # 2. Harvested areas with explicit HARVEST_DATE — classify by age
@@ -105,25 +100,20 @@ def classify_polygons(gdf):
             lambda x: (now - x.replace(tzinfo=None)).days / 365.25 if x is not None else None
         )
         
-        # Recently logged (< 20 years) → very low suitability
-        recent_20 = has_harvest & (years_since < 20)
-        gdf.loc[recent_20.reindex(gdf.index, fill_value=False), 'yew_suitability'] = 0.05
-        gdf.loc[recent_20.reindex(gdf.index, fill_value=False), 'mask_reason'] = 'harvest_date_<20yr'
+        # Logged < 60 years ago → 0.0 (no yew regeneration)
+        recent_60 = has_harvest & (years_since < 60)
+        gdf.loc[recent_60.reindex(gdf.index, fill_value=False), 'yew_suitability'] = 0.0
+        gdf.loc[recent_60.reindex(gdf.index, fill_value=False), 'mask_reason'] = 'harvest_date_<60yr'
         
-        # Logged 20-40 years ago
-        medium_harvest = has_harvest & (years_since >= 20) & (years_since < 40)
-        gdf.loc[medium_harvest.reindex(gdf.index, fill_value=False), 'yew_suitability'] = 0.15
-        gdf.loc[medium_harvest.reindex(gdf.index, fill_value=False), 'mask_reason'] = 'harvest_date_20-40yr'
+        # Logged 60-80 years ago → 0.5
+        medium_harvest = has_harvest & (years_since >= 60) & (years_since < 80)
+        gdf.loc[medium_harvest.reindex(gdf.index, fill_value=False), 'yew_suitability'] = 0.5
+        gdf.loc[medium_harvest.reindex(gdf.index, fill_value=False), 'mask_reason'] = 'harvest_date_60-80yr'
         
-        # Logged 40-80 years ago
-        old_harvest = has_harvest & (years_since >= 40) & (years_since < 80)
-        gdf.loc[old_harvest.reindex(gdf.index, fill_value=False), 'yew_suitability'] = 0.4
-        gdf.loc[old_harvest.reindex(gdf.index, fill_value=False), 'mask_reason'] = 'harvest_date_40-80yr'
-        
-        # Logged > 80 years ago → more recovery
-        very_old_harvest = has_harvest & (years_since >= 80)
-        gdf.loc[very_old_harvest.reindex(gdf.index, fill_value=False), 'yew_suitability'] = 0.7
-        gdf.loc[very_old_harvest.reindex(gdf.index, fill_value=False), 'mask_reason'] = 'harvest_date_>80yr'
+        # Logged > 80 years ago → 0.7
+        old_harvest = has_harvest & (years_since >= 80)
+        gdf.loc[old_harvest.reindex(gdf.index, fill_value=False), 'yew_suitability'] = 0.7
+        gdf.loc[old_harvest.reindex(gdf.index, fill_value=False), 'mask_reason'] = 'harvest_date_>80yr'
     
     # =====================================================================
     # 3. OPENING_SOURCE cutblocks WITHOUT harvest date
@@ -150,37 +140,27 @@ def classify_polygons(gdf):
         # Use age class code (1=1-20yr, 2=21-40yr, ..., 9=251+yr)
         age_cls = gdf['PROJ_AGE_CLASS_CD_1'].fillna('')
         
-        # Age class 1: 1-20 years → 0.05
-        cls1 = is_opening_cutblock & (age_cls == '1')
-        gdf.loc[cls1, 'yew_suitability'] = np.minimum(gdf.loc[cls1, 'yew_suitability'], 0.05)
-        gdf.loc[cls1 & (gdf['yew_suitability'] <= 0.05), 'mask_reason'] = 'cutblock_age_1-20yr'
-        
-        # Age class 2: 21-40 years → 0.15
-        cls2 = is_opening_cutblock & (age_cls == '2')
-        gdf.loc[cls2, 'yew_suitability'] = np.minimum(gdf.loc[cls2, 'yew_suitability'], 0.15)
-        gdf.loc[cls2 & (gdf['yew_suitability'] <= 0.15), 'mask_reason'] = 'cutblock_age_21-40yr'
-        
-        # Age class 3: 41-60 years → 0.3
-        cls3 = is_opening_cutblock & (age_cls == '3')
-        gdf.loc[cls3, 'yew_suitability'] = np.minimum(gdf.loc[cls3, 'yew_suitability'], 0.3)
-        gdf.loc[cls3 & (gdf['yew_suitability'] <= 0.3), 'mask_reason'] = 'cutblock_age_41-60yr'
+        # Age class 1-3: 1-60 years → 0.0 (no yew)
+        cls123 = is_opening_cutblock & age_cls.isin(['1', '2', '3'])
+        gdf.loc[cls123, 'yew_suitability'] = np.minimum(gdf.loc[cls123, 'yew_suitability'], 0.0)
+        gdf.loc[cls123 & (gdf['yew_suitability'] <= 0.0), 'mask_reason'] = 'cutblock_age_<60yr'
         
         # Age class 4: 61-80 years → 0.5
         cls4 = is_opening_cutblock & (age_cls == '4')
         gdf.loc[cls4, 'yew_suitability'] = np.minimum(gdf.loc[cls4, 'yew_suitability'], 0.5)
         gdf.loc[cls4 & (gdf['yew_suitability'] <= 0.5), 'mask_reason'] = 'cutblock_age_61-80yr'
         
-        # Age class 5-6: 81-120 years → 0.7 (some recovery)
+        # Age class 5-6: 81-120 years → 0.7
         cls56 = is_opening_cutblock & age_cls.isin(['5', '6'])
         gdf.loc[cls56, 'yew_suitability'] = np.minimum(gdf.loc[cls56, 'yew_suitability'], 0.7)
         gdf.loc[cls56 & (gdf['yew_suitability'] <= 0.7), 'mask_reason'] = 'cutblock_age_81-120yr'
         
         # Age class 7-9: > 120 years — leave at 1.0 (sufficient recovery time)
         
-        # Cutblocks with NO age class at all — treat as moderately suspicious
+        # Cutblocks with NO age class at all — treat conservatively as <60yr
         no_age_cls = is_opening_cutblock & (age_cls == '')
-        gdf.loc[no_age_cls, 'yew_suitability'] = np.minimum(gdf.loc[no_age_cls, 'yew_suitability'], 0.4)
-        gdf.loc[no_age_cls & (gdf['yew_suitability'] <= 0.4), 'mask_reason'] = 'cutblock_no_age_info'
+        gdf.loc[no_age_cls, 'yew_suitability'] = np.minimum(gdf.loc[no_age_cls, 'yew_suitability'], 0.0)
+        gdf.loc[no_age_cls & (gdf['yew_suitability'] <= 0.0), 'mask_reason'] = 'cutblock_no_age_info'
         
         n_cutblock = is_opening_cutblock.sum()
         n_reduced = (gdf.loc[is_opening_cutblock, 'yew_suitability'] < 1.0).sum()
@@ -194,17 +174,23 @@ def classify_polygons(gdf):
     already_classified = has_harvest | is_opening_cutblock
     has_age = gdf['PROJ_AGE_1'].notna() & ~already_classified
     if has_age.any():
-        young = has_age & (gdf['PROJ_AGE_1'] < 40)
+        young = has_age & (gdf['PROJ_AGE_1'] < 60)
         gdf.loc[young, 'yew_suitability'] = np.minimum(
-            gdf.loc[young, 'yew_suitability'], 0.2
+            gdf.loc[young, 'yew_suitability'], 0.0
         )
-        gdf.loc[young & (gdf['yew_suitability'] <= 0.2), 'mask_reason'] = 'young_stand_<40yr'
+        gdf.loc[young & (gdf['yew_suitability'] <= 0.0), 'mask_reason'] = 'young_stand_<60yr'
         
-        medium_age = has_age & (gdf['PROJ_AGE_1'] >= 40) & (gdf['PROJ_AGE_1'] < 80)
+        medium_age = has_age & (gdf['PROJ_AGE_1'] >= 60) & (gdf['PROJ_AGE_1'] < 80)
         gdf.loc[medium_age, 'yew_suitability'] = np.minimum(
-            gdf.loc[medium_age, 'yew_suitability'], 0.6
+            gdf.loc[medium_age, 'yew_suitability'], 0.5
         )
-        gdf.loc[medium_age & (gdf['yew_suitability'] <= 0.6), 'mask_reason'] = 'medium_stand_40-80yr'
+        gdf.loc[medium_age & (gdf['yew_suitability'] <= 0.5), 'mask_reason'] = 'stand_60-80yr'
+        
+        older = has_age & (gdf['PROJ_AGE_1'] >= 80) & (gdf['PROJ_AGE_1'] < 120)
+        gdf.loc[older, 'yew_suitability'] = np.minimum(
+            gdf.loc[older, 'yew_suitability'], 0.7
+        )
+        gdf.loc[older & (gdf['yew_suitability'] <= 0.7), 'mask_reason'] = 'stand_80-120yr'
     
     # =====================================================================
     # 5. Young stands by PROJ_AGE_CLASS_CD_1 only (no explicit age, no
@@ -215,17 +201,23 @@ def classify_polygons(gdf):
     if has_age_class_only.any():
         age_cls2 = gdf['PROJ_AGE_CLASS_CD_1']
         
-        young_cls = has_age_class_only & age_cls2.isin(['1', '2'])
+        young_cls = has_age_class_only & age_cls2.isin(['1', '2', '3'])
         gdf.loc[young_cls, 'yew_suitability'] = np.minimum(
-            gdf.loc[young_cls, 'yew_suitability'], 0.2
+            gdf.loc[young_cls, 'yew_suitability'], 0.0
         )
-        gdf.loc[young_cls & (gdf['yew_suitability'] <= 0.2), 'mask_reason'] = 'age_class_1-2_no_source'
+        gdf.loc[young_cls & (gdf['yew_suitability'] <= 0.0), 'mask_reason'] = 'age_class_<60yr_no_source'
         
-        medium_cls = has_age_class_only & age_cls2.isin(['3', '4'])
+        medium_cls = has_age_class_only & (age_cls2 == '4')
         gdf.loc[medium_cls, 'yew_suitability'] = np.minimum(
-            gdf.loc[medium_cls, 'yew_suitability'], 0.6
+            gdf.loc[medium_cls, 'yew_suitability'], 0.5
         )
-        gdf.loc[medium_cls & (gdf['yew_suitability'] <= 0.6), 'mask_reason'] = 'age_class_3-4_no_source'
+        gdf.loc[medium_cls & (gdf['yew_suitability'] <= 0.5), 'mask_reason'] = 'age_class_60-80yr_no_source'
+        
+        older_cls = has_age_class_only & age_cls2.isin(['5', '6'])
+        gdf.loc[older_cls, 'yew_suitability'] = np.minimum(
+            gdf.loc[older_cls, 'yew_suitability'], 0.7
+        )
+        gdf.loc[older_cls & (gdf['yew_suitability'] <= 0.7), 'mask_reason'] = 'age_class_80-120yr_no_source'
     
     # =====================================================================
     # Print summary
