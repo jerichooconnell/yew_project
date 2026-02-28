@@ -31,17 +31,24 @@ from tqdm import tqdm
 
 
 # ---------------------------------------------------------------------------
-# MLP (must match classify_tiled_gpu.py)
+# MLP (must match classify_tiled_gpu.py exactly)
 # ---------------------------------------------------------------------------
 class YewMLP(nn.Module):
-    def __init__(self, input_dim=64):
+    def __init__(self, input_dim=64, hidden_dims=(128, 64, 32)):
         super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(input_dim, 128), nn.ReLU(), nn.Dropout(0.3),
-            nn.Linear(128, 64),        nn.ReLU(), nn.Dropout(0.2),
-            nn.Linear(64, 32),         nn.ReLU(),
-            nn.Linear(32, 1),
-        )
+        layers = []
+        prev = input_dim
+        for h in hidden_dims:
+            layers.extend([
+                nn.Linear(prev, h),
+                nn.BatchNorm1d(h),
+                nn.ReLU(),
+                nn.Dropout(0.2),
+            ])
+            prev = h
+        layers.append(nn.Linear(prev, 1))
+        self.net = nn.Sequential(*layers)
+
     def forward(self, x):
         return self.net(x).squeeze(-1)
 

@@ -1,6 +1,6 @@
 # CWH Yew Mapping Workflow
 
-**Project:** Spatial prediction of Pacific yew (*Taxus brevifolia*) habitat in the Coastal Western Hemlock (CWH) BEC zone, British Columbia  
+**Project:** Spatial prediction of Pacific yew (*Taxus brevifolia*) habitat in the coastal zone of British Columbia  
 **Last updated:** February 2026  
 
 ---
@@ -11,17 +11,75 @@ The pipeline uses Google satellite spectral embeddings as input features to a tr
 
 ---
 
-## 1. Study Area
+## 1. Study Areas
 
-**Zone:** Coastal Western Hemlock (CWH) BEC zone  
+Two study area definitions have been developed:
+
+### 1a. CWH BEC Zone (original, patchy boundary)
+
+**Zone:** Coastal Western Hemlock (CWH) Biogeoclimatic Ecosystem Classification zone  
 **Area:** ~3.6 million ha  
-**Extent:** Lat 48.4–55.4°N, Lon 122.0–132.6°W  
+**Extent:** Lat 48.4–55.4°N, Lon 121.0–132.6°W  
 **Boundary file:** `data/processed/cwh_negatives/cwh_boundary_forestry.gpkg`  
 - Single dissolved MultiPolygon (38 parts), EPSG:4326  
 - Built from BC VRI GDB (`VEG_COMP_LYR_R1_POLY_2024.gdb`) BEC_ZONE_CODE = 'CWH'  
 - Script: `scripts/preprocessing/build_cwh_boundary_from_vri.py`
 
-> **Important:** The BC government WFS endpoint for BEC zones (`openmaps.gov.bc.ca`) currently returns a 400 error. Always pass `--boundary data/processed/cwh_negatives/cwh_boundary_forestry.gpkg` to avoid the approximate-polygon fallback.
+> **Issue with this boundary:** The CWH zone is naturally patchy — many small isolated polygons scattered through the interior mountain ranges. This makes uniform sampling difficult and the 38-part boundary misses some coastal fringe areas.
+
+> **WFS note:** The BC government WFS endpoint for BEC zones (`openmaps.gov.bc.ca`) currently returns a 400 error. Always pass `--boundary data/processed/cwh_negatives/cwh_boundary_forestry.gpkg` to avoid the approximate-polygon fallback.
+
+**Population estimate (Feb 2026, 100k sample):**
+
+| Threshold | Estimated area | 95% CI |
+|---|---|---|
+| P≥0.3 | 411,758 ha | 404,600–418,900 ha |
+| **P≥0.5** | **314,416 ha** | **308,117–320,715 ha** |
+| P≥0.7 | 232,482 ha | 226,900–238,100 ha |
+
+---
+
+### 1b. Coastal BC Study Region (current, preferred)
+
+A more ecologically coherent boundary built by intersecting the BC provincial outline (Natural Earth 10m admin-1) with a bounding polygon defined by two user-specified corners:
+
+**NE corner:** 54.7786°N, 127.8119°W  
+**SE corner:** 49.0325°N, 119.5254°W  
+**Area:** ~227,650 km² (22.8 million ha)  
+**Boundary file:** `data/processed/coastal_study_region.geojson`  
+- 87-part MultiPolygon, EPSG:4326  
+- Includes all coastal islands: Haida Gwaii (23 polygons), Vancouver Island, Gulf Islands, Central Coast islands  
+- Southern boundary follows actual Canada–US border through Strait of Juan de Fuca (extends to ~48.3°N)
+
+**Boundary definition logic:**
+```
+East boundary : diagonal line from NE corner → SE corner
+South boundary: US–Canada border (below 49th parallel for Vancouver Island)
+West boundary : BC coastline including all islands (Natural Earth 10m)
+North boundary: latitude of NE corner, westward to coast
+```
+
+**Regenerate boundary:**
+```bash
+conda run -n yew_pytorch python3 -c "
+import geopandas as gpd; from shapely.geometry import Polygon; import os
+gdf = gpd.read_file('https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_1_states_provinces.zip')
+bc = gdf[gdf['name']=='British Columbia']
+poly = Polygon([(-127.811936,54.778601),(-119.525404,49.032480),(-119.525404,48.0),(-140.0,48.0),(-140.0,54.778601),(-127.811936,54.778601)])
+region = gpd.GeoDataFrame(geometry=[bc.geometry.iloc[0].intersection(poly)], crs=4326)
+region.to_file('data/processed/coastal_study_region.geojson', driver='GeoJSON')
+"
+```
+
+**Sample and classify:**
+```bash
+conda run -n yew_pytorch python scripts/prediction/sample_coastal_region.py \
+    --n-samples 100000 \
+    --gee-project <your-gee-project> \
+    --output-dir results/analysis/coastal_region_100k
+```
+
+Add `--skip-extract` on reruns to reuse the cached embeddings CSV.
 
 ---
 
@@ -46,7 +104,7 @@ conda run -n yew_pytorch python scripts/prediction/classify_tiled_area.py \
 Tiles are cached as `emb_R_C.npy` files in `results/predictions/south_vi_large/`.  
 RGB mosaic saved as `rgb_image.npy`; full extent metadata in `metadata.json`.
 
-### 2b. BC-wide CWH sample (300 m)
+### 2b. CWH zone sample (300 m)
 
 Use `resample_cwh_100k.py` which samples 100k points **within the actual CWH polygon**:
 
@@ -59,6 +117,19 @@ conda run -n yew_pytorch python scripts/prediction/resample_cwh_100k.py \
 ```
 
 Embeddings cached to `embeddings_cwh_100000_seed42.csv`. Add `--skip-extract` on reruns to skip GEE and reuse the cache.
+
+### 2c. Coastal BC region sample (300 m) — preferred
+
+Use `sample_coastal_region.py` which samples 100k points within the broader coastal BC study region (227,650 km², incl. Haida Gwaii and all of Vancouver Island):
+
+```bash
+conda run -n yew_pytorch python scripts/prediction/sample_coastal_region.py \
+    --n-samples 100000 \
+    --gee-project <your-gee-project> \
+    --output-dir results/analysis/coastal_region_100k
+```
+
+Embeddings cached to `embeddings_coastal_100000_seed42.csv`. Add `--skip-extract` on reruns.
 
 ---
 
@@ -206,7 +277,7 @@ Each area produces:
 
 ---
 
-## 7. BC-Wide KMZ Map
+## 7. KMZ Map
 
 From sample predictions, a KMZ ground overlay is generated for Google Earth:
 
@@ -218,21 +289,33 @@ conda run -n yew_pytorch python scripts/visualization/create_cwh_kmz.py \
 
 The script rasterises point predictions to a 0.03° grid (~3 km), applies a NaturalEarth land mask to remove ocean points, and writes a KMZ with a colour-coded RGBA overlay.
 
+## 7b. Static PNG Map
+
+```bash
+conda run -n yew_pytorch python scripts/visualization/generate_png_map.py
+```
+
+Outputs a 200 dpi map to `results/analysis/cwh_yew_population_100k/cwh_yew_100k_map.png` with NaturalEarth coastlines, CWH boundary overlay, probability colorbar, and stats box.
+
 ---
 
-## 8. Population Estimate
+## 8. Population Estimates (February 2026)
 
-The BC-wide estimated yew habitat area (P≥0.5 threshold) as of February 2026 run:
+### CWH zone (100k sample, Feb 2026)
 
 | Threshold | Estimated area | 95% CI |
 |---|---|---|
-| P≥0.3 | ~330,000 ha | ±16,000 ha |
-| **P≥0.5** | **~245,000 ha** | **±14,000 ha** |
-| P≥0.7 | ~179,000 ha | ±12,000 ha |
+| P≥0.3 | 411,758 ha | 404,600–418,900 ha |
+| **P≥0.5** | **314,416 ha** | **308,117–320,715 ha** |
+| P≥0.7 | 232,482 ha | 226,900–238,100 ha |
 
-These estimates are based on 16,139 CWH-filtered points from the 2024 300k sample. The 100k re-sample (run Feb 2026) will update these figures.
+**Zone area:** 3,595,194 ha — **Model:** YewMLP AUC 0.998, F1 0.947
 
-> **Note:** Estimates apply exclusively to the CWH BEC zone (~3.6M ha). Areas outside CWH (interior BC, Coast Mountains, Haida Gwaii alpine) are not included.
+### Coastal BC region (100k sample, in progress Feb 2026)
+
+Results pending extraction. Region area: 22,765,200 ha (227,652 km²).
+
+> **Note (methodology):** Earlier estimates using `sample_cwh_yew_population.py` were inflated (~1.1M ha at P≥0.5) due to a WFS fallback bug that sampled the bounding-box rectangle rather than the actual CWH polygon. The corrected estimates above use `resample_cwh_100k.py` which passes `cwh_boundary_forestry.gpkg` directly to GEE.
 
 ---
 
@@ -247,8 +330,11 @@ These estimates are based on 16,139 CWH-filtered points from the 2024 300k sampl
 | `results/predictions/south_vi_large/metadata.json` | South VI tile extent |
 | `data/processed/combined_negative_embeddings.csv` | 8,994 training negatives |
 | `data/raw/yew_annotations_combined.csv` | 267 manual annotations |
-| `results/analysis/cwh_yew_population_100k/` | 100k re-sample outputs |
+| `results/analysis/cwh_yew_population_100k/` | CWH 100k re-sample outputs (predictions, KMZ, PNG) |
+| `results/analysis/coastal_region_100k/` | Coastal BC region 100k sample outputs |
 | `results/analysis/cwh_spot_comparisons/` | 15-area spot comparison maps |
+| `data/processed/coastal_study_region.geojson` | Coastal BC study region boundary (87-part MultiPolygon) |
+| `results/analysis/cwh_yew_population_100k/proposed_region.html` | Interactive Leaflet map of study region |
 
 ---
 
@@ -268,6 +354,7 @@ Environment file: `config/yew_pytorch_env.yml`
 ## 11. Known Issues / Limitations
 
 1. **BC WFS download** — `openmaps.gov.bc.ca` BEC WFS returns a 400 error. Always use `--boundary data/processed/cwh_negatives/cwh_boundary_forestry.gpkg`.
-2. **`sample_cwh_yew_population.py` tiled fallback** — when the WFS fails the old script falls back to an approximate bounding-box polygon, inflating the zone area ~7×. Use `resample_cwh_100k.py` instead for BC-wide estimates.
-3. **PROJ_AGE_1 pre-disturbance bias** — for recently burned/logged stands, `PROJ_AGE_1` stores the pre-disturbance age. Always ensure `LINE_7B_DISTURBANCE_HISTORY` is parsed alongside it; the classifier takes the minimum age.
-4. **Sample size vs precision** — at 300 m scale, 100k points within 3.6M ha gives one point per ~36 ha. The margin of error at P≥0.5 is approximately ±0.5% of CWH area (±18,000 ha).
+2. **`sample_cwh_yew_population.py` boundary bug** — when the WFS fails this old script falls back to an approximate bounding-box polygon, inflating the zone area ~7×. **Do not use it.** Use `resample_cwh_100k.py` (CWH zone) or `sample_coastal_region.py` (coastal region) instead.
+3. **`/tmp` boundary file loss** — `sample_coastal_region.py` reads `data/processed/coastal_study_region.geojson`. Earlier runs stored the boundary in `/tmp/` which is cleared on reboot. The boundary is now committed to the project.
+4. **PROJ_AGE_1 pre-disturbance bias** — for recently burned/logged stands, `PROJ_AGE_1` stores the pre-disturbance age. Always ensure `LINE_7B_DISTURBANCE_HISTORY` is parsed alongside it; the classifier takes the minimum age.
+5. **Sample size vs precision** — at 300 m scale, 100k points within 3.6M ha gives one point per ~36 ha. The margin of error at P≥0.5 is approximately ±0.5% of CWH area (±18,000 ha).
