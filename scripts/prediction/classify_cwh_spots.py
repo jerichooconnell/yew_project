@@ -33,6 +33,7 @@ import rasterio.transform as rtransform
 import requests
 import torch
 import torch.nn as nn
+import xgboost as xgb
 from matplotlib.colors import LinearSegmentedColormap
 from PIL import Image as PILImage
 from pyproj import Transformer as ProjTransformer
@@ -297,8 +298,9 @@ def centre_to_bbox(lat, lon, km=10):
 #   knn3_raw    — k-Nearest Neighbors (k=3) on raw embeddings
 #   logistic_raw — Logistic Regression on raw embeddings (linear probe)
 SKLEARN_CLASSIFIERS = {'rf_raw', 'rf_raw_expanded', 'knn3_raw', 'logistic_raw'}
+XGB_CLASSIFIERS     = {'xgb_raw_expanded'}
 MLP_CLASSIFIERS     = {'mlp_scaled', 'mlp_raw'}
-ALL_CLASSIFIERS     = SKLEARN_CLASSIFIERS | MLP_CLASSIFIERS
+ALL_CLASSIFIERS     = SKLEARN_CLASSIFIERS | XGB_CLASSIFIERS | MLP_CLASSIFIERS
 
 
 def classify_grid(emb_array, classifier, scaler, device, batch_size=500_000,
@@ -321,6 +323,12 @@ def classify_grid(emb_array, classifier, scaler, device, batch_size=500_000,
             end = min(start + batch_size, len(flat))
             batch = flat[start:end]
             probs[start:end] = classifier.predict_proba(batch)[:, 1]
+        return probs.reshape(h, w)
+
+    elif classifier_type in XGB_CLASSIFIERS:
+        # XGBoost - faster inference than sklearn RF
+        dmat = xgb.DMatrix(flat)
+        probs = classifier.predict(dmat)
         return probs.reshape(h, w)
 
     elif classifier_type == 'mlp_scaled':
@@ -1011,6 +1019,7 @@ def main():
         'mlp_raw':          ('mlp_raw_model.pth',    None),
         'rf_raw':           ('rf_raw_model.pkl',      None),
         'rf_raw_expanded':  ('rf_raw_model_expanded.pkl', None),
+        'xgb_raw_expanded': ('xgb_raw_model_expanded.json', None),
         'knn3_raw':         ('knn3_raw_model.pkl',    None),
         'logistic_raw':     ('logistic_raw_model.pkl', None),
     }
@@ -1038,6 +1047,10 @@ def main():
                 scaler = pickle.load(f)
         print(f"  ✓ MLP loaded ({model_path.name})"
               + (f" + {scaler_file}" if scaler_file else ""))
+    elif classifier_type in XGB_CLASSIFIERS:
+        classifier = xgb.Booster()
+        classifier.load_model(str(model_path))
+        print(f"  ✓ XGBoost model loaded ({model_path.name})")
     else:
         with open(model_path, 'rb') as f:
             classifier = pickle.load(f)
