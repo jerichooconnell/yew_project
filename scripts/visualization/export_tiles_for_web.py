@@ -103,6 +103,25 @@ LOG_RGBA = {
     6: (175, 155, 125, 160),   # alpine / barren
 }
 
+# Suppression factors by VRI logging category (same as classify_cwh_spots.py)
+LOG_SUPPRESS = {
+    1: 0.00,   # water / non-forest → zero out completely
+    2: 0.00,   # logged  <20 yr     → zero out
+    3: 0.08,   # logged 20–40 yr    → heavily suppressed
+    4: 0.30,   # logged 40–80 yr    → moderately suppressed
+    5: 1.00,   # forest >80 yr      → unchanged
+    6: 0.00,   # alpine / barren    → zero out
+}
+
+
+def apply_logging_mask(grid, log_grid):
+    """Suppress yew probabilities based on VRI logging categories."""
+    masked = grid.copy()
+    for cat, factor in LOG_SUPPRESS.items():
+        where = log_grid == cat
+        masked[where] *= factor
+    return masked
+
 
 def centre_to_bbox(lat, lon, km=10):
     half_lat = (km * 1000 / 2) / 111320.0
@@ -156,11 +175,20 @@ def main():
             print(f"  SKIP {name}: {grid_path} not found")
             continue
 
-        grid = np.load(grid_path)
+        raw_grid = np.load(grid_path)
         south, north, west, east = centre_to_bbox(lat, lon, km=AREA_KM)
 
-        # Statistics
-        valid = grid[grid >= YEW_TRANSPARENT_BELOW]
+        # Apply logging / water / alpine mask if available
+        if log_path.exists():
+            log_grid = np.load(log_path)
+            grid = apply_logging_mask(raw_grid, log_grid)
+            zeroed = int((raw_grid > 0.02).sum()) - int((grid > 0.02).sum())
+        else:
+            grid = raw_grid
+            log_grid = None
+            zeroed = 0
+
+        # Statistics (on masked grid)
         stats = {
             'mean': float(np.mean(grid)),
             'median': float(np.median(grid)),
@@ -172,7 +200,7 @@ def main():
             'w': int(grid.shape[1]),
         }
 
-        # Export yew probability PNG
+        # Export yew probability PNG (with logging mask applied)
         png_path = OUT_DIR / f'{slug}.png'
         size = grid_to_png(grid, YEWCMAP, png_path)
         total_bytes += size
@@ -194,8 +222,7 @@ def main():
         }
 
         # Export forestry / logging overlay PNG (if available)
-        if log_path.exists():
-            log_grid = np.load(log_path)
+        if log_grid is not None:
             log_png_path = OUT_DIR / f'{slug}_logging.png'
             log_size = logging_to_png(log_grid, log_png_path)
             total_log_bytes += log_size
@@ -213,7 +240,7 @@ def main():
             }
             print(f"  ✓ {name}: {grid.shape[0]}×{grid.shape[1]} → "
                   f"yew {size/1024:.0f} KB + logging {log_size/1024:.0f} KB "
-                  f"(P≥0.5: {stats['p50_ha']:.0f} ha)")
+                  f"(P≥0.5: {stats['p50_ha']:.0f} ha, {zeroed:,} px masked)")
         else:
             print(f"  ✓ {name}: {grid.shape[0]}×{grid.shape[1]} → {size/1024:.0f} KB "
                   f"(P≥0.5: {stats['p50_ha']:.0f} ha) [no logging data]")
