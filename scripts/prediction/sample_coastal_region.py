@@ -36,12 +36,13 @@ class YewMLP(nn.Module):
             layers.append(nn.Linear(prev_dim, h_dim))
             layers.append(nn.BatchNorm1d(h_dim))
             layers.append(nn.ReLU())
+            layers.append(nn.Dropout(0.2))
             prev_dim = h_dim
         layers.append(nn.Linear(prev_dim, 1))
-        self.network = nn.Sequential(*layers)
+        self.net = nn.Sequential(*layers)
     
     def forward(self, x):
-        return self.network(x)
+        return self.net(x).squeeze(-1)
 
 
 def load_model(model_path, device='cpu'):

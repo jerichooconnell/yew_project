@@ -115,3 +115,6 @@ embedding_ml_classifier/
 
 # Misc scratch files
 Untitled-*.py
+
+# Lookup tables (downloadable)
+data/lookup_tables/

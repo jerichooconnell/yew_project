@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-Extract GEE embeddings for a 10km×10km area and classify with saved MLP model.
+Extract GEE embeddings for a 10km×10km area and classify with a saved model.
+Supports multiple classifier types: MLP, Random Forest, kNN, Logistic Regression.
 Generates an interactive HTML map for each area plus a summary comparison page.
 
 Usage:
-    python scripts/prediction/classify_cwh_spots.py
+    python scripts/prediction/classify_cwh_spots.py --classifier rf_raw --force-reclassify
+    python scripts/prediction/classify_cwh_spots.py --classifier logistic_raw
 """
 
 import argparse
@@ -105,23 +107,52 @@ STUDY_AREAS = [
     (50.830, -124.920, "Bute Inlet Slopes",      "Deep fjord CWH, Coast Mountains"),
     (49.020, -124.200, "Nanaimo Lakes",          "South VI mid-elevation CWH"),
     (51.400, -127.700, "Rivers Inlet",           "Central BC outer coast CWH"),
+    # 20 additional coastal BC sites
+    (48.550, -124.420, "Port Renfrew",           "SW VI Pacific Rim old-growth CWH"),
+    (48.820, -124.050, "Cowichan Uplands",       "South VI lower-elevation CWH"),
+    (49.620, -125.100, "Comox Uplands",          "Central VI mid-elevation CWH"),
+    (49.780, -126.020, "Gold River Forest",      "West-central VI inner CWH"),
+    (50.720, -127.500, "Port Hardy Forest",      "North VI CWH valley bottoms"),
+    (49.400, -123.720, "Sunshine Coast South",   "Lower Sunshine Coast CWH"),
+    (49.520, -123.420, "Howe Sound East",        "Howe Sound montane CWH"),
+    (49.780, -124.550, "Powell River Forest",    "Upper Sunshine Coast CWH"),
+    (50.100, -124.060, "Jervis Inlet Slopes",    "Jervis Inlet fjord CWH"),
+    (51.020, -124.480, "Toba Inlet Slopes",      "Remote fjord CWH, northern Sunshine Coast"),
+    (51.080, -125.680, "Knight Inlet",           "Deep fjord, mainland Coast Mountains CWH"),
+    (50.760, -126.480, "Broughton Archipelago",  "Outer archipelago CWH"),
+    (51.220, -126.020, "Kingcome Inlet",         "Remote fjord valley, inner CWH"),
+    (51.640, -126.520, "Owikeno Lake",           "Rivers Inlet drainage, interior CWH"),
+    (52.090, -126.840, "Burke Channel",          "Outer fjord near Bella Coola"),
+    (52.380, -127.680, "Ocean Falls",            "Outer coast CWH, high precipitation"),
+    (52.720, -126.560, "Dean Channel",           "Dean River CWH, coast-interior edge"),
+    (52.900, -128.700, "Princess Royal Island",  "Outer island CWH, spirit bear range"),
+    (52.510, -128.580, "Milbanke Sound",         "Outer mid-coast CWH"),
+    (54.820, -130.120, "Portland Inlet",         "Far north coast CWH near Nisga'a"),
 ]
 
 
 # ── Colormap ──────────────────────────────────────────────────────────────────
-YEWCMAP = LinearSegmentedColormap.from_list(
-    'yew',
-    [
-        (0.00, (0.90, 0.90, 0.90, 0.00)),
-        (0.05, (0.60, 0.80, 0.60, 0.55)),
-        (0.10, (0.20, 0.70, 0.20, 0.70)),
-        (0.30, (0.45, 0.85, 0.05, 0.80)),
-        (0.50, (1.00, 0.90, 0.00, 0.88)),
-        (0.70, (0.90, 0.40, 0.10, 0.93)),
-        (1.00, (0.65, 0.00, 0.45, 0.96)),
-    ],
-    N=256,
-)
+# Full 0→1 probability range; near-zero pixels made transparent.
+YEW_VMIN = 0.0
+YEW_VMAX = 1.0
+YEW_TRANSPARENT_BELOW = 0.02   # hide noise floor
+
+def _make_yewcmap():
+    return LinearSegmentedColormap.from_list(
+        'yew',
+        [
+            (0.00, (0.20, 0.70, 0.20, 0.70)),   # low  – green
+            (0.17, (0.45, 0.85, 0.05, 0.80)),   # lime
+            (0.33, (1.00, 0.90, 0.00, 0.88)),   # yellow
+            (0.50, (1.00, 0.60, 0.00, 0.90)),   # orange-yellow
+            (0.67, (0.90, 0.40, 0.10, 0.93)),   # orange
+            (0.83, (0.80, 0.15, 0.30, 0.95)),   # red-orange
+            (1.00, (0.65, 0.00, 0.45, 0.96)),   # high – magenta
+        ],
+        N=256,
+    )
+
+YEWCMAP = _make_yewcmap()
 
 
 # ── YewMLP (must match training definition exactly) ───────────────────────────
@@ -258,31 +289,79 @@ def centre_to_bbox(lat, lon, km=10):
 
 
 # ── Inference ─────────────────────────────────────────────────────────────────
-def classify_grid(emb_array, model, scaler, device, batch_size=500_000):
+
+# Classifier types:
+#   mlp_scaled  — MLP with StandardScaler (original production method)
+#   mlp_raw     — MLP on raw embeddings (no scaler)
+#   rf_raw      — Random Forest on raw embeddings
+#   knn3_raw    — k-Nearest Neighbors (k=3) on raw embeddings
+#   logistic_raw — Logistic Regression on raw embeddings (linear probe)
+SKLEARN_CLASSIFIERS = {'rf_raw', 'rf_raw_expanded', 'knn3_raw', 'logistic_raw'}
+MLP_CLASSIFIERS     = {'mlp_scaled', 'mlp_raw'}
+ALL_CLASSIFIERS     = SKLEARN_CLASSIFIERS | MLP_CLASSIFIERS
+
+
+def classify_grid(emb_array, classifier, scaler, device, batch_size=500_000,
+                  classifier_type='mlp_scaled'):
     """
-    Run MLP inference on (H, W, 64) embedding array.
+    Run inference on (H, W, 64) embedding array.
     Returns (H, W) probability grid.
+
+    For sklearn classifiers: uses predict_proba on CPU (batched for memory).
+    For MLP classifiers:     uses GPU inference with optional scaler.
     """
     h, w, _ = emb_array.shape
     flat = emb_array.reshape(-1, 64).astype(np.float32)
     flat = np.nan_to_num(flat, nan=0.0, posinf=0.0, neginf=0.0)
 
-    flat_s = scaler.transform(flat)
-    probs  = np.zeros(len(flat), dtype=np.float32)
+    if classifier_type in SKLEARN_CLASSIFIERS:
+        # sklearn classifiers work on CPU, predict_proba gives [P(0), P(1)]
+        probs = np.zeros(len(flat), dtype=np.float32)
+        for start in range(0, len(flat), batch_size):
+            end = min(start + batch_size, len(flat))
+            batch = flat[start:end]
+            probs[start:end] = classifier.predict_proba(batch)[:, 1]
+        return probs.reshape(h, w)
 
-    model.eval()
-    with torch.no_grad():
-        for start in range(0, len(flat_s), batch_size):
-            batch = torch.tensor(flat_s[start:start + batch_size], device=device)
-            logits = model(batch)
-            probs[start:start + batch_size] = torch.sigmoid(logits).cpu().numpy()
+    elif classifier_type == 'mlp_scaled':
+        # Original method: StandardScaler → MLP on GPU
+        flat_s = scaler.transform(flat)
+        probs = np.zeros(len(flat), dtype=np.float32)
+        classifier.eval()
+        with torch.no_grad():
+            for start in range(0, len(flat_s), batch_size):
+                batch = torch.tensor(flat_s[start:start + batch_size], device=device)
+                logits = classifier(batch)
+                probs[start:start + batch_size] = torch.sigmoid(logits).cpu().numpy()
+        return probs.reshape(h, w)
 
-    return probs.reshape(h, w)
+    elif classifier_type == 'mlp_raw':
+        # MLP on raw embeddings (no scaler)
+        probs = np.zeros(len(flat), dtype=np.float32)
+        classifier.eval()
+        with torch.no_grad():
+            for start in range(0, len(flat), batch_size):
+                batch = torch.tensor(flat[start:start + batch_size], device=device)
+                logits = classifier(batch)
+                probs[start:start + batch_size] = torch.sigmoid(logits).cpu().numpy()
+        return probs.reshape(h, w)
+
+    else:
+        raise ValueError(f"Unknown classifier type: {classifier_type}")
 
 
 # ── Visualisation ─────────────────────────────────────────────────────────────
-def grid_to_png_b64(grid, cmap, threshold=0.02):
-    rgba = cmap(grid)
+def grid_to_png_b64(grid, cmap, threshold=None, vmin=None, vmax=None):
+    """Render probability grid to RGBA PNG (base64).  Values below *threshold*
+    (default: YEW_TRANSPARENT_BELOW) are fully transparent."""
+    if vmin is None:
+        vmin = YEW_VMIN
+    if vmax is None:
+        vmax = YEW_VMAX
+    if threshold is None:
+        threshold = YEW_TRANSPARENT_BELOW
+    normed = np.clip((grid - vmin) / (vmax - vmin), 0, 1)
+    rgba = cmap(normed)
     rgba[grid < threshold] = [0, 0, 0, 0]
     img = PILImage.fromarray((rgba * 255).astype(np.uint8), mode='RGBA')
     buf = io.BytesIO()
@@ -556,7 +635,7 @@ def make_area_map(area_info, output_html, log_b64=None):
         ).add_to(m)
 
     # Yew probability overlay
-    yew_b64 = grid_to_png_b64(grid, YEWCMAP, threshold=0.02)
+    yew_b64 = grid_to_png_b64(grid, YEWCMAP)
     folium.raster_layers.ImageOverlay(
         image=f'data:image/png;base64,{yew_b64}',
         bounds=[[south, west], [north, east]],
@@ -599,16 +678,19 @@ def make_area_map(area_info, output_html, log_b64=None):
                 background:#ffffffee;border:2px solid #555;z-index:9999;
                 font-size:12px;padding:10px;border-radius:6px;">
       <b style="font-size:13px;">Yew Probability</b>
-      <div style="margin:5px 0 2px">
-        <span style="background:#99cc99;padding:1px 8px;">▇</span> 0.05–0.10</div>
+      <div style="font-size:10px;color:#777;margin:2px 0 4px">(range 0.70 – 1.00)</div>
       <div style="margin:2px 0">
-        <span style="background:#33b233;padding:1px 8px;">▇</span> 0.10–0.30</div>
+        <span style="background:#33b233;padding:1px 8px;">▇</span> 0.70–0.75</div>
       <div style="margin:2px 0">
-        <span style="background:#73d90d;padding:1px 8px;">▇</span> 0.30–0.50</div>
+        <span style="background:#73d90d;padding:1px 8px;">▇</span> 0.75–0.80</div>
       <div style="margin:2px 0">
-        <span style="background:#ffe600;padding:1px 8px;">▇</span> 0.50–0.70</div>
+        <span style="background:#ffe600;padding:1px 8px;">▇</span> 0.80–0.85</div>
       <div style="margin:2px 0">
-        <span style="background:#e66619;padding:1px 8px;">▇</span> 0.70–1.00</div>
+        <span style="background:#ff9900;padding:1px 8px;">▇</span> 0.85–0.90</div>
+      <div style="margin:2px 0">
+        <span style="background:#e66619;padding:1px 8px;">▇</span> 0.90–0.95</div>
+      <div style="margin:2px 0">
+        <span style="background:#a6004d;padding:1px 8px;">▇</span> 0.95–1.00</div>
       <hr style="margin:7px 0">
       <span style="font-size:11px;color:#444;">
         Grid: {stats["h"]}×{stats["w"]} px<br>
@@ -880,8 +962,9 @@ def make_summary_page(all_stats, output_html):
 
 # ── Thumbnail ─────────────────────────────────────────────────────────────────
 def save_thumbnail(grid, path, size=200):
-    rgba = YEWCMAP(grid)
-    rgba[grid < 0.02] = [0.85, 0.85, 0.85, 1.0]   # grey for near-zero
+    normed = np.clip((grid - YEW_VMIN) / (YEW_VMAX - YEW_VMIN), 0, 1)
+    rgba = YEWCMAP(normed)
+    rgba[grid < YEW_TRANSPARENT_BELOW] = [0.85, 0.85, 0.85, 1.0]   # grey for near-zero
     img = PILImage.fromarray((rgba * 255).astype(np.uint8), mode='RGBA')
     img = img.resize((size, size), PILImage.LANCZOS)
     img.save(str(path), format='PNG')
@@ -897,7 +980,14 @@ def main():
                         help='Delete classification grid caches and re-classify with the current model')
     parser.add_argument('--skip-logging',     action='store_true',
                         help='Skip reading VEG_COMP GDB (faster, no logging overlay)')
+    parser.add_argument('--classifier',       type=str, default='mlp_scaled',
+                        choices=sorted(ALL_CLASSIFIERS),
+                        help='Classifier type (default: mlp_scaled)')
+    parser.add_argument('--tiles',            type=str, default=None,
+                        help='Comma-separated list of tile indices (1-based) or name substrings to process (default: all)')
     args = parser.parse_args()
+
+    classifier_type = args.classifier
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     cache_dir = OUTPUT_DIR / 'tile_cache'
@@ -909,17 +999,49 @@ def main():
     else:
         device = torch.device(args.device)
     print(f"Device: {device}")
+    print(f"Classifier: {classifier_type}")
+    print(f"Vis range: VMIN={YEW_VMIN}, VMAX={YEW_VMAX}")
 
-    # ── Load model + scaler ───────────────────────────────────────────────
-    print(f"\nLoading model from {MODEL_DIR}...")
-    model = YewMLP()
-    model.load_state_dict(torch.load(MODEL_DIR / 'mlp_model.pth', map_location=device))
-    model = model.to(device)
-    model.eval()
+    # ── Load classifier ───────────────────────────────────────────────────
+    print(f"\nLoading classifier from {MODEL_DIR}...")
+    scaler = None
 
-    with open(MODEL_DIR / 'mlp_scaler.pkl', 'rb') as f:
-        scaler = pickle.load(f)
-    print("  ✓ Model and scaler loaded")
+    CLASSIFIER_FILES = {
+        'mlp_scaled':       ('mlp_scaled_model.pth', 'mlp_scaler.pkl'),
+        'mlp_raw':          ('mlp_raw_model.pth',    None),
+        'rf_raw':           ('rf_raw_model.pkl',      None),
+        'rf_raw_expanded':  ('rf_raw_model_expanded.pkl', None),
+        'knn3_raw':         ('knn3_raw_model.pkl',    None),
+        'logistic_raw':     ('logistic_raw_model.pkl', None),
+    }
+    model_file, scaler_file = CLASSIFIER_FILES[classifier_type]
+    model_path = MODEL_DIR / model_file
+
+    if not model_path.exists():
+        # Fallback: try the original MLP model for backwards compatibility
+        if classifier_type == 'mlp_scaled':
+            model_path = MODEL_DIR / 'mlp_model.pth'
+            scaler_file = 'mlp_scaler.pkl'
+
+    if not model_path.exists():
+        print(f"  ✗ Model file not found: {model_path}")
+        print(f"  Run: python scripts/training/compare_classifiers.py")
+        return
+
+    if classifier_type in MLP_CLASSIFIERS:
+        classifier = YewMLP()
+        classifier.load_state_dict(torch.load(model_path, map_location=device))
+        classifier = classifier.to(device)
+        classifier.eval()
+        if scaler_file:
+            with open(MODEL_DIR / scaler_file, 'rb') as f:
+                scaler = pickle.load(f)
+        print(f"  ✓ MLP loaded ({model_path.name})"
+              + (f" + {scaler_file}" if scaler_file else ""))
+    else:
+        with open(model_path, 'rb') as f:
+            classifier = pickle.load(f)
+        print(f"  ✓ sklearn classifier loaded ({model_path.name})")
 
     # ── GEE init ──────────────────────────────────────────────────────────
     print("\nInitialising Google Earth Engine...")
@@ -929,7 +1051,26 @@ def main():
     # ── Process each area ─────────────────────────────────────────────────
     all_stats = []
 
-    for i, (lat, lon, name, desc) in enumerate(STUDY_AREAS):
+    # Filter tiles if --tiles was specified
+    if args.tiles:
+        tokens = [t.strip() for t in args.tiles.split(',')]
+        selected_indices = set()
+        for tok in tokens:
+            if tok.isdigit():
+                idx = int(tok) - 1  # 1-based → 0-based
+                if 0 <= idx < len(STUDY_AREAS):
+                    selected_indices.add(idx)
+            else:
+                # Match by name substring (case-insensitive)
+                for j, (_, _, nm, _) in enumerate(STUDY_AREAS):
+                    if tok.lower() in nm.lower():
+                        selected_indices.add(j)
+        areas_to_process = [(i, STUDY_AREAS[i]) for i in sorted(selected_indices)]
+        print(f"\nProcessing {len(areas_to_process)} of {len(STUDY_AREAS)} tiles")
+    else:
+        areas_to_process = list(enumerate(STUDY_AREAS))
+
+    for i, (lat, lon, name, desc) in areas_to_process:
         slug  = name.lower().replace(' ', '_').replace('-', '_')
         print(f"\n{'='*68}")
         print(f"[{i+1}/{len(STUDY_AREAS)}] {name}  ({lat:.3f}, {lon:.3f})")
@@ -974,9 +1115,10 @@ def main():
             print("  ↩ Loaded grid from cache")
             grid = np.load(grid_cache)
         else:
-            print("  Classifying...")
+            print(f"  Classifying ({classifier_type})...")
             t0 = time.time()
-            grid = classify_grid(emb, model, scaler, device)
+            grid = classify_grid(emb, classifier, scaler, device,
+                                 classifier_type=classifier_type)
             np.save(grid_cache, grid)   # raw, un-masked — always kept as-is
             print(f"  ✓ Done in {time.time()-t0:.1f}s")
 
@@ -1041,7 +1183,8 @@ def main():
         make_summary_page(all_stats, OUTPUT_DIR / 'index.html')
 
     print(f"\n{'='*68}")
-    print(f"ALL DONE \u2014 {len(all_stats)}/{len(STUDY_AREAS)} areas processed")
+    n_requested = len(areas_to_process)
+    print(f"ALL DONE \u2014 {len(all_stats)}/{n_requested} areas processed")
     print(f"Each map has a Field Sampling panel - click Yew Present/Absent then the map")
     print(f"Open: file://{(OUTPUT_DIR / 'index.html').absolute()}")
 

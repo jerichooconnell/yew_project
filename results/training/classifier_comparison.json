@@ -1,0 +1,101 @@
+[
+  {
+    "name": "MLP raw",
+    "accuracy": 0.9757142857142858,
+    "balanced_accuracy": 0.9743980612883052,
+    "f1": 0.9596199524940617,
+    "precision": 0.9483568075117371,
+    "recall": 0.9711538461538461,
+    "roc_auc": 0.9962329971857411,
+    "time_s": 16.3,
+    "scaling": "none"
+  },
+  {
+    "name": "MLP + StandardScaler",
+    "accuracy": 0.9857142857142858,
+    "balanced_accuracy": 0.9898373983739837,
+    "f1": 0.9765258215962441,
+    "precision": 0.9541284403669725,
+    "recall": 1.0,
+    "roc_auc": 0.996066877736085,
+    "time_s": 13.31,
+    "scaling": "StandardScaler"
+  },
+  {
+    "name": "kNN (k=3) raw",
+    "accuracy": 0.9114285714285715,
+    "balanced_accuracy": 0.8634498123827392,
+    "f1": 0.8333333333333334,
+    "precision": 0.9451219512195121,
+    "recall": 0.7451923076923077,
+    "roc_auc": 0.990902517198249,
+    "time_s": 0.03,
+    "scaling": "none"
+  },
+  {
+    "name": "Random Forest raw",
+    "accuracy": 0.9842857142857143,
+    "balanced_accuracy": 0.9888211382113821,
+    "f1": 0.9742388758782201,
+    "precision": 0.9497716894977168,
+    "recall": 1.0,
+    "roc_auc": 0.9895589040025017,
+    "time_s": 2.96,
+    "scaling": "none"
+  },
+  {
+    "name": "Random Forest scaled",
+    "accuracy": 0.9842857142857143,
+    "balanced_accuracy": 0.9888211382113821,
+    "f1": 0.9742388758782201,
+    "precision": 0.9497716894977168,
+    "recall": 1.0,
+    "roc_auc": 0.9895589040025017,
+    "time_s": 1.83,
+    "scaling": "StandardScaler"
+  },
+  {
+    "name": "kNN (k=5) raw",
+    "accuracy": 0.8928571428571429,
+    "balanced_accuracy": 0.8308122263914948,
+    "f1": 0.7899159663865546,
+    "precision": 0.9463087248322147,
+    "recall": 0.6778846153846154,
+    "roc_auc": 0.9847218964978111,
+    "time_s": 0.04,
+    "scaling": "none"
+  },
+  {
+    "name": "kNN (k=1) raw",
+    "accuracy": 0.9757142857142858,
+    "balanced_accuracy": 0.9730104752970606,
+    "f1": 0.9594272076372315,
+    "precision": 0.95260663507109,
+    "recall": 0.9663461538461539,
+    "roc_auc": 0.9730104752970606,
+    "time_s": 0.15,
+    "scaling": "none"
+  },
+  {
+    "name": "Logistic Regression raw",
+    "accuracy": 0.8128571428571428,
+    "balanced_accuracy": 0.6948092557848655,
+    "f1": 0.5618729096989966,
+    "precision": 0.9230769230769231,
+    "recall": 0.40384615384615385,
+    "roc_auc": 0.9164858896185116,
+    "time_s": 3.95,
+    "scaling": "none"
+  },
+  {
+    "name": "Ridge Classifier raw",
+    "accuracy": 0.7657142857142857,
+    "balanced_accuracy": 0.6099319887429644,
+    "f1": 0.3643410852713178,
+    "precision": 0.94,
+    "recall": 0.22596153846153846,
+    "roc_auc": 0.9060008208255159,
+    "time_s": 0.05,
+    "scaling": "none"
+  }
+]
