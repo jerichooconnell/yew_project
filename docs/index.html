@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pacific Yew Habitat Map — Coastal BC</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; }
+
+    /* ── Sidebar ─────────────────────────────────────── */
+    #sidebar {
+      position: absolute; top: 0; left: 0; width: 340px; height: 100%;
+      background: #ffffffe8; backdrop-filter: blur(8px);
+      z-index: 1000; overflow-y: auto; border-right: 1px solid #ccc;
+      transition: transform 0.3s ease;
+      display: flex; flex-direction: column;
+    }
+    #sidebar.collapsed { transform: translateX(-340px); }
+    #sidebar-toggle {
+      position: absolute; top: 10px; left: 10px; z-index: 1001;
+      background: white; border: 2px solid rgba(0,0,0,0.2); border-radius: 4px;
+      width: 36px; height: 36px; cursor: pointer; font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      transition: left 0.3s ease;
+    }
+    #sidebar-toggle.shifted { left: 350px; }
+
+    .sidebar-header {
+      padding: 16px; background: #2d5a27; color: white;
+      flex-shrink: 0;
+    }
+    .sidebar-header h1 { font-size: 16px; margin-bottom: 4px; }
+    .sidebar-header p { font-size: 11px; opacity: 0.85; line-height: 1.4; }
+
+    .sidebar-section { padding: 10px 14px; border-bottom: 1px solid #e0e0e0; }
+    .sidebar-section h3 { font-size: 13px; color: #2d5a27; margin-bottom: 6px; }
+
+    /* Tile list */
+    .tile-list { list-style: none; flex: 1; overflow-y: auto; padding: 0; }
+    .tile-item {
+      padding: 8px 14px; border-bottom: 1px solid #eee; cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      transition: background 0.15s;
+    }
+    .tile-item:hover { background: #e8f5e9; }
+    .tile-item.active { background: #c8e6c9; }
+    .tile-cb { flex-shrink: 0; }
+    .tile-info { flex: 1; min-width: 0; }
+    .tile-name { font-size: 12px; font-weight: 600; color: #333; }
+    .tile-desc { font-size: 10px; color: #777; }
+    .tile-stats { font-size: 10px; color: #555; margin-top: 1px; }
+    .tile-flyto {
+      flex-shrink: 0; background: #2d5a27; color: white; border: none;
+      border-radius: 3px; padding: 3px 8px; font-size: 10px; cursor: pointer;
+    }
+    .tile-flyto:hover { background: #1b4a17; }
+
+    /* ── Legend ─────────────────────────────────────── */
+    #legend {
+      position: absolute; bottom: 20px; right: 10px; z-index: 1000;
+      background: #ffffffe8; backdrop-filter: blur(8px);
+      border: 2px solid #555; border-radius: 6px;
+      padding: 10px; font-size: 12px; width: 200px;
+    }
+    #legend h4 { margin-bottom: 4px; color: #2d5a27; }
+    .legend-row { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
+    .legend-swatch { width: 24px; height: 14px; border-radius: 2px; flex-shrink: 0; }
+
+    /* ── Observation Panel ───────────────────────────── */
+    #obs-panel {
+      position: absolute; top: 10px; right: 10px; z-index: 1000;
+      background: #ffffffe8; backdrop-filter: blur(8px);
+      border: 2px solid #2d5a27; border-radius: 8px;
+      padding: 12px; font-size: 12px; width: 280px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    #obs-panel h3 { color: #2d5a27; margin-bottom: 6px; font-size: 14px; }
+    .obs-btns { display: flex; gap: 6px; margin-bottom: 6px; }
+    .obs-btn {
+      flex: 1; padding: 8px 4px; border-radius: 5px; cursor: pointer;
+      font-weight: bold; font-size: 12px; border: 2px solid;
+      transition: box-shadow 0.15s, transform 0.1s;
+    }
+    .obs-btn:hover { transform: scale(1.02); }
+    .obs-btn-yew { background: #e8f5e9; border-color: #4caf50; color: #1b5e20; }
+    .obs-btn-yew.active { box-shadow: 0 0 0 3px #4caf50; }
+    .obs-btn-noyew { background: #ffebee; border-color: #ef5350; color: #b71c1c; }
+    .obs-btn-noyew.active { box-shadow: 0 0 0 3px #ef5350; }
+    #obs-status { font-size: 11px; color: #666; margin-bottom: 6px; }
+
+    .obs-list {
+      max-height: 150px; overflow-y: auto; border: 1px solid #ddd;
+      border-radius: 4px; margin-bottom: 6px;
+    }
+    .obs-list table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .obs-list th { background: #f5f5f5; padding: 3px 5px; text-align: left; position: sticky; top: 0; }
+    .obs-list td { padding: 2px 5px; border-bottom: 1px solid #eee; }
+    .obs-remove { cursor: pointer; color: #999; font-size: 14px; }
+    .obs-remove:hover { color: #e53935; }
+
+    .obs-actions { display: flex; gap: 5px; }
+    .obs-actions button {
+      flex: 1; padding: 6px; border-radius: 4px; cursor: pointer;
+      font-size: 11px; border: 1px solid #bbb;
+    }
+    .btn-clear { background: #f5f5f5; }
+    .btn-submit {
+      background: #2d5a27; color: white; border: none; font-weight: bold;
+    }
+    .btn-submit:hover { background: #1b4a17; }
+
+    /* ── Toggle all control ──────────────────────────── */
+    .toggle-all-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-bottom: 1px solid #ccc;
+      background: #f9f9f9;
+    }
+    .toggle-all-row label { font-size: 12px; font-weight: 600; color: #333; }
+
+    /* ── Sort control ──────────────────────────── */
+    .sort-row {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 14px 6px; background: #f9f9f9; border-bottom: 1px solid #ccc;
+    }
+    .sort-row label { font-size: 11px; color: #555; }
+    .sort-row select { font-size: 11px; padding: 2px 4px; border-radius: 3px; border: 1px solid #ccc; }
+
+    /* Mobile */
+    @media (max-width: 700px) {
+      #sidebar { width: 280px; }
+      #sidebar-toggle.shifted { left: 290px; }
+      #obs-panel { width: 240px; right: 5px; top: 50px; }
+      #legend { width: 160px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- Sidebar toggle -->
+<button id="sidebar-toggle" class="shifted" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
+
+<!-- Sidebar -->
+<div id="sidebar">
+  <div class="sidebar-header">
+    <h1>🌲 Pacific Yew Habitat Map</h1>
+    <p>
+      35 study areas across BC's Coastal Western Hemlock (CWH) zone.<br>
+      MLP model · 10 m GEE satellite embeddings · 2024 imagery.
+    </p>
+  </div>
+
+  <div class="sidebar-section">
+    <h3>About</h3>
+    <p style="font-size:11px; color:#555; line-height:1.4;">
+      Predicted probability of Pacific yew (<i>Taxus brevifolia</i>) habitat
+      using a neural network trained on iNaturalist observations and
+      Google Earth Engine satellite embeddings. Each tile covers ~10×10 km.
+      <br><br>
+      <b>Use the observation panel</b> (top right) to report yew sightings
+      and improve the model.
+    </p>
+  </div>
+
+  <div class="toggle-all-row">
+    <input type="checkbox" id="toggle-all" checked onchange="toggleAllTiles(this.checked)">
+    <label for="toggle-all">Show yew probability</label>
+  </div>
+  <div class="toggle-all-row">
+    <input type="checkbox" id="toggle-forestry" onchange="toggleAllForestry(this.checked)">
+    <label for="toggle-forestry">🌳 Show forestry / logging</label>
+  </div>
+
+  <div class="sort-row">
+    <label for="sort-select">Sort:</label>
+    <select id="sort-select" onchange="sortTileList(this.value)">
+      <option value="name">Name (A–Z)</option>
+      <option value="p50" selected>Habitat area (P≥0.5)</option>
+      <option value="mean">Mean probability</option>
+      <option value="lat">Latitude (N→S)</option>
+    </select>
+  </div>
+
+  <ul class="tile-list" id="tile-list"></ul>
+</div>
+
+<!-- Legend -->
+<div id="legend">
+  <h4>Yew Probability</h4>
+  <div class="legend-row"><span class="legend-swatch" style="background:rgba(51,178,51,0.70)"></span> 0.02 – 0.17</div>
+  <div class="legend-row"><span class="legend-swatch" style="background:rgba(115,217,13,0.80)"></span> 0.17 – 0.33</div>
+  <div class="legend-row"><span class="legend-swatch" style="background:rgba(255,230,0,0.88)"></span> 0.33 – 0.50</div>
+  <div class="legend-row"><span class="legend-swatch" style="background:rgba(255,153,0,0.90)"></span> 0.50 – 0.67</div>
+  <div class="legend-row"><span class="legend-swatch" style="background:rgba(230,102,25,0.93)"></span> 0.67 – 0.83</div>
+  <div class="legend-row"><span class="legend-swatch" style="background:rgba(166,0,77,0.96)"></span> 0.83 – 1.00</div>
+  <hr style="margin:6px 0">
+  <div id="forestry-legend" style="display:none;">
+    <h4 style="margin-top:4px;">🌳 Forestry / VRI</h4>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(30,100,220,0.71)"></span> Water / non-forest</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(220,50,50,0.67)"></span> Logged &lt; 20 yr</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(230,120,30,0.59)"></span> Logged 20–40 yr</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(220,200,50,0.43)"></span> Logged 40–80 yr</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(100,200,100,0.27)"></span> Forest &gt; 80 yr</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(175,155,125,0.63)"></span> Alpine / barren</div>
+    <hr style="margin:6px 0">
+  </div>
+  <div style="font-size:10px;color:#666;">
+    Transparent = P &lt; 0.02<br>
+    10 m resolution · MLP classifier<br>
+    Forestry: BC VRI 2024
+  </div>
+</div>
+
+<!-- Observation submission panel -->
+<div id="obs-panel">
+  <h3>🌿 Report Observation</h3>
+  <div class="obs-btns">
+    <button class="obs-btn obs-btn-yew" onclick="setObsMode('yew')">✔ Yew Present</button>
+    <button class="obs-btn obs-btn-noyew" onclick="setObsMode('noyew')">✘ No Yew</button>
+  </div>
+  <div id="obs-status">Click a button, then click the map</div>
+
+  <div class="obs-list">
+    <table>
+      <thead><tr><th>Type</th><th>Lat</th><th>Lon</th><th></th></tr></thead>
+      <tbody id="obs-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="obs-actions">
+    <button class="btn-clear" onclick="clearObs()">Clear All</button>
+    <button class="btn-submit" onclick="submitObs()">📤 Submit to GitHub</button>
+  </div>
+
+  <div id="obs-footer" style="font-size:10px;color:#888;margin-top:6px;line-height:1.3;">
+    Submissions create a GitHub Issue with your observations so the project
+    maintainer can review and add them to the training data.
+    Requires a free GitHub account.
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+<script>
+// ── Config ───────────────────────────────────────────────────────────────────
+const GITHUB_OWNER = 'jerichooconnell';
+const GITHUB_REPO  = 'yew_project';
+const TILES_JSON   = 'tiles/tiles.json';
+
+// ── Map init ─────────────────────────────────────────────────────────────────
+const map = L.map('map', {
+  center: [50.5, -126.0],
+  zoom: 6,
+  zoomControl: true,
+});
+
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  attribution: 'Esri World Imagery',
+  maxZoom: 18,
+}).addTo(map);
+
+const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap',
+  maxZoom: 18,
+});
+
+const topoLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+  attribution: 'Esri Topo',
+  maxZoom: 18,
+});
+
+L.control.layers({
+  'Satellite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution:'Esri',maxZoom:18}).addTo(map),
+  'OpenStreetMap': osmLayer,
+  'Terrain': topoLayer,
+}, {}, {position: 'bottomleft'}).addTo(map);
+
+// ── State ────────────────────────────────────────────────────────────────────
+let tiles = [];
+let overlays = {};
+let forestryOverlays = {};
+let forestryVisible = false;
+let obsMode = null;
+let observations = [];
+let obsMarkers = [];
+
+// ── Load tiles ───────────────────────────────────────────────────────────────
+fetch(TILES_JSON)
+  .then(r => r.json())
+  .then(data => {
+    tiles = data;
+    initTiles();
+    sortTileList(document.getElementById('sort-select').value);
+  })
+  .catch(err => console.error('Failed to load tiles.json:', err));
+
+function initTiles() {
+  tiles.forEach((t, i) => {
+    const bounds = [[t.bbox.south, t.bbox.west], [t.bbox.north, t.bbox.east]];
+    const overlay = L.imageOverlay('tiles/' + t.png, bounds, {
+      opacity: 0.9,
+      interactive: false,
+    }).addTo(map);
+    overlays[t.slug] = overlay;
+    t._index = i;
+
+    // Forestry / logging overlay (not added to map by default)
+    if (t.logging_png) {
+      const logOverlay = L.imageOverlay('tiles/' + t.logging_png, bounds, {
+        opacity: 0.85,
+        interactive: false,
+      });
+      forestryOverlays[t.slug] = logOverlay;
+    }
+  });
+}
+
+// ── Tile list ────────────────────────────────────────────────────────────────
+function renderTileList(sortedTiles) {
+  const list = document.getElementById('tile-list');
+  list.innerHTML = '';
+  sortedTiles.forEach(t => {
+    const li = document.createElement('li');
+    li.className = 'tile-item';
+    li.innerHTML = `
+      <input type="checkbox" class="tile-cb" data-slug="${t.slug}"
+             ${overlays[t.slug] && map.hasLayer(overlays[t.slug]) ? 'checked' : ''}
+             onchange="toggleTile('${t.slug}', this.checked)">
+      <div class="tile-info">
+        <div class="tile-name">${t.name}</div>
+        <div class="tile-desc">${t.desc}</div>
+        <div class="tile-stats">P≥0.5: ${t.stats.p50_ha.toFixed(0)} ha · max: ${t.stats.max.toFixed(2)}</div>
+      </div>
+      <button class="tile-flyto" onclick="flyToTile('${t.slug}')" title="Zoom to tile">⌖</button>
+    `;
+    list.appendChild(li);
+  });
+}
+
+function sortTileList(by) {
+  let sorted = [...tiles];
+  if (by === 'name')  sorted.sort((a, b) => a.name.localeCompare(b.name));
+  if (by === 'p50')   sorted.sort((a, b) => b.stats.p50_ha - a.stats.p50_ha);
+  if (by === 'mean')  sorted.sort((a, b) => b.stats.mean - a.stats.mean);
+  if (by === 'lat')   sorted.sort((a, b) => b.lat - a.lat);
+  renderTileList(sorted);
+}
+
+function toggleTile(slug, show) {
+  if (show && overlays[slug]) {
+    overlays[slug].addTo(map);
+  } else if (overlays[slug]) {
+    map.removeLayer(overlays[slug]);
+  }
+}
+
+function toggleAllTiles(show) {
+  Object.keys(overlays).forEach(slug => toggleTile(slug, show));
+  document.querySelectorAll('.tile-cb').forEach(cb => cb.checked = show);
+}
+
+function toggleAllForestry(show) {
+  forestryVisible = show;
+  Object.keys(forestryOverlays).forEach(slug => {
+    if (show) {
+      forestryOverlays[slug].addTo(map);
+    } else {
+      map.removeLayer(forestryOverlays[slug]);
+    }
+  });
+  document.getElementById('forestry-legend').style.display = show ? 'block' : 'none';
+}
+
+function flyToTile(slug) {
+  const t = tiles.find(x => x.slug === slug);
+  if (!t) return;
+  const bounds = [[t.bbox.south, t.bbox.west], [t.bbox.north, t.bbox.east]];
+  map.flyToBounds(bounds, { padding: [20, 20], maxZoom: 13 });
+  // Ensure overlay is visible
+  if (!map.hasLayer(overlays[slug])) {
+    overlays[slug].addTo(map);
+    const cb = document.querySelector(`.tile-cb[data-slug="${slug}"]`);
+    if (cb) cb.checked = true;
+  }
+  // Also show forestry if globally enabled
+  if (forestryVisible && forestryOverlays[slug] && !map.hasLayer(forestryOverlays[slug])) {
+    forestryOverlays[slug].addTo(map);
+  }
+}
+
+// ── Sidebar toggle ───────────────────────────────────────────────────────────
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const btn = document.getElementById('sidebar-toggle');
+  sb.classList.toggle('collapsed');
+  btn.classList.toggle('shifted');
+  btn.textContent = sb.classList.contains('collapsed') ? '☰' : '✕';
+}
+
+// ── Observation mode ─────────────────────────────────────────────────────────
+function setObsMode(mode) {
+  if (obsMode === mode) {
+    obsMode = null;
+    document.querySelectorAll('.obs-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('obs-status').textContent = 'Click a button, then click the map';
+    document.getElementById('obs-status').style.color = '#666';
+    map.getContainer().style.cursor = '';
+  } else {
+    obsMode = mode;
+    document.querySelectorAll('.obs-btn').forEach(b => b.classList.remove('active'));
+    if (mode === 'yew') {
+      document.querySelector('.obs-btn-yew').classList.add('active');
+      document.getElementById('obs-status').textContent = '▶ Click map to mark YEW PRESENT';
+      document.getElementById('obs-status').style.color = '#1b5e20';
+    } else {
+      document.querySelector('.obs-btn-noyew').classList.add('active');
+      document.getElementById('obs-status').textContent = '▶ Click map to mark YEW ABSENT';
+      document.getElementById('obs-status').style.color = '#b71c1c';
+    }
+    map.getContainer().style.cursor = 'crosshair';
+  }
+}
+
+map.on('click', function(e) {
+  if (!obsMode) return;
+  const lat = e.latlng.lat;
+  const lon = e.latlng.lng;
+  const isYew = obsMode === 'yew';
+
+  const color = isYew ? '#4caf50' : '#ef5350';
+  const label = isYew ? '✔ Yew Present' : '✘ No Yew';
+  const marker = L.circleMarker([lat, lon], {
+    radius: 8, color: color, fillColor: color,
+    fillOpacity: 0.85, weight: 2,
+  }).addTo(map)
+    .bindPopup(`<b>${label}</b><br>Lat: ${lat.toFixed(5)}<br>Lon: ${lon.toFixed(5)}`);
+
+  observations.push({ type: obsMode, lat, lon });
+  obsMarkers.push(marker);
+  refreshObsTable();
+});
+
+function refreshObsTable() {
+  const tbody = document.getElementById('obs-tbody');
+  tbody.innerHTML = '';
+  observations.forEach((o, i) => {
+    const color = o.type === 'yew' ? '#1b5e20' : '#b71c1c';
+    const label = o.type === 'yew' ? '✔ Yew' : '✘ Absent';
+    tbody.innerHTML += `<tr>
+      <td style="color:${color};font-weight:bold;">${label}</td>
+      <td style="text-align:right">${o.lat.toFixed(5)}</td>
+      <td style="text-align:right">${o.lon.toFixed(5)}</td>
+      <td><span class="obs-remove" onclick="removeObs(${i})" title="Remove">✕</span></td>
+    </tr>`;
+  });
+}
+
+function removeObs(i) {
+  if (obsMarkers[i]) obsMarkers[i].remove();
+  observations.splice(i, 1);
+  obsMarkers.splice(i, 1);
+  refreshObsTable();
+}
+
+function clearObs() {
+  obsMarkers.forEach(m => m.remove());
+  observations = [];
+  obsMarkers = [];
+  refreshObsTable();
+}
+
+// ── Submit observations via GitHub Issue ─────────────────────────────────────
+function submitObs() {
+  if (observations.length === 0) {
+    alert('No observations to submit. Click the map to add some first.');
+    return;
+  }
+
+  // Build a structured issue body
+  const now = new Date().toISOString().replace('T', ' ').substr(0, 19) + ' UTC';
+  let csv = 'has_yew,lat,lon\n';
+  observations.forEach(o => {
+    csv += `${o.type === 'yew' ? 1 : 0},${o.lat.toFixed(6)},${o.lon.toFixed(6)}\n`;
+  });
+
+  const nYew = observations.filter(o => o.type === 'yew').length;
+  const nNo  = observations.filter(o => o.type === 'noyew').length;
+
+  const title = encodeURIComponent(
+    `[Observation] ${nYew} yew + ${nNo} absent — ${now}`
+  );
+
+  let body = `## Yew Observation Report\n\n`;
+  body += `**Submitted:** ${now}\n`;
+  body += `**Observations:** ${nYew} yew present, ${nNo} yew absent\n\n`;
+  body += `### Data (CSV)\n\n`;
+  body += '```csv\n' + csv + '```\n\n';
+  body += `### Map\n\n`;
+  observations.forEach((o, i) => {
+    const icon = o.type === 'yew' ? '🟢' : '🔴';
+    body += `${i + 1}. ${icon} ${o.type === 'yew' ? 'Yew present' : 'No yew'} — `;
+    body += `(${o.lat.toFixed(5)}, ${o.lon.toFixed(5)})\n`;
+  });
+  body += `\n### Notes\n\n_Add any additional notes about your observations here._\n`;
+
+  const url = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues/new?` +
+    `title=${title}&body=${encodeURIComponent(body)}&labels=observation`;
+
+  window.open(url, '_blank');
+}
+</script>
+</body>
+</html>
