@@ -299,7 +299,7 @@ def centre_to_bbox(lat, lon, km=10):
 #   logistic_raw — Logistic Regression on raw embeddings (linear probe)
 SKLEARN_CLASSIFIERS = {'rf_raw', 'rf_raw_expanded', 'knn3_raw', 'logistic_raw'}
 XGB_CLASSIFIERS     = {'xgb_raw_expanded'}
-MLP_CLASSIFIERS     = {'mlp_scaled', 'mlp_raw'}
+MLP_CLASSIFIERS     = {'mlp_scaled', 'mlp_raw', 'mlp_raw_expanded'}
 ALL_CLASSIFIERS     = SKLEARN_CLASSIFIERS | XGB_CLASSIFIERS | MLP_CLASSIFIERS
 
 
@@ -343,7 +343,7 @@ def classify_grid(emb_array, classifier, scaler, device, batch_size=500_000,
                 probs[start:start + batch_size] = torch.sigmoid(logits).cpu().numpy()
         return probs.reshape(h, w)
 
-    elif classifier_type == 'mlp_raw':
+    elif classifier_type in ('mlp_raw', 'mlp_raw_expanded'):
         # MLP on raw embeddings (no scaler)
         probs = np.zeros(len(flat), dtype=np.float32)
         classifier.eval()
@@ -1017,6 +1017,7 @@ def main():
     CLASSIFIER_FILES = {
         'mlp_scaled':       ('mlp_scaled_model.pth', 'mlp_scaler.pkl'),
         'mlp_raw':          ('mlp_raw_model.pth',    None),
+        'mlp_raw_expanded': ('mlp_raw_model_expanded.pth', None),
         'rf_raw':           ('rf_raw_model.pkl',      None),
         'rf_raw_expanded':  ('rf_raw_model_expanded.pkl', None),
         'xgb_raw_expanded': ('xgb_raw_model_expanded.json', None),
