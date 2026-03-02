@@ -326,7 +326,7 @@ def classify_grid(emb_array, classifier, scaler, device, batch_size=500_000,
         return probs.reshape(h, w)
 
     elif classifier_type in XGB_CLASSIFIERS:
-        # XGBoost - faster inference than sklearn RF
+        # XGBoost - GPU-accelerated inference
         dmat = xgb.DMatrix(flat)
         probs = classifier.predict(dmat)
         return probs.reshape(h, w)
@@ -1051,7 +1051,10 @@ def main():
     elif classifier_type in XGB_CLASSIFIERS:
         classifier = xgb.Booster()
         classifier.load_model(str(model_path))
-        print(f"  ✓ XGBoost model loaded ({model_path.name})")
+        # Use GPU inference if available
+        xgb_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        classifier.set_param({'device': xgb_device})
+        print(f"  ✓ XGBoost model loaded ({model_path.name}), device={xgb_device}")
     else:
         with open(model_path, 'rb') as f:
             classifier = pickle.load(f)
