@@ -1153,5 +1153,326 @@
       "forest_gt80_pct": 55.7,
       "alpine_pct": 9.9
     }
+  },
+  {
+    "slug": "muchalat_valley",
+    "name": "Muchalat Valley",
+    "desc": "Central VI CWHmm1/xm2 valley",
+    "lat": 50.25,
+    "lon": -125.75,
+    "bbox": {
+      "south": 50.205084,
+      "north": 50.294916,
+      "west": -125.820242,
+      "east": -125.679758
+    },
+    "stats": {
+      "mean": 0.03507033362984657,
+      "median": 0.0022049658000469208,
+      "max": 0.99284428358078,
+      "p30_ha": 441.82,
+      "p50_ha": 205.04,
+      "p70_ha": 78.2,
+      "h": 1001,
+      "w": 1565
+    },
+    "png": "muchalat_valley.png",
+    "logging_png": "muchalat_valley_logging.png",
+    "logging_stats": {
+      "water_pct": 1.9,
+      "logged_lt20_pct": 30.6,
+      "logged_20_40_pct": 15.9,
+      "logged_40_80_pct": 32.4,
+      "forest_gt80_pct": 18.9,
+      "alpine_pct": 0.3
+    }
+  },
+  {
+    "slug": "stave_lake",
+    "name": "Stave Lake",
+    "desc": "Lower Fraser Valley CWHvm1/dm",
+    "lat": 49.25,
+    "lon": -122.25,
+    "bbox": {
+      "south": 49.205084,
+      "north": 49.294916,
+      "west": -122.318809,
+      "east": -122.181191
+    },
+    "stats": {
+      "mean": 0.3153042197227478,
+      "median": 0.18167762458324432,
+      "max": 0.9996315240859985,
+      "p30_ha": 5779.28,
+      "p50_ha": 4357.2,
+      "p70_ha": 2965.14,
+      "h": 1001,
+      "w": 1533
+    },
+    "png": "stave_lake.png",
+    "logging_png": "stave_lake_logging.png",
+    "logging_stats": {
+      "water_pct": 5.2,
+      "logged_lt20_pct": 4.8,
+      "logged_20_40_pct": 7.9,
+      "logged_40_80_pct": 22.4,
+      "forest_gt80_pct": 57.5,
+      "alpine_pct": 0.0
+    }
+  },
+  {
+    "slug": "haida_gwaii_south",
+    "name": "Haida Gwaii South",
+    "desc": "Moresby Island CWHvh3 outer coast",
+    "lat": 53.81907,
+    "lon": -132.4353,
+    "bbox": {
+      "south": 53.774154,
+      "north": 53.863986,
+      "west": -132.511385,
+      "east": -132.359215
+    },
+    "stats": {
+      "mean": 0.088164784014225,
+      "median": 0.04277466982603073,
+      "max": 0.9936838150024414,
+      "p30_ha": 1130.7,
+      "p50_ha": 302.32,
+      "p70_ha": 68.36,
+      "h": 1001,
+      "w": 1694
+    },
+    "png": "haida_gwaii_south.png",
+    "logging_png": "haida_gwaii_south_logging.png",
+    "logging_stats": {
+      "water_pct": 3.4,
+      "logged_lt20_pct": 10.3,
+      "logged_20_40_pct": 10.3,
+      "logged_40_80_pct": 0.2,
+      "forest_gt80_pct": 71.7,
+      "alpine_pct": 0.0
+    }
+  },
+  {
+    "slug": "chilliwack_uplands",
+    "name": "Chilliwack Uplands",
+    "desc": "Fraser Valley east CWHdm/ms1",
+    "lat": 49.25,
+    "lon": -121.75,
+    "bbox": {
+      "south": 49.205084,
+      "north": 49.294916,
+      "west": -121.818809,
+      "east": -121.681191
+    },
+    "stats": {
+      "mean": 0.13835234940052032,
+      "median": 0.02091456577181816,
+      "max": 0.9987775683403015,
+      "p30_ha": 2337.43,
+      "p50_ha": 1676.73,
+      "p70_ha": 1058.39,
+      "h": 1001,
+      "w": 1533
+    },
+    "png": "chilliwack_uplands.png",
+    "logging_png": "chilliwack_uplands_logging.png",
+    "logging_stats": {
+      "water_pct": 14.6,
+      "logged_lt20_pct": 5.1,
+      "logged_20_40_pct": 7.0,
+      "logged_40_80_pct": 17.9,
+      "forest_gt80_pct": 48.7,
+      "alpine_pct": 4.6
+    }
+  },
+  {
+    "slug": "stewart_lowlands",
+    "name": "Stewart Lowlands",
+    "desc": "Far north CWHvh3 near Stewart BC",
+    "lat": 55.25,
+    "lon": -130.75,
+    "bbox": {
+      "south": 55.205084,
+      "north": 55.294916,
+      "west": -130.8288,
+      "east": -130.6712
+    },
+    "stats": {
+      "mean": 0.01979067362844944,
+      "median": 0.002571232384070754,
+      "max": 0.942062497138977,
+      "p30_ha": 141.3,
+      "p50_ha": 26.13,
+      "p70_ha": 5.75,
+      "h": 1001,
+      "w": 1755
+    },
+    "png": "stewart_lowlands.png"
+  },
+  {
+    "slug": "smith_sound",
+    "name": "Smith Sound",
+    "desc": "Mid-coast CWHvm2 mainland fjord",
+    "lat": 51.25,
+    "lon": -127.25,
+    "bbox": {
+      "south": 51.205084,
+      "north": 51.294916,
+      "west": -127.321759,
+      "east": -127.178241
+    },
+    "stats": {
+      "mean": 0.08352409303188324,
+      "median": 0.012528912164270878,
+      "max": 0.9986988306045532,
+      "p30_ha": 1396.5,
+      "p50_ha": 856.55,
+      "p70_ha": 487.99,
+      "h": 1001,
+      "w": 1599
+    },
+    "png": "smith_sound.png",
+    "logging_png": "smith_sound_logging.png",
+    "logging_stats": {
+      "water_pct": 11.0,
+      "logged_lt20_pct": 9.4,
+      "logged_20_40_pct": 1.4,
+      "logged_40_80_pct": 5.3,
+      "forest_gt80_pct": 72.3,
+      "alpine_pct": 0.5
+    }
+  },
+  {
+    "slug": "alberni_valley",
+    "name": "Alberni Valley",
+    "desc": "South-central VI CWHmm1/vm2",
+    "lat": 49.25,
+    "lon": -125.25,
+    "bbox": {
+      "south": 49.205084,
+      "north": 49.294916,
+      "west": -125.318809,
+      "east": -125.181191
+    },
+    "stats": {
+      "mean": 0.31836792826652527,
+      "median": 0.18313369154930115,
+      "max": 0.9995213747024536,
+      "p30_ha": 5927.63,
+      "p50_ha": 4408.25,
+      "p70_ha": 2984.01,
+      "h": 1001,
+      "w": 1533
+    },
+    "png": "alberni_valley.png",
+    "logging_png": "alberni_valley_logging.png",
+    "logging_stats": {
+      "water_pct": 2.9,
+      "logged_lt20_pct": 2.8,
+      "logged_20_40_pct": 4.9,
+      "logged_40_80_pct": 23.5,
+      "forest_gt80_pct": 65.7,
+      "alpine_pct": 0.2
+    }
+  },
+  {
+    "slug": "sechelt_peninsula",
+    "name": "Sechelt Peninsula",
+    "desc": "Central Sunshine Coast CWHvm2/dm",
+    "lat": 49.75,
+    "lon": -123.75,
+    "bbox": {
+      "south": 49.705084,
+      "north": 49.794916,
+      "west": -123.819515,
+      "east": -123.680485
+    },
+    "stats": {
+      "mean": 0.15254175662994385,
+      "median": 0.05689752846956253,
+      "max": 0.9990112781524658,
+      "p30_ha": 2666.72,
+      "p50_ha": 1468.85,
+      "p70_ha": 726.74,
+      "h": 1001,
+      "w": 1549
+    },
+    "png": "sechelt_peninsula.png",
+    "logging_png": "sechelt_peninsula_logging.png",
+    "logging_stats": {
+      "water_pct": 7.7,
+      "logged_lt20_pct": 2.2,
+      "logged_20_40_pct": 9.3,
+      "logged_40_80_pct": 22.0,
+      "forest_gt80_pct": 57.1,
+      "alpine_pct": 1.2
+    }
+  },
+  {
+    "slug": "klemtu_forest",
+    "name": "Klemtu Forest",
+    "desc": "Mid-coast CWHvh2/vm2 inner islands",
+    "lat": 52.75,
+    "lon": -128.25,
+    "bbox": {
+      "south": 52.705084,
+      "north": 52.794916,
+      "west": -128.324205,
+      "east": -128.175795
+    },
+    "stats": {
+      "mean": 0.03204457089304924,
+      "median": 0.004755814094096422,
+      "max": 0.9790410995483398,
+      "p30_ha": 426.27,
+      "p50_ha": 182.23,
+      "p70_ha": 63.9,
+      "h": 1001,
+      "w": 1653
+    },
+    "png": "klemtu_forest.png",
+    "logging_png": "klemtu_forest_logging.png",
+    "logging_stats": {
+      "water_pct": 14.9,
+      "logged_lt20_pct": 0.4,
+      "logged_20_40_pct": 2.3,
+      "logged_40_80_pct": 1.7,
+      "forest_gt80_pct": 80.6,
+      "alpine_pct": 0.0
+    }
+  },
+  {
+    "slug": "namu_lowlands",
+    "name": "Namu Lowlands",
+    "desc": "Central coast CWHvh2 old-growth",
+    "lat": 51.75,
+    "lon": -127.75,
+    "bbox": {
+      "south": 51.705084,
+      "north": 51.794916,
+      "west": -127.82255,
+      "east": -127.67745
+    },
+    "stats": {
+      "mean": 0.09749884903430939,
+      "median": 0.02028728649020195,
+      "max": 0.9974199533462524,
+      "p30_ha": 1671.82,
+      "p50_ha": 1011.25,
+      "p70_ha": 554.08,
+      "h": 1001,
+      "w": 1617
+    },
+    "png": "namu_lowlands.png",
+    "logging_png": "namu_lowlands_logging.png",
+    "logging_stats": {
+      "water_pct": 11.5,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 0.3,
+      "forest_gt80_pct": 87.8,
+      "alpine_pct": 0.1
+    }
   }
 ]

@@ -38,6 +38,69 @@
     .sidebar-section { padding: 10px 14px; border-bottom: 1px solid #e0e0e0; }
     .sidebar-section h3 { font-size: 13px; color: #2d5a27; margin-bottom: 6px; }
 
+    /* ── Sidebar Tabs ─────────────────────────────────── */
+    .sidebar-tabs {
+      display: flex; border-bottom: 2px solid #2d5a27;
+      background: #f0f5ef; flex-shrink: 0;
+    }
+    .sidebar-tab {
+      flex: 1; padding: 8px 6px; text-align: center;
+      font-size: 12px; font-weight: 600; color: #555;
+      cursor: pointer; border: none; background: transparent;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .sidebar-tab:hover { background: #e0ede0; }
+    .sidebar-tab.active {
+      color: #2d5a27; border-bottom-color: #2d5a27;
+      background: #ffffffe8;
+    }
+    .tab-content { display: none; flex-direction: column; flex: 1; overflow-y: auto; }
+    .tab-content.active { display: flex; }
+
+    /* ── Logging Stats Table ──────────────────────────── */
+    .stats-panel { padding: 10px 14px; overflow-y: auto; flex: 1; }
+    .stats-panel h3 { font-size: 14px; color: #2d5a27; margin-bottom: 8px; }
+    .stats-panel p { font-size: 11px; color: #555; line-height: 1.4; margin-bottom: 8px; }
+    .stats-table {
+      width: 100%; border-collapse: collapse; font-size: 11px;
+      margin-bottom: 12px;
+    }
+    .stats-table th {
+      background: #2d5a27; color: white; padding: 5px 6px;
+      text-align: left; font-size: 10px; font-weight: 600;
+      position: sticky; top: 0; z-index: 1;
+    }
+    .stats-table th.num { text-align: right; }
+    .stats-table td { padding: 4px 6px; border-bottom: 1px solid #e8e8e8; }
+    .stats-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .stats-table tr:hover { background: #e8f5e9; }
+    .stats-table tr.zone-header td {
+      background: #f0f5ef; font-weight: 700; color: #2d5a27;
+      border-top: 2px solid #ccc;
+    }
+    .stats-table tr.total-row td {
+      background: #e0ede0; font-weight: 700; border-top: 2px solid #2d5a27;
+    }
+    .stats-toggle {
+      display: flex; gap: 6px; margin-bottom: 8px;
+    }
+    .stats-toggle button {
+      flex: 1; padding: 6px 4px; font-size: 11px; font-weight: 600;
+      border: 2px solid #ccc; border-radius: 4px; cursor: pointer;
+      background: white; color: #555; transition: all 0.15s;
+    }
+    .stats-toggle button.active {
+      border-color: #2d5a27; color: #2d5a27; background: #e8f5e9;
+    }
+    .stats-toggle button:hover { border-color: #888; }
+    .bar-cell { position: relative; }
+    .bar-fill {
+      position: absolute; top: 1px; left: 0; bottom: 1px;
+      border-radius: 2px; opacity: 0.25;
+    }
+    .bar-text { position: relative; z-index: 1; }
+
     /* Tile list */
     .tile-list { list-style: none; flex: 1; overflow-y: auto; padding: 0; }
     .tile-item {
@@ -149,43 +212,89 @@
   <div class="sidebar-header">
     <h1>🌲 Pacific Yew Habitat Map</h1>
     <p>
-      35 study areas across BC's Coastal Western Hemlock (CWH) zone.<br>
-      MLP model · 10 m GEE satellite embeddings · 2024 imagery.
+      45 study areas across BC's Coastal Western Hemlock (CWH) zone.<br>
+      XGBoost model · 10 m GEE satellite embeddings · 2024 imagery.
     </p>
   </div>
 
-  <div class="sidebar-section">
-    <h3>About</h3>
-    <p style="font-size:11px; color:#555; line-height:1.4;">
-      Predicted probability of Pacific yew (<i>Taxus brevifolia</i>) habitat
-      using a neural network trained on iNaturalist observations and
-      Google Earth Engine satellite embeddings. Each tile covers ~10×10 km.
-      <br><br>
-      <b>Use the observation panel</b> (top right) to report yew sightings
-      and improve the model.
-    </p>
+  <!-- Sidebar Tabs -->
+  <div class="sidebar-tabs">
+    <button class="sidebar-tab active" onclick="switchTab('map')">🗺️ Map</button>
+    <button class="sidebar-tab" onclick="switchTab('logging')">🪓 Logging Impact</button>
   </div>
 
-  <div class="toggle-all-row">
-    <input type="checkbox" id="toggle-all" checked onchange="toggleAllTiles(this.checked)">
-    <label for="toggle-all">Show yew probability</label>
-  </div>
-  <div class="toggle-all-row">
-    <input type="checkbox" id="toggle-forestry" onchange="toggleAllForestry(this.checked)">
-    <label for="toggle-forestry">🌳 Show forestry / logging</label>
+  <!-- Tab 1: Map -->
+  <div id="tab-map" class="tab-content active">
+    <div class="sidebar-section">
+      <h3>About</h3>
+      <p style="font-size:11px; color:#555; line-height:1.4;">
+        Predicted probability of Pacific yew (<i>Taxus brevifolia</i>) habitat
+        using XGBoost trained on iNaturalist observations and
+        Google Earth Engine satellite embeddings. Each tile covers ~10×10 km.
+        <br><br>
+        <b>Use the observation panel</b> (top right) to report yew sightings
+        and improve the model.
+      </p>
+    </div>
+
+    <div class="toggle-all-row">
+      <input type="checkbox" id="toggle-all" checked onchange="toggleAllTiles(this.checked)">
+      <label for="toggle-all">Show yew probability</label>
+    </div>
+    <div class="toggle-all-row">
+      <input type="checkbox" id="toggle-forestry" onchange="toggleAllForestry(this.checked)">
+      <label for="toggle-forestry">🌳 Show forestry / logging</label>
+    </div>
+    <div class="toggle-all-row">
+      <input type="checkbox" id="toggle-fire" onchange="toggleFireLayer(this.checked)">
+      <label for="toggle-fire">🔥 Show historical fires (≥50 ha)</label>
+    </div>
+    <div class="toggle-all-row">
+      <input type="checkbox" id="toggle-parks" onchange="toggleParksLayer(this.checked)">
+      <label for="toggle-parks">🏞️ Show protected areas / parks</label>
+    </div>
+
+    <div class="sort-row">
+      <label for="sort-select">Sort:</label>
+      <select id="sort-select" onchange="sortTileList(this.value)">
+        <option value="name">Name (A–Z)</option>
+        <option value="p50" selected>Habitat area (P≥0.5)</option>
+        <option value="mean">Mean probability</option>
+        <option value="lat">Latitude (N→S)</option>
+      </select>
+    </div>
+
+    <ul class="tile-list" id="tile-list"></ul>
   </div>
 
-  <div class="sort-row">
-    <label for="sort-select">Sort:</label>
-    <select id="sort-select" onchange="sortTileList(this.value)">
-      <option value="name">Name (A–Z)</option>
-      <option value="p50" selected>Habitat area (P≥0.5)</option>
-      <option value="mean">Mean probability</option>
-      <option value="lat">Latitude (N→S)</option>
-    </select>
-  </div>
+  <!-- Tab 2: Logging Impact -->
+  <div id="tab-logging" class="tab-content">
+    <div class="stats-panel">
+      <h3>🪓 Logging Impact on Yew Habitat</h3>
+      <p>
+        Estimated yew habitat destroyed by logging in each BEC subzone,
+        based on yew prevalence in surviving old-growth forest (P&ge;0.5).
+        Covers 42 of 45 tiles (~4,200 km²) across the CWH zone.
+      </p>
 
-  <ul class="tile-list" id="tile-list"></ul>
+      <div class="stats-toggle">
+        <button class="active" onclick="showStatsView('zone')">By Zone</button>
+        <button onclick="showStatsView('subzone')">By Subzone</button>
+      </div>
+
+      <div id="stats-zone" style="overflow-x:auto;"></div>
+      <div id="stats-subzone" style="overflow-x:auto; display:none;"></div>
+
+      <div style="margin-top:12px; padding:10px; background:#f5f5f5; border-radius:6px; font-size:10px; color:#555; line-height:1.5;">
+        <b>Methodology:</b><br>
+        1. Yew prevalence rate = fraction of old-growth (&gt;80 yr) pixels with P&ge;0.5<br>
+        2. Est. original yew = prevalence &times; (old-growth + logged area)<br>
+        3. Destroyed = original &minus; current remaining after logging suppression<br>
+        4. Logging suppression: &lt;20yr &rarr; &times;0, 20-40yr &rarr; &times;0.08, 40-80yr &rarr; &times;0.30<br>
+        5. Data: XGBoost model on 2024 GEE embeddings, BC VRI 2024, BC BEC zones
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Legend -->
@@ -208,9 +317,19 @@
     <div class="legend-row"><span class="legend-swatch" style="background:rgba(175,155,125,0.63)"></span> Alpine / barren</div>
     <hr style="margin:6px 0">
   </div>
+  <div id="fire-legend" style="display:none;">
+    <h4 style="margin-top:4px;">🔥 Historical Fires</h4>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(255,80,0,0.5);border:2px solid #ff3300;"></span> Fire perimeter</div>
+    <hr style="margin:6px 0">
+  </div>
+  <div id="parks-legend" style="display:none;">
+    <h4 style="margin-top:4px;">🏞️ Protected Areas</h4>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(0,180,0,0.25);border:2px solid #00aa00;"></span> Park / protected area</div>
+    <hr style="margin:6px 0">
+  </div>
   <div style="font-size:10px;color:#666;">
     Transparent = P &lt; 0.02<br>
-    10 m resolution · MLP classifier<br>
+    10 m resolution · XGBoost classifier<br>
     Forestry: BC VRI 2024
   </div>
 </div>
@@ -286,10 +405,27 @@ let forestryVisible = false;
 let obsMode = null;
 let observations = [];
 let obsMarkers = [];
+let fireLayer = null;
+let parksLayer = null;
+
+// ── JSON loader (works on file:// and http://) ──────────────────────────────
+function loadJSON(url) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.onload = function() {
+      if (xhr.status === 200 || xhr.status === 0) { // status 0 = file://
+        try { resolve(JSON.parse(xhr.responseText)); }
+        catch(e) { reject(e); }
+      } else { reject(new Error('HTTP ' + xhr.status)); }
+    };
+    xhr.onerror = function() { reject(new Error('XHR failed for ' + url)); };
+    xhr.send();
+  });
+}
 
 // ── Load tiles ───────────────────────────────────────────────────────────────
-fetch(TILES_JSON)
-  .then(r => r.json())
+loadJSON(TILES_JSON)
   .then(data => {
     tiles = data;
     initTiles();
@@ -372,6 +508,84 @@ function toggleAllForestry(show) {
     }
   });
   document.getElementById('forestry-legend').style.display = show ? 'block' : 'none';
+}
+
+// ── Fire & Parks layers ──────────────────────────────────────────────────────
+function toggleFireLayer(show) {
+  if (show && !fireLayer) {
+    // Load on first toggle
+    loadJSON('tiles/fire_contours.geojson')
+      .then(data => {
+        fireLayer = L.geoJSON(data, {
+          style: function(feature) {
+            const yr = feature.properties.FIRE_YEAR || 0;
+            // Recent fires are more red, older fires more orange
+            const age = 2025 - yr;
+            const r = 255, g = Math.min(140, age * 2), b = 0;
+            return {
+              color: `rgb(${r},${Math.max(0,g-60)},${b})`,
+              weight: 1.5,
+              fillColor: `rgb(${r},${g},${b})`,
+              fillOpacity: 0.3,
+              opacity: 0.8,
+            };
+          },
+          onEachFeature: function(feature, layer) {
+            const p = feature.properties;
+            layer.bindPopup(
+              `<b>🔥 Fire ${p.FIRE_LABEL || p.FIRE_YEAR || 'Unknown'}</b><br>` +
+              `Year: ${p.FIRE_YEAR || '?'}<br>` +
+              `Cause: ${p.FIRE_CAUSE || '?'}<br>` +
+              `Size: ${p.FIRE_SIZE_HECTARES ? p.FIRE_SIZE_HECTARES.toLocaleString() + ' ha' : '?'}`
+            );
+          },
+        }).addTo(map);
+      })
+      .catch(err => console.error('Failed to load fire GeoJSON:', err));
+  } else if (show && fireLayer) {
+    fireLayer.addTo(map);
+  } else if (!show && fireLayer) {
+    map.removeLayer(fireLayer);
+  }
+  document.getElementById('fire-legend').style.display = show ? 'block' : 'none';
+}
+
+function toggleParksLayer(show) {
+  if (show && !parksLayer) {
+    loadJSON('tiles/park_contours.geojson')
+      .then(data => {
+        parksLayer = L.geoJSON(data, {
+          style: function(feature) {
+            const desig = (feature.properties.PROTECTED_LANDS_DESIGNATION || '').toLowerCase();
+            let color = '#00aa00';
+            if (desig.includes('ecological')) color = '#0088aa';
+            return {
+              color: color,
+              weight: 2,
+              fillColor: color,
+              fillOpacity: 0.15,
+              opacity: 0.7,
+              dashArray: desig.includes('ecological') ? '5,5' : null,
+            };
+          },
+          onEachFeature: function(feature, layer) {
+            const p = feature.properties;
+            layer.bindPopup(
+              `<b>🏞️ ${p.PROTECTED_LANDS_NAME || 'Protected Area'}</b><br>` +
+              `Type: ${p.PROTECTED_LANDS_DESIGNATION || '?'}<br>` +
+              `Class: ${p.PARK_CLASS || '?'}<br>` +
+              `Area: ${p.OFFICIAL_AREA_HA ? p.OFFICIAL_AREA_HA.toLocaleString() + ' ha' : '?'}`
+            );
+          },
+        }).addTo(map);
+      })
+      .catch(err => console.error('Failed to load parks GeoJSON:', err));
+  } else if (show && parksLayer) {
+    parksLayer.addTo(map);
+  } else if (!show && parksLayer) {
+    map.removeLayer(parksLayer);
+  }
+  document.getElementById('parks-legend').style.display = show ? 'block' : 'none';
 }
 
 function flyToTile(slug) {
@@ -510,6 +724,139 @@ function submitObs() {
     `title=${title}&body=${encodeURIComponent(body)}&labels=observation`;
 
   window.open(url, '_blank');
+}
+
+// ── Sidebar tabs ─────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.sidebar-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'logging' && !window._loggingStatsRendered) {
+    renderLoggingStats();
+    window._loggingStatsRendered = true;
+  }
+}
+
+// ── Logging Impact Statistics ────────────────────────────────────────────────
+const BEC_STATS = [
+  {s:"CDFmm",z:"CDF",og:4184,log:1108,l2:241,l3:382,l4:486,yr:0.6589,orig:3487,cur:2757,dest:730},
+  {s:"CMAunp",z:"CMA",og:14460,log:1361,l2:189,l3:2,l4:1169,yr:0.0103,orig:163,cur:149,dest:14},
+  {s:"CWHdm",z:"CWH",og:23394,log:11410,l2:1430,l3:2535,l4:7445,yr:0.3205,orig:11155,cur:7622,dest:3533},
+  {s:"CWHds1",z:"CWH",og:2441,log:3116,l2:801,l3:692,l4:1622,yr:0.0374,orig:208,cur:116,dest:92},
+  {s:"CWHds2",z:"CWH",og:1628,log:1716,l2:968,l3:25,l4:724,yr:0.0249,orig:83,cur:41,dest:43},
+  {s:"CWHmm1",z:"CWH",og:1779,log:8407,l2:838,l3:2053,l4:5516,yr:0.2682,orig:2732,cur:484,dest:2247},
+  {s:"CWHmm2",z:"CWH",og:3224,log:18766,l2:1709,l3:6998,l4:10059,yr:0.2855,orig:6278,cur:939,dest:5339},
+  {s:"CWHms1",z:"CWH",og:3096,log:1431,l2:436,l3:118,l4:877,yr:0.0226,orig:102,cur:71,dest:31},
+  {s:"CWHms2",z:"CWH",og:2086,log:3261,l2:119,l3:819,l4:2322,yr:0.018,orig:97,cur:38,dest:59},
+  {s:"CWHvh1",z:"CWH",og:2062,log:1394,l2:11,l3:497,l4:887,yr:0.5575,orig:1927,cur:1150,dest:777},
+  {s:"CWHvh2",z:"CWH",og:41046,log:683,l2:127,l3:467,l4:89,yr:0.1283,orig:5354,cur:5276,dest:78},
+  {s:"CWHvm1",z:"CWH",og:59785,log:35613,l2:4125,l3:9920,l4:21568,yr:0.1383,orig:13193,cur:8335,dest:4858},
+  {s:"CWHvm2",z:"CWH",og:33205,log:8067,l2:445,l3:1716,l4:5907,yr:0.1332,orig:5499,cur:4459,dest:1040},
+  {s:"CWHws2",z:"CWH",og:5891,log:2386,l2:1369,l3:35,l4:983,yr:0.0308,orig:255,cur:181,dest:73},
+  {s:"CWHxm1",z:"CWH",og:13137,log:17826,l2:3078,l3:5130,l4:9618,yr:0.4163,orig:12891,cur:5488,dest:7402},
+  {s:"CWHxm2",z:"CWH",og:14437,log:46324,l2:11447,l3:8176,l4:26702,yr:0.2797,orig:16994,cur:4056,dest:12938},
+  {s:"ESSFmc",z:"ESSF",og:81,log:52,l2:29,l3:0,l4:23,yr:0.0,orig:0,cur:0,dest:0},
+  {s:"ESSFmw",z:"ESSF",og:1351,log:568,l2:487,l3:0,l4:81,yr:0.0061,orig:12,cur:8,dest:4},
+  {s:"MHmm1",z:"MH",og:20575,log:3099,l2:134,l3:514,l4:2452,yr:0.149,orig:3527,cur:3092,dest:435},
+  {s:"MHmm2",z:"MH",og:13458,log:2192,l2:503,l3:0,l4:1690,yr:0.0074,orig:116,cur:100,dest:16},
+  {s:"MHmmp",z:"MH",og:83,log:0,l2:0,l3:0,l4:0,yr:0.0,orig:0,cur:0,dest:0},
+  {s:"MHwh1",z:"MH",og:968,log:1,l2:0,l3:0,l4:1,yr:0.0006,orig:1,cur:1,dest:0},
+  {s:"MHwhp",z:"MH",og:60,log:1,l2:0,l3:0,l4:1,yr:0.0,orig:0,cur:0,dest:0},
+];
+
+function fmt(n) { return n.toLocaleString('en-CA', {maximumFractionDigits:0}); }
+function pct(n, d) { return d > 0 ? (n/d*100).toFixed(1)+'%' : '–'; }
+
+function showStatsView(view) {
+  document.querySelectorAll('.stats-toggle button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('stats-zone').style.display    = view === 'zone' ? '' : 'none';
+  document.getElementById('stats-subzone').style.display = view === 'subzone' ? '' : 'none';
+}
+
+function barHtml(val, max, color) {
+  const w = max > 0 ? (val / max * 100) : 0;
+  return `<td class="num bar-cell">
+    <span class="bar-fill" style="width:${w.toFixed(0)}%;background:${color}"></span>
+    <span class="bar-text">${fmt(val)}</span>
+  </td>`;
+}
+
+function renderLoggingStats() {
+  // ── Zone-level summary ──
+  const zones = {};
+  BEC_STATS.forEach(r => {
+    if (!zones[r.z]) zones[r.z] = {z:r.z, og:0, log:0, orig:0, cur:0, dest:0, ogYewWt:0};
+    const zn = zones[r.z];
+    zn.og += r.og; zn.log += r.log;
+    zn.orig += r.orig; zn.cur += r.cur; zn.dest += r.dest;
+    zn.ogYewWt += r.yr * r.og;
+  });
+  const zoneArr = Object.values(zones).sort((a,b) => b.dest - a.dest);
+  const maxDest = Math.max(...zoneArr.map(z => z.dest));
+  const totals = {og:0, log:0, orig:0, cur:0, dest:0, ogYewWt:0};
+  zoneArr.forEach(z => { totals.og+=z.og; totals.log+=z.log; totals.orig+=z.orig; totals.cur+=z.cur; totals.dest+=z.dest; totals.ogYewWt+=z.ogYewWt; });
+
+  let zh = `<table class="stats-table">
+    <thead><tr>
+      <th>Zone</th><th class="num">Old-Growth<br>(ha)</th><th class="num">Logged<br>(ha)</th>
+      <th class="num">Yew Rate<br>(OG)</th><th class="num">Est. Orig<br>Yew (ha)</th>
+      <th class="num">Current<br>Yew (ha)</th><th class="num">Destroyed<br>Yew (ha)</th>
+    </tr></thead><tbody>`;
+  zoneArr.forEach(z => {
+    const rate = z.og > 0 ? z.ogYewWt / z.og : 0;
+    zh += `<tr>
+      <td><b>${z.z}</b></td>
+      <td class="num">${fmt(z.og)}</td><td class="num">${fmt(z.log)}</td>
+      <td class="num">${(rate*100).toFixed(1)}%</td>
+      <td class="num">${fmt(z.orig)}</td><td class="num">${fmt(z.cur)}</td>
+      ${barHtml(z.dest, maxDest, '#c0392b')}
+    </tr>`;
+  });
+  const tRate = totals.og > 0 ? totals.ogYewWt / totals.og : 0;
+  zh += `<tr class="total-row">
+    <td>TOTAL</td>
+    <td class="num">${fmt(totals.og)}</td><td class="num">${fmt(totals.log)}</td>
+    <td class="num">${(tRate*100).toFixed(1)}%</td>
+    <td class="num">${fmt(totals.orig)}</td><td class="num">${fmt(totals.cur)}</td>
+    <td class="num"><b>${fmt(totals.dest)}</b></td>
+  </tr>`;
+  zh += '</tbody></table>';
+  document.getElementById('stats-zone').innerHTML = zh;
+
+  // ── Subzone-level detail ──
+  const sorted = [...BEC_STATS].sort((a,b) => b.dest - a.dest);
+  const maxSubDest = Math.max(...sorted.map(r => r.dest));
+  let sh = `<table class="stats-table">
+    <thead><tr>
+      <th>Subzone</th><th class="num">Old-<br>Growth</th><th class="num">Logged<br>(ha)</th>
+      <th class="num">Logged<br>%</th><th class="num">Yew %<br>in OG</th>
+      <th class="num">Orig<br>Yew</th><th class="num">Current</th><th class="num">Destroyed</th>
+    </tr></thead><tbody>`;
+  sorted.forEach(r => {
+    const forested = r.og + r.log;
+    const logPct = forested > 0 ? (r.log / forested * 100).toFixed(0) : 0;
+    sh += `<tr>
+      <td><b>${r.s}</b></td>
+      <td class="num">${fmt(r.og)}</td><td class="num">${fmt(r.log)}</td>
+      <td class="num">${logPct}%</td>
+      <td class="num">${(r.yr*100).toFixed(1)}%</td>
+      <td class="num">${fmt(r.orig)}</td><td class="num">${fmt(r.cur)}</td>
+      ${barHtml(r.dest, maxSubDest, '#c0392b')}
+    </tr>`;
+  });
+  // Subzone totals
+  sh += `<tr class="total-row">
+    <td>TOTAL</td>
+    <td class="num">${fmt(totals.og)}</td><td class="num">${fmt(totals.log)}</td>
+    <td class="num">${totals.og+totals.log>0 ? (totals.log/(totals.og+totals.log)*100).toFixed(0) : 0}%</td>
+    <td class="num">${(tRate*100).toFixed(1)}%</td>
+    <td class="num">${fmt(totals.orig)}</td><td class="num">${fmt(totals.cur)}</td>
+    <td class="num"><b>${fmt(totals.dest)}</b></td>
+  </tr>`;
+  sh += '</tbody></table>';
+  document.getElementById('stats-subzone').innerHTML = sh;
 }
 </script>
 </body>

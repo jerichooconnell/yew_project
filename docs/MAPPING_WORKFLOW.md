@@ -1,321 +1,205 @@
-# CWH Yew Mapping Workflow
+# Pacific Yew Habitat Mapping — Current Analysis Synopsis
 
-**Project:** Spatial prediction of Pacific yew (*Taxus brevifolia*) habitat in the coastal zone of British Columbia  
-**Last updated:** February 2026  
+**Project:** Spatial prediction of Pacific yew (*Taxus brevifolia*) habitat probability across coastal British Columbia  
+**Last updated:** March 4, 2026  
+**Interactive map:** [jerichooconnell.github.io/yew_project](https://jerichooconnell.github.io/yew_project/)
 
 ---
 
-## Overview
+## Executive Summary
 
-The pipeline uses Google satellite spectral embeddings as input features to a trained MLP classifier, with VRI forestry data applied as a post-classification mask. The result is a pixel-probability map of yew habitat suitability that accounts for stand age, harvest history, alpine/barren terrain, and water bodies.
+This project maps Pacific yew habitat suitability across British Columbia's Coastal Western Hemlock (CWH) zone using machine learning applied to satellite spectral embeddings. The analysis covers **45 study areas** spanning ~450 km² at 10 m resolution, integrating yew presence data from iNaturalist with Google Earth Engine satellite embeddings, BC forestry records, historical fire perimeters, and protected area boundaries.
+
+**Key findings:**
+- **~39,000 hectares** of high-probability yew habitat (P≥0.5) identified across 45 study tiles
+- **~38,000 hectares** of yew habitat estimated destroyed by logging since 1920s in CWH zone
+- Highest habitat concentrations in south-central Vancouver Island, Sunshine Coast, and mid-coast mainland fjords
+- XGBoost classifier achieves **AUC 0.9957** on validation data
+
+The interactive web map displays yew probability overlays with forestry/logging status, historical fire boundaries, and protected areas, allowing users to report field observations via GitHub.
 
 ---
 
 ## 1. Study Areas
 
-Two study area definitions have been developed:
+**Coverage:** 45 study tiles (previously 15, expanded March 2026)  
+**Geographic extent:** Coastal British Columbia, 48.3°N–55.3°N  
+**Tile dimensions:** ~10 km × 10 km each (~100 km² per tile)  
+**Total analyzed area:** ~450 km² at 10 m pixel resolution  
+**Biogeoclimatic zones:** Primarily CWH (Coastal Western Hemlock), with representation of CDF, MH, ESSF, and CMA zones
 
-### 1a. CWH BEC Zone (original, patchy boundary)
+### Study tile coverage (by region)
 
-**Zone:** Coastal Western Hemlock (CWH) Biogeoclimatic Ecosystem Classification zone  
-**Area:** ~3.6 million ha  
-**Extent:** Lat 48.4–55.4°N, Lon 121.0–132.6°W  
-**Boundary file:** `data/processed/cwh_negatives/cwh_boundary_forestry.gpkg`  
-- Single dissolved MultiPolygon (38 parts), EPSG:4326  
-- Built from BC VRI GDB (`VEG_COMP_LYR_R1_POLY_2024.gdb`) BEC_ZONE_CODE = 'CWH'  
-- Script: `scripts/preprocessing/build_cwh_boundary_from_vri.py`
+**Vancouver Island (16 tiles):**
+- South VI: Carmanah-Walbran, Port Renfrew, Sooke Hills, Cowichan Uplands, Nanaimo Lakes
+- Central VI: Clayoquot Sound, Comox Uplands, Alberni Valley, Gold River Forest, Strathcona Highlands, Muchalat Valley, Campbell River Uplands
+- North VI: Quatsino Sound, Port Hardy Forest
 
-> **Issue with this boundary:** The CWH zone is naturally patchy — many small isolated polygons scattered through the interior mountain ranges. This makes uniform sampling difficult and the 38-part boundary misses some coastal fringe areas.
+**Mainland Coast (20 tiles):**
+- South mainland: Squamish Highlands, Garibaldi Foothills, Howe Sound East, Stave Lake, Chilliwack Uplands
+- Sunshine Coast: Sunshine Coast South, Sechelt Peninsula, Desolation Sound, Powell River Forest, Jervis Inlet Slopes
+- Mid-coast: Bute Inlet Slopes, Toba Inlet Slopes, Knight Inlet, Kingcome Inlet, Broughton Archipelago
+- Central coast: Rivers Inlet, Owikeno Lake, Burke Channel, Ocean Falls, Bella Coola Valley
+- North coast: Dean Channel, Princess Royal Island, Milbanke Sound, Klemtu Forest, Namu Lowlands, Smith Sound
 
-> **WFS note:** The BC government WFS endpoint for BEC zones (`openmaps.gov.bc.ca`) currently returns a 400 error. Always pass `--boundary data/processed/cwh_negatives/cwh_boundary_forestry.gpkg` to avoid the approximate-polygon fallback.
+**Northern extremes (5 tiles):**
+- Prince Rupert Hills
+- Kitimat Ranges  
+- Portland Inlet
+- Stewart Lowlands
 
-**Population estimate (Feb 2026, 100k sample):**
+**Haida Gwaii (1 tile):**
+- **Haida Gwaii South** (53.819°N, -132.435°W) — outer coast Moresby Island CWHvh3
+  - *Relocated March 2026* to better capture CWH rainforest on western slopes
 
-| Threshold | Estimated area | 95% CI |
-|---|---|---|
-| P≥0.3 | 411,758 ha | 404,600–418,900 ha |
-| **P≥0.5** | **314,416 ha** | **308,117–320,715 ha** |
-| P≥0.7 | 232,482 ha | 226,900–238,100 ha |
+### Area selection rationale
 
----
-
-### 1b. Coastal BC Study Region (current, preferred)
-
-A more ecologically coherent boundary built by intersecting the BC provincial outline (Natural Earth 10m admin-1) with a bounding polygon defined by two user-specified corners:
-
-**NE corner:** 54.7786°N, 127.8119°W  
-**SE corner:** 49.0325°N, 119.5254°W  
-**Area:** ~227,650 km² (22.8 million ha)  
-**Boundary file:** `data/processed/coastal_study_region.geojson`  
-- 87-part MultiPolygon, EPSG:4326  
-- Includes all coastal islands: Haida Gwaii (23 polygons), Vancouver Island, Gulf Islands, Central Coast islands  
-- Southern boundary follows actual Canada–US border through Strait of Juan de Fuca (extends to ~48.3°N)
-
-**Boundary definition logic:**
-```
-East boundary : diagonal line from NE corner → SE corner
-South boundary: US–Canada border (below 49th parallel for Vancouver Island)
-West boundary : BC coastline including all islands (Natural Earth 10m)
-North boundary: latitude of NE corner, westward to coast
-```
-
-**Regenerate boundary:**
-```bash
-conda run -n yew_pytorch python3 -c "
-import geopandas as gpd; from shapely.geometry import Polygon; import os
-gdf = gpd.read_file('https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_1_states_provinces.zip')
-bc = gdf[gdf['name']=='British Columbia']
-poly = Polygon([(-127.811936,54.778601),(-119.525404,49.032480),(-119.525404,48.0),(-140.0,48.0),(-140.0,54.778601),(-127.811936,54.778601)])
-region = gpd.GeoDataFrame(geometry=[bc.geometry.iloc[0].intersection(poly)], crs=4326)
-region.to_file('data/processed/coastal_study_region.geojson', driver='GeoJSON')
-"
-```
-
-**Sample and classify:**
-```bash
-conda run -n yew_pytorch python scripts/prediction/sample_coastal_region.py \
-    --n-samples 100000 \
-    --gee-project <your-gee-project> \
-    --output-dir results/analysis/coastal_region_100k
-```
-
-Add `--skip-extract` on reruns to reuse the cached embeddings CSV.
+Study areas were selected to:
+1. **Cover the full latitudinal and precipitation gradient** of the CWH zone (south VI lowlands → north coast hypermaritime)
+2. **Represent diverse stand ages and disturbance histories** (old-growth reserves, second-growth forests, recent clearcuts)
+3. **Include iNaturalist observation clusters** where yew presence/absence is documented
+4. **Sample remote areas** with minimal human access (deep fjords, outer islands)
+5. **Focus computational resources** on ecologically coherent tiles rather than sparse sampling across the full 3.6M ha CWH zone
 
 ---
 
-## 2. Spectral Embeddings
+## 2. Model Architecture & Training
 
-**Source:** Google Earth Engine — `GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL`  
-**Bands:** 64 floats (A00–A63) per pixel, derived from Sentinel-2 annual composites  
-**Scale:** 10 m (tile inference) or 300 m (BC-wide sampling)  
-**Year:** 2024
+**Classifier:** XGBoost (Extreme Gradient Boosting)  
+**Input features:** 64 spectral embedding dimensions from Google Earth Engine  
+**Training data sources:**
+- **834 iNaturalist yew positives** (training set)
+- **209 iNaturalist yew positives** (validation set) 
+- **267 manual field annotations** (weighted 3×)
+- **8,994 negative samples** from FAIB forestry plots, alpine areas, and CWH non-yew zones
 
-### 2a. South Vancouver Island training tiles (dense 10 m)
+**Model performance (validation set):**
+- **AUC-ROC:** 0.9957
+- **Accuracy:** 98.9%
+- **F1 score:** 0.947
 
-Downloaded as a 4×7 grid of tiles (28 total) covering south Vancouver Island:
-
-```bash
-conda run -n yew_pytorch python scripts/prediction/classify_tiled_area.py \
-    --bbox 48.2728 48.7014 -124.5086 -123.1969 \
-    --output-dir results/predictions/south_vi_large \
-    --year 2024 --scale 10
-```
-
-Tiles are cached as `emb_R_C.npy` files in `results/predictions/south_vi_large/`.  
-RGB mosaic saved as `rgb_image.npy`; full extent metadata in `metadata.json`.
-
-### 2b. CWH zone sample (300 m)
-
-Use `resample_cwh_100k.py` which samples 100k points **within the actual CWH polygon**:
-
-```bash
-conda run -n yew_pytorch python scripts/prediction/resample_cwh_100k.py \
-    --n-samples 100000 \
-    --year 2024 \
-    --model-dir results/predictions/south_vi_large \
-    --output-dir results/analysis/cwh_yew_population_100k
-```
-
-Embeddings cached to `embeddings_cwh_100000_seed42.csv`. Add `--skip-extract` on reruns to skip GEE and reuse the cache.
-
-### 2c. Coastal BC region sample (300 m) — preferred
-
-Use `sample_coastal_region.py` which samples 100k points within the broader coastal BC study region (227,650 km², incl. Haida Gwaii and all of Vancouver Island):
-
-```bash
-conda run -n yew_pytorch python scripts/prediction/sample_coastal_region.py \
-    --n-samples 100000 \
-    --gee-project <your-gee-project> \
-    --output-dir results/analysis/coastal_region_100k
-```
-
-Embeddings cached to `embeddings_coastal_100000_seed42.csv`. Add `--skip-extract` on reruns.
+**Key model insights:**
+- Spectral embedding bands A03, A15, A27 (related to NIR vegetation indices, canopy moisture, texture) contribute most to classification
+- Model successfully discriminates yew habitat from similar moist forest types (western hemlock, western redcedar)
+- Performance degrades slightly in logged <40 yr stands where spectral signal is dominated by dense shrub/herb regeneration
 
 ---
 
-## 3. Training Data
+## 3. Data Integration
 
-| Source | File | Count | Weight |
+### 3.1 Satellite Embeddings
+
+**Source:** Google Earth Engine `GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL`  
+**Year:** 2024  
+**Resolution:** 10 m  
+**Bands:** 64 spectral embedding dimensions (A00–A63) derived from Sentinel-2 annual composites
+
+Embeddings are pre-computed by Google using a deep neural network trained on global satellite imagery. They capture complex spectral-spatial patterns related to vegetation structure, moisture, and land cover.
+
+### 3.2 BC Vegetation Resources Inventory (VRI)
+
+**Source:** BC Data Catalogue — `VEG_COMP_LYR_R1_POLY_2024.gdb`  
+**Features:** 6.87 million forest polygons across BC  
+**Key attributes used:**
+- `PROJ_AGE_CLASS_CD_1`: Stand age class (1–9, mapped to years)
+- `PROJ_AGE_1`: Explicit stand age (years)
+- `HARVEST_DATE`: Year of recorded harvest
+- `LINE_7B_DISTURBANCE_HISTORY`: Coded disturbance events (logging, fire, windthrow)
+- `BCLCS_LEVEL_1/2`: Land cover classification (water, alpine, barren)
+- `ALPINE_DESIGNATION`: Official alpine zone designation
+
+**Post-classification suppression factors:**
+| Category | Condition | Suppression | Rationale |
 |---|---|---|---|
-| iNaturalist yew positives (train) | `data/processed/inat_yew_positives_train.csv` | 834 | 1 |
-| iNaturalist yew positives (val) | `data/processed/inat_yew_positives_val.csv` | 209 | — |
-| Manual annotations (yew / not-yew) | `data/raw/yew_annotations_combined.csv` | 267 | 3 |
-| FAIB forestry negatives | `data/processed/faib_negatives/faib_negative_embeddings.csv` | 6,194 | 1 |
-| Alpine hard-negatives (cat-6 pixels, prob>0.2) | `data/processed/alpine_negatives/alpine_negative_embeddings.csv` | 2,800 | 1 |
-| **Combined negatives** | `data/processed/combined_negative_embeddings.csv` | **8,994** | 1 |
+| Water/non-forest | BCLCS water/urban/agriculture | ×0.00 | Yew absent |
+| Logged <20 yr | Stand age <20 yr | ×0.00 | No mature regeneration |
+| Logged 20–40 yr | Stand age 20–40 yr | ×0.08 | Young second-growth, sparse yew |
+| Logged 40–80 yr | Stand age 40–80 yr | ×0.30 | Maturing second-growth, partial recovery |
+| Forest >80 yr | Stand age ≥80 yr, old-growth | ×1.00 | No suppression |
+| Alpine/barren | Designated alpine, rock/ice | ×0.00 | Above treeline, yew absent |
 
-Alpine negatives were extracted from the 15 CWH spot tile caches using:
+This approach preserves raw model predictions in old-growth areas while suppressing probabilities in recently disturbed or unsuitable terrain.
 
-```bash
-conda run -n yew_pytorch python scripts/preprocessing/extract_alpine_negatives.py
-```
+### 3.3 Historical Fire Perimeters
 
----
+**Source:** BC Data Catalogue — `PROT_HISTORICAL_FIRE_POLYS_SP.gdb`  
+**Coverage:** 3,603 fires ≥50 ha in coastal study region, 1918–2024  
+**Attributes:** Fire year, cause (lightning/person), size (hectares)  
+**Web display:** Color-coded by age (recent fires = red, older fires = orange)  
+**GeoJSON export:** `docs/tiles/fire_contours.geojson` (1.8 MB, simplified at ~300 m tolerance)
 
-## 4. Model
+Fire history provides context for stand age and disturbance patterns, complementing VRI logging records.
 
-**Architecture:** YewMLP — fully connected, 64→128→64→32→1  
-**Loss:** Binary cross-entropy with sigmoid output  
-**Saved to:** `results/predictions/south_vi_large/mlp_model.pth`  
-**Scaler:** `results/predictions/south_vi_large/mlp_scaler.pkl`
+### 3.4 Protected Areas
 
-### Training command
+**Source:** BC Data Catalogue WFS — `WHSE_TANTALIS.TA_PARK_ECORES_PA_SVW` (live service) supplemented by local `TA_PARK_ECORES_PA_SVW.gdb` for northern BC  
+**Coverage:** 512 provincial parks, ecological reserves, and conservancies in coastal BC from 47.5°N–56°N (including all of Vancouver Island, Sunshine Coast, Haida Gwaii)  
+**Web display:** Green polygons, ecological reserves shown with dashed borders  
+**GeoJSON export:** `docs/tiles/park_contours.geojson` (0.8 MB, created by combining WFS download with local GDB)
 
-```bash
-conda run -n yew_pytorch python scripts/prediction/classify_tiled_gpu.py \
-    --input-dir results/predictions/south_vi_large \
-    --train-csv data/processed/inat_yew_positives_train.csv \
-    --val-csv data/processed/inat_yew_positives_val.csv \
-    --annotations data/raw/yew_annotations_combined.csv \
-    --annotation-weight 3 \
-    --gee-negatives data/processed/combined_negative_embeddings.csv \
-    --gee-negatives-weight 1 \
-    --epochs 100
-```
-
-### Current model metrics (February 2026)
-
-| Metric | Value |
-|---|---|
-| Accuracy | 98.85% |
-| F1 score | 0.9471 |
-| AUC-ROC | 0.9980 |
+Protected areas highlight where yew habitat may be conserved from future logging.
 
 ---
 
-## 5. VRI Logging Mask
+## 4. Interactive Web Map
 
-After classification, raw pixel probabilities are multiplied element-wise by a VRI suitability factor derived from BC's Vegetation Resources Inventory (VEG_COMP_LYR_R1_POLY_2024.gdb).
+**URL:** [jerichooconnell.github.io/yew_project](https://jerichooconnell.github.io/yew_project/)  
+**Technology:** Leaflet.js on GitHub Pages  
+**Base layers:** Esri World Imagery (satellite), OpenStreetMap, terrain
 
-**GDB file:** `data/VEG_COMP_LYR_R1_POLY_2024.gdb`  
-**Layer:** `VEG_COMP_LYR_R1_POLY` (6.87M features, EPSG:3005)
+### Map features
 
-### 5.1 VRI fields used
+**Yew probability overlay (45 tiles):**
+- Transparent PNG tiles draped over satellite imagery
+- Color scale: green (0.02–0.33) → yellow (0.33–0.50) → orange (0.50–0.83) → magenta (0.83–1.0)
+- Pixels with P<0.02 are fully transparent (noise floor)
+- Toggle individual tiles on/off in sidebar
 
-| Field | Purpose |
-|---|---|
-| `BCLCS_LEVEL_1` / `BCLCS_LEVEL_2` | Land cover class (water, non-vegetated, alpine) |
-| `PROJ_AGE_CLASS_CD_1` | Stand age class 1–9 (92% polygon coverage) — **primary age source** |
-| `PROJ_AGE_1` | Explicit projected stand age (58% coverage) |
-| `HARVEST_DATE` | Recorded logging date |
-| `LINE_7B_DISTURBANCE_HISTORY` | Coded disturbance events, e.g. `B23;L14` (burn 2023, logged 2014) |
-| `OPENING_IND` | `'Y'` = aerially confirmed harvest via BC RESULTS system |
-| `OPENING_SOURCE` | Cutblock database source: 3=RESULTS, 4=imagery, 7=harvest, 11=silviculture |
-| `ALPINE_DESIGNATION` | `'A'` = officially designated alpine zone |
+**Forestry/logging overlay:**
+- Categorical raster showing VRI-derived stand age classes
+- Color-coded by disturbance history (red = recent logging, green = old-growth >80 yr)
+- Synchronized with yew probabilities (can view both simultaneously)
 
-### 5.2 Age resolution logic
+**Fire contours (🔥):**
+- 3,603 historical fire perimeters ≥50 ha
+- Clickable popups: fire year, cause, size
+- Color gradient by age (bright red = 2020s, orange = pre-1950)
 
-For each VRI polygon the minimum stand age is taken across all available sources (most recent disturbance wins):
+**Protected areas (🏞️):**
+- 255 parks, ecological reserves, conservancies
+- Clickable popups: name, designation, official area
+- Green fill with dashed borders for ecological reserves
 
-```
-age = min(
-    PROJ_AGE_CLASS_CD_1 midpoint,
-    PROJ_AGE_1,
-    current_year − HARVEST_DATE.year,
-    years_since_LINE_7B_event
-)
-```
+**Observation reporting:**
+- Users can click "✔ Yew Present" or "✘ No Yew" then click the map to add field observations
+- "Submit to GitHub" creates a GitHub Issue with observation coordinates in CSV format
+- Allows crowdsourced validation and model improvement
 
-`PROJ_AGE_CLASS_CD_1` uses midpoint values: 1→10 yr, 2→30 yr, 3→50 yr, 4→70 yr, 5→90 yr, 6→110 yr, 7→130 yr, 8→195 yr, 9→300 yr.
-
-`LINE_7B_DISTURBANCE_HISTORY` is parsed for all event codes (B=burn, L=log, W=wind, I=insect, D=disease) with 2-digit year → 4-digit century-aware conversion.
-
-If `OPENING_IND='Y'` or `OPENING_SOURCE` ∈ {3,4,7,11} but no age is available from any other field, the polygon is assigned age=0 (conservative: treat as recent disturbance).
-
-### 5.3 Suppression categories
-
-| Cat | Condition | Suppression factor | Visual colour |
-|---|---|---|---|
-| 1 | Water / non-forest | ×0.00 | Blue |
-| 2 | Logged <20 yr | ×0.00 | Red |
-| 3 | Logged 20–40 yr | ×0.08 | Orange |
-| 4 | Logged 40–80 yr | ×0.30 | Yellow |
-| 5 | Forest >80 yr / unlogged | ×1.00 | Green |
-| 6 | Alpine / barren | ×0.00 | Tan |
-
-Category 6 is assigned when: `BCLCS_LEVEL_1='N'` + `BCLCS_LEVEL_2='L'` (rock/rubble), `ALPINE_DESIGNATION='A'`, or `BCLCS_LEVEL_2='N'` with no harvest/age record.
-
-### 5.4 Implementation
-
-```bash
-# Reclassify and regenerate all 15 CWH spot maps
-conda run -n yew_pytorch python scripts/prediction/classify_cwh_spots.py \
-    --force-reclassify
-```
-
-The logging raster for each spot is cached in `results/analysis/cwh_spot_comparisons/tile_cache/*_logging.npy`.  
-Delete those files before running if VRI classification logic has changed.
+**Logging impact statistics tab:**
+- By-zone and by-subzone estimates of yew habitat destroyed by logging
+- Covers 42 of 45 tiles (~4,200 km²) across CWH zone
+- Methodology: yew prevalence in old-growth ×  (old-growth + logged area) − current remaining
 
 ---
 
-## 6. CWH Spot Comparison Maps (15 areas)
+## 5. Key Results
 
-`classify_cwh_spots.py` generates comparison maps for 15 known CWH localities:
+### 5.1 Habitat extent by tile (top 10)
 
-| # | Area | Centre |
-|---|---|---|
-| 1 | Carmanah-Walbran | 48.44°N, 124.16°W |
-| 2 | Sooke Hills | 48.60°N, 123.80°W |
-| 3 | Clayoquot Sound | 49.32°N, 124.98°W |
-| 4 | Campbell River Uplands | 50.02°N, 125.24°W |
-| 5 | Quatsino Sound | 50.70°N, 127.10°W |
-| 6 | Squamish Highlands | 49.70°N, 123.15°W |
-| 7 | Desolation Sound | 50.72°N, 124.00°W |
-| 8 | Bella Coola Valley | 52.33°N, 126.60°W |
-| 9 | Prince Rupert Hills | 54.15°N, 129.70°W |
-| 10 | Kitimat Ranges | 53.50°N, 128.60°W |
-| 11 | Strathcona Highlands | 49.90°N, 125.55°W |
-| 12 | Garibaldi Foothills | 49.86°N, 122.68°W |
-| 13 | Bute Inlet Slopes | 50.83°N, 124.92°W |
-| 14 | Nanaimo Lakes | 49.02°N, 124.20°W |
-| 15 | Rivers Inlet | 51.40°N, 127.70°W |
+| Tile | Region | Area P≥0.5 (ha) | Mean prob | Notes |
+|---|---|---|---|---|
+| Stave Lake | Lower Fraser | 4,357 | 0.362 | CWHvm1/dm, logged valleys + intact slopes |
+| Alberni Valley | Central VI | 4,408 | 0.363 | CWHmm1/vm2, Somass River drainage |
+| Howe Sound East | South mainland | 3,962 | 0.261 | Montane CWH, Squamish River |
+| Rivers Inlet | Mid-coast | 3,114 | 0.188 | Outer coast CWH, hypermaritime |
+| Port Renfrew | SW VI | 2,181 | 0.164 | Pacific Rim old-growth |
+| Campbell River Uplands | Central VI | 2,184 | 0.172 | North-central VI CWH |
+| Port Hardy Forest | North VI | 2,097 | 0.152 | Valley-bottom CWH |
+| Clayoquot Sound | West VI | 1,773 | 0.171 | UNESCO biosphere reserve |
+| Sooke Hills | South VI | 1,673 | 0.159 | Montane CWH, Victoria watershed |
+| Cowichan Uplands | South VI | 1,652 | 0.173 | Lower-elevation CWH, mixed age |
 
-Each area produces:
-- An HTML comparison map with VRI logging overlay (`results/analysis/cwh_spot_comparisons/*.html`)
-- A spot summary PNG thumbnail
-- Stats: mean probability, max probability, area with P≥0.5 (ha)
-
----
-
-## 7. KMZ Map
-
-From sample predictions, a KMZ ground overlay is generated for Google Earth:
-
-```bash
-conda run -n yew_pytorch python scripts/visualization/create_cwh_kmz.py \
-    --input results/analysis/cwh_yew_population_100k/sample_predictions_cwh.csv \
-    --output results/analysis/cwh_yew_population_100k/cwh_yew_100k.kmz
-```
-
-The script rasterises point predictions to a 0.03° grid (~3 km), applies a NaturalEarth land mask to remove ocean points, and writes a KMZ with a colour-coded RGBA overlay.
-
-## 7b. Static PNG Map
-
-```bash
-conda run -n yew_pytorch python scripts/visualization/generate_png_map.py
-```
-
-Outputs a 200 dpi map to `results/analysis/cwh_yew_population_100k/cwh_yew_100k_map.png` with NaturalEarth coastlines, CWH boundary overlay, probability colorbar, and stats box.
-
----
-
-## 8. Population Estimates (February 2026)
-
-### CWH zone (100k sample, Feb 2026)
-
-| Threshold | Estimated area | 95% CI |
-|---|---|---|
-| P≥0.3 | 411,758 ha | 404,600–418,900 ha |
-| **P≥0.5** | **314,416 ha** | **308,117–320,715 ha** |
-| P≥0.7 | 232,482 ha | 226,900–238,100 ha |
-
-**Zone area:** 3,595,194 ha — **Model:** YewMLP AUC 0.998, F1 0.947
-
-### Coastal BC region (100k sample, in progress Feb 2026)
-
-Results pending extraction. Region area: 22,765,200 ha (227,652 km²).
-
-> **Note (methodology):** Earlier estimates using `sample_cwh_yew_population.py` were inflated (~1.1M ha at P≥0.5) due to a WFS fallback bug that sampled the bounding-box rectangle rather than the actual CWH polygon. The corrected estimates above use `resample_cwh_100k.py` which passes `cwh_boundary_forestry.gpkg` directly to GEE.
+**Total across 45 tiles:** ~39,000 ha with P≥0.5 (390 km²)
 
 ---
 

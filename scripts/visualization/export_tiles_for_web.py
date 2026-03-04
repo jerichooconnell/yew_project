@@ -69,6 +69,17 @@ STUDY_AREAS = [
     (52.900, -128.700, "Princess Royal Island",  "Outer island CWH, spirit bear range"),
     (52.510, -128.580, "Milbanke Sound",         "Outer mid-coast CWH"),
     (54.820, -130.120, "Portland Inlet",         "Far north coast CWH near Nisga'a"),
+    # 10 gap-filling tiles (March 2026)
+    (50.250, -125.750, "Muchalat Valley",        "Central VI CWHmm1/xm2 valley"),
+    (49.250, -122.250, "Stave Lake",             "Lower Fraser Valley CWHvm1/dm"),
+    (53.81907, -132.43530, "Haida Gwaii South",  "Moresby Island CWHvh3 outer coast"),
+    (49.250, -121.750, "Chilliwack Uplands",     "Fraser Valley east CWHdm/ms1"),
+    (55.250, -130.750, "Stewart Lowlands",       "Far north CWHvh3 near Stewart BC"),
+    (51.250, -127.250, "Smith Sound",            "Mid-coast CWHvm2 mainland fjord"),
+    (49.250, -125.250, "Alberni Valley",         "South-central VI CWHmm1/vm2"),
+    (49.750, -123.750, "Sechelt Peninsula",      "Central Sunshine Coast CWHvm2/dm"),
+    (52.750, -128.250, "Klemtu Forest",          "Mid-coast CWHvh2/vm2 inner islands"),
+    (51.750, -127.750, "Namu Lowlands",          "Central coast CWHvh2 old-growth"),
 ]
 
 
