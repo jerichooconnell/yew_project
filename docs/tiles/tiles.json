@@ -30,7 +30,8 @@
       "logged_40_80_pct": 27.5,
       "forest_gt80_pct": 7.8,
       "alpine_pct": 0.0
-    }
+    },
+    "age_png": "carmanah_walbran_age.png"
   },
   {
     "slug": "sooke_hills",
@@ -63,7 +64,8 @@
       "logged_40_80_pct": 43.6,
       "forest_gt80_pct": 21.4,
       "alpine_pct": 0.1
-    }
+    },
+    "age_png": "sooke_hills_age.png"
   },
   {
     "slug": "clayoquot_sound",
@@ -96,7 +98,8 @@
       "logged_40_80_pct": 36.6,
       "forest_gt80_pct": 30.7,
       "alpine_pct": 0.2
-    }
+    },
+    "age_png": "clayoquot_sound_age.png"
   },
   {
     "slug": "campbell_river_uplands",
@@ -129,7 +132,8 @@
       "logged_40_80_pct": 18.8,
       "forest_gt80_pct": 36.2,
       "alpine_pct": 1.4
-    }
+    },
+    "age_png": "campbell_river_uplands_age.png"
   },
   {
     "slug": "quatsino_sound",
@@ -162,7 +166,8 @@
       "logged_40_80_pct": 2.2,
       "forest_gt80_pct": 5.3,
       "alpine_pct": 0.0
-    }
+    },
+    "age_png": "quatsino_sound_age.png"
   },
   {
     "slug": "squamish_highlands",
@@ -195,7 +200,8 @@
       "logged_40_80_pct": 28.0,
       "forest_gt80_pct": 47.4,
       "alpine_pct": 3.5
-    }
+    },
+    "age_png": "squamish_highlands_age.png"
   },
   {
     "slug": "desolation_sound",
@@ -228,7 +234,8 @@
       "logged_40_80_pct": 4.1,
       "forest_gt80_pct": 8.5,
       "alpine_pct": 84.9
-    }
+    },
+    "age_png": "desolation_sound_age.png"
   },
   {
     "slug": "bella_coola_valley",
@@ -261,7 +268,8 @@
       "logged_40_80_pct": 10.4,
       "forest_gt80_pct": 60.3,
       "alpine_pct": 22.7
-    }
+    },
+    "age_png": "bella_coola_valley_age.png"
   },
   {
     "slug": "prince_rupert_hills",
@@ -294,7 +302,8 @@
       "logged_40_80_pct": 3.3,
       "forest_gt80_pct": 58.7,
       "alpine_pct": 27.3
-    }
+    },
+    "age_png": "prince_rupert_hills_age.png"
   },
   {
     "slug": "kitimat_ranges",
@@ -327,7 +336,8 @@
       "logged_40_80_pct": 4.7,
       "forest_gt80_pct": 55.1,
       "alpine_pct": 14.9
-    }
+    },
+    "age_png": "kitimat_ranges_age.png"
   },
   {
     "slug": "strathcona_highlands",
@@ -360,7 +370,8 @@
       "logged_40_80_pct": 31.8,
       "forest_gt80_pct": 24.0,
       "alpine_pct": 0.5
-    }
+    },
+    "age_png": "strathcona_highlands_age.png"
   },
   {
     "slug": "garibaldi_foothills",
@@ -393,7 +404,8 @@
       "logged_40_80_pct": 1.4,
       "forest_gt80_pct": 19.9,
       "alpine_pct": 76.4
-    }
+    },
+    "age_png": "garibaldi_foothills_age.png"
   },
   {
     "slug": "bute_inlet_slopes",
@@ -426,7 +438,8 @@
       "logged_40_80_pct": 8.6,
       "forest_gt80_pct": 29.8,
       "alpine_pct": 8.8
-    }
+    },
+    "age_png": "bute_inlet_slopes_age.png"
   },
   {
     "slug": "nanaimo_lakes",
@@ -459,7 +472,8 @@
       "logged_40_80_pct": 41.6,
       "forest_gt80_pct": 10.8,
       "alpine_pct": 0.0
-    }
+    },
+    "age_png": "nanaimo_lakes_age.png"
   },
   {
     "slug": "rivers_inlet",
@@ -492,7 +506,8 @@
       "logged_40_80_pct": 0.0,
       "forest_gt80_pct": 41.2,
       "alpine_pct": 0.0
-    }
+    },
+    "age_png": "rivers_inlet_age.png"
   },
   {
     "slug": "port_renfrew",
@@ -525,7 +540,8 @@
       "logged_40_80_pct": 20.4,
       "forest_gt80_pct": 30.8,
       "alpine_pct": 0.0
-    }
+    },
+    "age_png": "port_renfrew_age.png"
   },
   {
     "slug": "cowichan_uplands",
@@ -558,7 +574,8 @@
       "logged_40_80_pct": 48.9,
       "forest_gt80_pct": 18.0,
       "alpine_pct": 0.1
-    }
+    },
+    "age_png": "cowichan_uplands_age.png"
   },
   {
     "slug": "comox_uplands",
@@ -591,7 +608,8 @@
       "logged_40_80_pct": 42.5,
       "forest_gt80_pct": 23.3,
       "alpine_pct": 0.4
-    }
+    },
+    "age_png": "comox_uplands_age.png"
   },
   {
     "slug": "gold_river_forest",
@@ -624,7 +642,8 @@
       "logged_40_80_pct": 39.3,
       "forest_gt80_pct": 40.0,
       "alpine_pct": 1.1
-    }
+    },
+    "age_png": "gold_river_forest_age.png"
   },
   {
     "slug": "port_hardy_forest",
@@ -657,7 +676,8 @@
       "logged_40_80_pct": 17.7,
       "forest_gt80_pct": 41.2,
       "alpine_pct": 0.2
-    }
+    },
+    "age_png": "port_hardy_forest_age.png"
   },
   {
     "slug": "sunshine_coast_south",
@@ -690,7 +710,8 @@
       "logged_40_80_pct": 1.6,
       "forest_gt80_pct": 4.6,
       "alpine_pct": 0.0
-    }
+    },
+    "age_png": "sunshine_coast_south_age.png"
   },
   {
     "slug": "howe_sound_east",
@@ -723,7 +744,8 @@
       "logged_40_80_pct": 8.2,
       "forest_gt80_pct": 48.2,
       "alpine_pct": 0.1
-    }
+    },
+    "age_png": "howe_sound_east_age.png"
   },
   {
     "slug": "powell_river_forest",
@@ -756,7 +778,8 @@
       "logged_40_80_pct": 3.2,
       "forest_gt80_pct": 27.8,
       "alpine_pct": 5.1
-    }
+    },
+    "age_png": "powell_river_forest_age.png"
   },
   {
     "slug": "jervis_inlet_slopes",
@@ -789,7 +812,8 @@
       "logged_40_80_pct": 15.0,
       "forest_gt80_pct": 55.1,
       "alpine_pct": 27.4
-    }
+    },
+    "age_png": "jervis_inlet_slopes_age.png"
   },
   {
     "slug": "toba_inlet_slopes",
@@ -822,7 +846,8 @@
       "logged_40_80_pct": 0.0,
       "forest_gt80_pct": 6.1,
       "alpine_pct": 93.9
-    }
+    },
+    "age_png": "toba_inlet_slopes_age.png"
   },
   {
     "slug": "knight_inlet",
@@ -855,7 +880,8 @@
       "logged_40_80_pct": 9.5,
       "forest_gt80_pct": 64.7,
       "alpine_pct": 14.7
-    }
+    },
+    "age_png": "knight_inlet_age.png"
   },
   {
     "slug": "broughton_archipelago",
@@ -888,7 +914,8 @@
       "logged_40_80_pct": 13.1,
       "forest_gt80_pct": 34.0,
       "alpine_pct": 0.1
-    }
+    },
+    "age_png": "broughton_archipelago_age.png"
   },
   {
     "slug": "kingcome_inlet",
@@ -921,7 +948,8 @@
       "logged_40_80_pct": 8.4,
       "forest_gt80_pct": 45.3,
       "alpine_pct": 43.3
-    }
+    },
+    "age_png": "kingcome_inlet_age.png"
   },
   {
     "slug": "owikeno_lake",
@@ -954,7 +982,8 @@
       "logged_40_80_pct": 11.8,
       "forest_gt80_pct": 42.5,
       "alpine_pct": 40.4
-    }
+    },
+    "age_png": "owikeno_lake_age.png"
   },
   {
     "slug": "burke_channel",
@@ -987,7 +1016,8 @@
       "logged_40_80_pct": 12.7,
       "forest_gt80_pct": 44.2,
       "alpine_pct": 32.1
-    }
+    },
+    "age_png": "burke_channel_age.png"
   },
   {
     "slug": "ocean_falls",
@@ -1020,7 +1050,8 @@
       "logged_40_80_pct": 4.8,
       "forest_gt80_pct": 68.1,
       "alpine_pct": 5.0
-    }
+    },
+    "age_png": "ocean_falls_age.png"
   },
   {
     "slug": "dean_channel",
@@ -1053,7 +1084,8 @@
       "logged_40_80_pct": 4.5,
       "forest_gt80_pct": 43.8,
       "alpine_pct": 36.2
-    }
+    },
+    "age_png": "dean_channel_age.png"
   },
   {
     "slug": "princess_royal_island",
@@ -1086,7 +1118,8 @@
       "logged_40_80_pct": 0.7,
       "forest_gt80_pct": 73.1,
       "alpine_pct": 2.5
-    }
+    },
+    "age_png": "princess_royal_island_age.png"
   },
   {
     "slug": "milbanke_sound",
@@ -1119,7 +1152,8 @@
       "logged_40_80_pct": 0.0,
       "forest_gt80_pct": 91.6,
       "alpine_pct": 0.1
-    }
+    },
+    "age_png": "milbanke_sound_age.png"
   },
   {
     "slug": "portland_inlet",
@@ -1152,7 +1186,8 @@
       "logged_40_80_pct": 1.8,
       "forest_gt80_pct": 55.7,
       "alpine_pct": 9.9
-    }
+    },
+    "age_png": "portland_inlet_age.png"
   },
   {
     "slug": "muchalat_valley",
@@ -1185,7 +1220,8 @@
       "logged_40_80_pct": 32.4,
       "forest_gt80_pct": 18.9,
       "alpine_pct": 0.3
-    }
+    },
+    "age_png": "muchalat_valley_age.png"
   },
   {
     "slug": "stave_lake",
@@ -1218,7 +1254,8 @@
       "logged_40_80_pct": 22.4,
       "forest_gt80_pct": 57.5,
       "alpine_pct": 0.0
-    }
+    },
+    "age_png": "stave_lake_age.png"
   },
   {
     "slug": "haida_gwaii_south",
@@ -1251,7 +1288,8 @@
       "logged_40_80_pct": 0.2,
       "forest_gt80_pct": 71.7,
       "alpine_pct": 0.0
-    }
+    },
+    "age_png": "haida_gwaii_south_age.png"
   },
   {
     "slug": "chilliwack_uplands",
@@ -1284,7 +1322,8 @@
       "logged_40_80_pct": 17.9,
       "forest_gt80_pct": 48.7,
       "alpine_pct": 4.6
-    }
+    },
+    "age_png": "chilliwack_uplands_age.png"
   },
   {
     "slug": "stewart_lowlands",
@@ -1308,7 +1347,8 @@
       "h": 1001,
       "w": 1755
     },
-    "png": "stewart_lowlands.png"
+    "png": "stewart_lowlands.png",
+    "age_png": "stewart_lowlands_age.png"
   },
   {
     "slug": "smith_sound",
@@ -1341,7 +1381,8 @@
       "logged_40_80_pct": 5.3,
       "forest_gt80_pct": 72.3,
       "alpine_pct": 0.5
-    }
+    },
+    "age_png": "smith_sound_age.png"
   },
   {
     "slug": "alberni_valley",
@@ -1374,7 +1415,8 @@
       "logged_40_80_pct": 23.5,
       "forest_gt80_pct": 65.7,
       "alpine_pct": 0.2
-    }
+    },
+    "age_png": "alberni_valley_age.png"
   },
   {
     "slug": "sechelt_peninsula",
@@ -1407,7 +1449,8 @@
       "logged_40_80_pct": 22.0,
       "forest_gt80_pct": 57.1,
       "alpine_pct": 1.2
-    }
+    },
+    "age_png": "sechelt_peninsula_age.png"
   },
   {
     "slug": "klemtu_forest",
@@ -1440,7 +1483,8 @@
       "logged_40_80_pct": 1.7,
       "forest_gt80_pct": 80.6,
       "alpine_pct": 0.0
-    }
+    },
+    "age_png": "klemtu_forest_age.png"
   },
   {
     "slug": "namu_lowlands",
@@ -1473,6 +1517,7 @@
       "logged_40_80_pct": 0.3,
       "forest_gt80_pct": 87.8,
       "alpine_pct": 0.1
-    }
+    },
+    "age_png": "namu_lowlands_age.png"
   }
 ]

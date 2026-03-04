@@ -287,6 +287,10 @@
       <label for="toggle-forestry">🌳 Show forestry / logging</label>
     </div>
     <div class="toggle-all-row">
+      <input type="checkbox" id="toggle-age" onchange="toggleAllAge(this.checked)">
+      <label for="toggle-age">🌲 Show forest age (VRI)</label>
+    </div>
+    <div class="toggle-all-row">
       <input type="checkbox" id="toggle-fire" onchange="toggleFireLayer(this.checked)">
       <label for="toggle-fire">🔥 Show historical fires (≥50 ha)</label>
     </div>
@@ -393,6 +397,16 @@
   <div class="legend-row"><span class="legend-swatch" style="background:rgba(230,102,25,0.93)"></span> 0.67 – 0.83</div>
   <div class="legend-row"><span class="legend-swatch" style="background:rgba(166,0,77,0.96)"></span> 0.83 – 1.00</div>
   <hr style="margin:6px 0">
+  <div id="age-legend" style="display:none;">
+    <h4 style="margin-top:4px;">🌲 Forest Age (VRI)</h4>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(180,20,20,0.82)"></span> 0–10 yr (bare / logged)</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(230,80,10,0.82)"></span> 10–30 yr</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(240,180,20,0.82)"></span> 40–80 yr</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(40,155,50,0.82)"></span> 80–150 yr</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(10,70,20,0.82)"></span> 150+ yr (old-growth)</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(0,0,0,0);border:1px solid #ccc"></span> Water / alpine</div>
+    <hr style="margin:6px 0">
+  </div>
   <div id="forestry-legend" style="display:none;">
     <h4 style="margin-top:4px;">🌳 Forestry / VRI</h4>
     <div class="legend-row"><span class="legend-swatch" style="background:rgba(30,100,220,0.71)"></span> Water / non-forest</div>
@@ -487,7 +501,9 @@ L.control.layers({
 let tiles = [];
 let overlays = {};
 let forestryOverlays = {};
+let ageOverlays = {};
 let forestryVisible = false;
+let ageVisible = false;
 let obsMode = null;
 let observations = [];
 let obsMarkers = [];
@@ -537,6 +553,14 @@ function initTiles() {
         interactive: false,
       });
       forestryOverlays[t.slug] = logOverlay;
+    }
+    // Forest-age overlay (not added to map by default)
+    if (t.age_png) {
+      const ageOverlay = L.imageOverlay('tiles/' + t.age_png, bounds, {
+        opacity: 0.85,
+        interactive: false,
+      });
+      ageOverlays[t.slug] = ageOverlay;
     }
   });
 }
@@ -595,6 +619,18 @@ function toggleAllForestry(show) {
     }
   });
   document.getElementById('forestry-legend').style.display = show ? 'block' : 'none';
+}
+
+function toggleAllAge(show) {
+  ageVisible = show;
+  Object.keys(ageOverlays).forEach(slug => {
+    if (show) {
+      ageOverlays[slug].addTo(map);
+    } else {
+      map.removeLayer(ageOverlays[slug]);
+    }
+  });
+  document.getElementById('age-legend').style.display = show ? 'block' : 'none';
 }
 
 // ── Fire & Parks layers ──────────────────────────────────────────────────────
