@@ -133,7 +133,7 @@ LOG_SUPPRESS = {
     1: 0.00,   # water / non-forest → zero out completely
     2: 0.00,   # logged  <20 yr     → zero out
     3: 0.08,   # logged 20–40 yr    → heavily suppressed
-    4: 0.30,   # logged 40–80 yr    → moderately suppressed
+    4: 0.50,   # logged 40–80 yr    → moderately suppressed
     5: 1.00,   # forest >80 yr      → unchanged
     6: 0.00,   # alpine / barren    → zero out
 }

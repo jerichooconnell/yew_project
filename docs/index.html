@@ -330,9 +330,10 @@
         <b>Methodology:</b><br>
         1. Yew prevalence rate = fraction of old-growth (&gt;80 yr) pixels with P&ge;0.5<br>
         2. Est. original yew = prevalence &times; (old-growth + logged area)<br>
-        3. Destroyed = original &minus; current remaining after logging suppression<br>
-        4. Logging suppression: &lt;20yr &rarr; &times;0, 20-40yr &rarr; &times;0.08, 40-80yr &rarr; &times;0.30<br>
-        5. Data: XGBoost model on 2024 GEE embeddings, BC VRI 2024, BC BEC zones
+        3. Destroyed (logging) = original &minus; current after logging suppression<br>
+        4. Logging suppression: &lt;20yr &rarr; &times;0, 20-40yr &rarr; &times;0.08, <b>40-80yr &rarr; &times;0.50</b>, &gt;80yr &rarr; &times;1<br>
+        5. Fire suppression = yew pixels driven below P=0.5 threshold by fire-date modifier [(2024&minus;fire_year)/124]<br>
+        6. Data: XGBoost model on 2024 GEE embeddings, BC VRI 2024, BC BEC zones, BC Historical Fire Perimeters
       </div>
     </div>
   </div>
@@ -950,31 +951,34 @@ function renderCWHFireChart(data) {
   `;
 }
 
-// ── Logging Impact Statistics ────────────────────────────────────────────────
+// ── Logging Impact Statistics ─────────────────────────────────────────────────
+// Suppression factors: <20yr→×0, 20-40yr→×0.08, 40-80yr→×0.50, >80yr→×1
+// orig = yr × (og+l2+l3+l4); cur = yr × (og + l3×0.08 + l4×0.50); dest = orig-cur
+// fire = yew ha suppressed below P=0.5 threshold by fire-date modifier
 const BEC_STATS = [
-  {s:"CDFmm",z:"CDF",og:4184,log:1108,l2:241,l3:382,l4:486,yr:0.6589,orig:3487,cur:2757,dest:730},
-  {s:"CMAunp",z:"CMA",og:14460,log:1361,l2:189,l3:2,l4:1169,yr:0.0103,orig:163,cur:149,dest:14},
-  {s:"CWHdm",z:"CWH",og:23394,log:11410,l2:1430,l3:2535,l4:7445,yr:0.3205,orig:11155,cur:7622,dest:3533},
-  {s:"CWHds1",z:"CWH",og:2441,log:3116,l2:801,l3:692,l4:1622,yr:0.0374,orig:208,cur:116,dest:92},
-  {s:"CWHds2",z:"CWH",og:1628,log:1716,l2:968,l3:25,l4:724,yr:0.0249,orig:83,cur:41,dest:43},
-  {s:"CWHmm1",z:"CWH",og:1779,log:8407,l2:838,l3:2053,l4:5516,yr:0.2682,orig:2732,cur:484,dest:2247},
-  {s:"CWHmm2",z:"CWH",og:3224,log:18766,l2:1709,l3:6998,l4:10059,yr:0.2855,orig:6278,cur:939,dest:5339},
-  {s:"CWHms1",z:"CWH",og:3096,log:1431,l2:436,l3:118,l4:877,yr:0.0226,orig:102,cur:71,dest:31},
-  {s:"CWHms2",z:"CWH",og:2086,log:3261,l2:119,l3:819,l4:2322,yr:0.018,orig:97,cur:38,dest:59},
-  {s:"CWHvh1",z:"CWH",og:2062,log:1394,l2:11,l3:497,l4:887,yr:0.5575,orig:1927,cur:1150,dest:777},
-  {s:"CWHvh2",z:"CWH",og:41046,log:683,l2:127,l3:467,l4:89,yr:0.1283,orig:5354,cur:5276,dest:78},
-  {s:"CWHvm1",z:"CWH",og:59785,log:35613,l2:4125,l3:9920,l4:21568,yr:0.1383,orig:13193,cur:8335,dest:4858},
-  {s:"CWHvm2",z:"CWH",og:33205,log:8067,l2:445,l3:1716,l4:5907,yr:0.1332,orig:5499,cur:4459,dest:1040},
-  {s:"CWHws2",z:"CWH",og:5891,log:2386,l2:1369,l3:35,l4:983,yr:0.0308,orig:255,cur:181,dest:73},
-  {s:"CWHxm1",z:"CWH",og:13137,log:17826,l2:3078,l3:5130,l4:9618,yr:0.4163,orig:12891,cur:5488,dest:7402},
-  {s:"CWHxm2",z:"CWH",og:14437,log:46324,l2:11447,l3:8176,l4:26702,yr:0.2797,orig:16994,cur:4056,dest:12938},
-  {s:"ESSFmc",z:"ESSF",og:81,log:52,l2:29,l3:0,l4:23,yr:0.0,orig:0,cur:0,dest:0},
-  {s:"ESSFmw",z:"ESSF",og:1351,log:568,l2:487,l3:0,l4:81,yr:0.0061,orig:12,cur:8,dest:4},
-  {s:"MHmm1",z:"MH",og:20575,log:3099,l2:134,l3:514,l4:2452,yr:0.149,orig:3527,cur:3092,dest:435},
-  {s:"MHmm2",z:"MH",og:13458,log:2192,l2:503,l3:0,l4:1690,yr:0.0074,orig:116,cur:100,dest:16},
-  {s:"MHmmp",z:"MH",og:83,log:0,l2:0,l3:0,l4:0,yr:0.0,orig:0,cur:0,dest:0},
-  {s:"MHwh1",z:"MH",og:968,log:1,l2:0,l3:0,l4:1,yr:0.0006,orig:1,cur:1,dest:0},
-  {s:"MHwhp",z:"MH",og:60,log:1,l2:0,l3:0,l4:1,yr:0.0,orig:0,cur:0,dest:0},
+  {s:"CDFmm",z:"CDF",og:4184,log:1108,l2:241,l3:382,l4:486,yr:0.6589,orig:3487,cur:2937,dest:550,fire:0},
+  {s:"CMAunp",z:"CMA",og:14460,log:1360,l2:189,l3:2,l4:1169,yr:0.0103,orig:163,cur:155,dest:8,fire:0},
+  {s:"CWHdm",z:"CWH",og:23394,log:11410,l2:1430,l3:2535,l4:7445,yr:0.3205,orig:11155,cur:8756,dest:2399,fire:520},
+  {s:"CWHds1",z:"CWH",og:2440,log:3116,l2:801,l3:692,l4:1622,yr:0.0374,orig:208,cur:124,dest:84,fire:2},
+  {s:"CWHds2",z:"CWH",og:1628,log:1716,l2:968,l3:24,l4:724,yr:0.0249,orig:83,cur:50,dest:33,fire:13},
+  {s:"CWHmm1",z:"CWH",og:1779,log:8407,l2:838,l3:2053,l4:5516,yr:0.2682,orig:2732,cur:1261,dest:1471,fire:93},
+  {s:"CWHmm2",z:"CWH",og:3224,log:18766,l2:1709,l3:6997,l4:10059,yr:0.2855,orig:6278,cur:2516,dest:3762,fire:16},
+  {s:"CWHms1",z:"CWH",og:3096,log:1431,l2:436,l3:118,l4:877,yr:0.0226,orig:102,cur:80,dest:22,fire:20},
+  {s:"CWHms2",z:"CWH",og:2086,log:3261,l2:119,l3:819,l4:2322,yr:0.018,orig:96,cur:60,dest:36,fire:2},
+  {s:"CWHvh1",z:"CWH",og:2062,log:1394,l2:11,l3:497,l4:887,yr:0.5575,orig:1927,cur:1419,dest:508,fire:0},
+  {s:"CWHvh2",z:"CWH",og:41046,log:683,l2:127,l3:467,l4:89,yr:0.1283,orig:5354,cur:5277,dest:77,fire:0},
+  {s:"CWHvm1",z:"CWH",og:59785,log:35613,l2:4125,l3:9920,l4:21568,yr:0.1383,orig:13193,cur:9869,dest:3324,fire:108},
+  {s:"CWHvm2",z:"CWH",og:33204,log:8067,l2:444,l3:1716,l4:5906,yr:0.1332,orig:5497,cur:4834,dest:663,fire:50},
+  {s:"CWHws2",z:"CWH",og:5891,log:2386,l2:1369,l3:34,l4:983,yr:0.0308,orig:255,cur:197,dest:58,fire:2},
+  {s:"CWHxm1",z:"CWH",og:13137,log:17826,l2:3078,l3:5130,l4:9618,yr:0.4163,orig:12890,cur:7642,dest:5248,fire:280},
+  {s:"CWHxm2",z:"CWH",og:14437,log:46324,l2:11447,l3:8176,l4:26702,yr:0.2797,orig:16995,cur:7955,dest:9040,fire:217},
+  {s:"ESSFmc",z:"ESSF",og:81,log:52,l2:29,l3:0,l4:23,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"ESSFmw",z:"ESSF",og:1350,log:568,l2:487,l3:0,l4:80,yr:0.0061,orig:12,cur:8,dest:4,fire:0},
+  {s:"MHmm1",z:"MH",og:20575,log:3099,l2:134,l3:514,l4:2452,yr:0.149,orig:3527,cur:3254,dest:273,fire:1},
+  {s:"MHmm2",z:"MH",og:13458,log:2192,l2:502,l3:0,l4:1690,yr:0.0074,orig:116,cur:106,dest:10,fire:2},
+  {s:"MHmmp",z:"MH",og:83,log:0,l2:0,l3:0,l4:0,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"MHwh1",z:"MH",og:968,log:1,l2:0,l3:0,l4:1,yr:0.0006,orig:1,cur:1,dest:0,fire:0},
+  {s:"MHwhp",z:"MH",og:60,log:1,l2:0,l3:0,l4:1,yr:0.0,orig:0,cur:0,dest:0,fire:0},
 ];
 
 function fmt(n) { return n.toLocaleString('en-CA', {maximumFractionDigits:0}); }
@@ -999,22 +1003,23 @@ function renderLoggingStats() {
   // ── Zone-level summary ──
   const zones = {};
   BEC_STATS.forEach(r => {
-    if (!zones[r.z]) zones[r.z] = {z:r.z, og:0, log:0, orig:0, cur:0, dest:0, ogYewWt:0};
+    if (!zones[r.z]) zones[r.z] = {z:r.z, og:0, log:0, orig:0, cur:0, dest:0, fire:0, ogYewWt:0};
     const zn = zones[r.z];
     zn.og += r.og; zn.log += r.log;
-    zn.orig += r.orig; zn.cur += r.cur; zn.dest += r.dest;
+    zn.orig += r.orig; zn.cur += r.cur; zn.dest += r.dest; zn.fire += r.fire;
     zn.ogYewWt += r.yr * r.og;
   });
   const zoneArr = Object.values(zones).sort((a,b) => b.dest - a.dest);
   const maxDest = Math.max(...zoneArr.map(z => z.dest));
-  const totals = {og:0, log:0, orig:0, cur:0, dest:0, ogYewWt:0};
-  zoneArr.forEach(z => { totals.og+=z.og; totals.log+=z.log; totals.orig+=z.orig; totals.cur+=z.cur; totals.dest+=z.dest; totals.ogYewWt+=z.ogYewWt; });
+  const totals = {og:0, log:0, orig:0, cur:0, dest:0, fire:0, ogYewWt:0};
+  zoneArr.forEach(z => { totals.og+=z.og; totals.log+=z.log; totals.orig+=z.orig; totals.cur+=z.cur; totals.dest+=z.dest; totals.fire+=z.fire; totals.ogYewWt+=z.ogYewWt; });
 
   let zh = `<table class="stats-table">
     <thead><tr>
       <th>Zone</th><th class="num">Old-Growth<br>(ha)</th><th class="num">Logged<br>(ha)</th>
       <th class="num">Yew Rate<br>(OG)</th><th class="num">Est. Orig<br>Yew (ha)</th>
-      <th class="num">Current<br>Yew (ha)</th><th class="num">Destroyed<br>Yew (ha)</th>
+      <th class="num">Current<br>Yew (ha)</th><th class="num">Logging<br>Loss (ha)</th>
+      <th class="num">Fire<br>Loss (ha)</th>
     </tr></thead><tbody>`;
   zoneArr.forEach(z => {
     const rate = z.og > 0 ? z.ogYewWt / z.og : 0;
@@ -1024,15 +1029,24 @@ function renderLoggingStats() {
       <td class="num">${(rate*100).toFixed(1)}%</td>
       <td class="num">${fmt(z.orig)}</td><td class="num">${fmt(z.cur)}</td>
       ${barHtml(z.dest, maxDest, '#c0392b')}
+      <td class="num" style="color:#e67e22">${z.fire > 0 ? fmt(z.fire) : '—'}</td>
     </tr>`;
   });
   const tRate = totals.og > 0 ? totals.ogYewWt / totals.og : 0;
+  const totalCombined = totals.dest + totals.fire;
   zh += `<tr class="total-row">
     <td>TOTAL</td>
     <td class="num">${fmt(totals.og)}</td><td class="num">${fmt(totals.log)}</td>
     <td class="num">${(tRate*100).toFixed(1)}%</td>
     <td class="num">${fmt(totals.orig)}</td><td class="num">${fmt(totals.cur)}</td>
     <td class="num"><b>${fmt(totals.dest)}</b></td>
+    <td class="num" style="color:#e67e22"><b>${fmt(totals.fire)}</b></td>
+  </tr>
+  <tr style="background:#fff8f0; font-size:10px;">
+    <td colspan="5" style="color:#888; padding:4px 6px;">Combined decline (logging + fire)</td>
+    <td colspan="3" class="num"><b style="color:#c0392b">${fmt(totalCombined)} ha</b>
+      &nbsp;<span style="color:#888">(${totals.orig>0?(totalCombined/totals.orig*100).toFixed(0):0}% of original)</span>
+    </td>
   </tr>`;
   zh += '</tbody></table>';
   document.getElementById('stats-zone').innerHTML = zh;
@@ -1044,7 +1058,8 @@ function renderLoggingStats() {
     <thead><tr>
       <th>Subzone</th><th class="num">Old-<br>Growth</th><th class="num">Logged<br>(ha)</th>
       <th class="num">Logged<br>%</th><th class="num">Yew %<br>in OG</th>
-      <th class="num">Orig<br>Yew</th><th class="num">Current</th><th class="num">Destroyed</th>
+      <th class="num">Orig<br>Yew</th><th class="num">Current</th>
+      <th class="num">Logging<br>Loss</th><th class="num">Fire<br>Loss</th>
     </tr></thead><tbody>`;
   sorted.forEach(r => {
     const forested = r.og + r.log;
@@ -1056,6 +1071,7 @@ function renderLoggingStats() {
       <td class="num">${(r.yr*100).toFixed(1)}%</td>
       <td class="num">${fmt(r.orig)}</td><td class="num">${fmt(r.cur)}</td>
       ${barHtml(r.dest, maxSubDest, '#c0392b')}
+      <td class="num" style="color:#e67e22">${r.fire > 0 ? fmt(r.fire) : '—'}</td>
     </tr>`;
   });
   // Subzone totals
@@ -1066,6 +1082,7 @@ function renderLoggingStats() {
     <td class="num">${(tRate*100).toFixed(1)}%</td>
     <td class="num">${fmt(totals.orig)}</td><td class="num">${fmt(totals.cur)}</td>
     <td class="num"><b>${fmt(totals.dest)}</b></td>
+    <td class="num" style="color:#e67e22"><b>${fmt(totals.fire)}</b></td>
   </tr>`;
   sh += '</tbody></table>';
   document.getElementById('stats-subzone').innerHTML = sh;
