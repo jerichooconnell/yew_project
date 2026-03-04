@@ -117,25 +117,27 @@ YEWCMAP = _make_yewcmap()
 
 # Logging-category RGBA colours (matching classify_cwh_spots.py)
 # cat 0 = no data (transparent), 1 = water/non-forest, 2 = logged <20 yr,
-# 3 = logged 20–40 yr, 4 = logged 40–80 yr, 5 = forest >80 yr,
-# 6 = alpine / barren
+# 3 = logged 20–40 yr, 4 = logged 40–80 yr, 5 = forest 80-150 yr,
+# 6 = alpine / barren, 7 = old-growth >150 yr
 LOG_RGBA = {
     1: (30,  100, 220, 180),   # water / non-forest
     2: (220, 50,  50,  170),   # logged  <20 yr
     3: (230, 120, 30,  150),   # logged 20–40 yr
     4: (220, 200, 50,  110),   # logged 40–80 yr
-    5: (100, 200, 100,  70),   # forest  >80 yr / unlogged
+    5: (100, 200, 100,  70),   # forest 80–150 yr
     6: (175, 155, 125, 160),   # alpine / barren
+    7: (20,  100,  40,  70),   # old-growth >150 yr
 }
 
 # Suppression factors by VRI logging category (same as classify_cwh_spots.py)
 LOG_SUPPRESS = {
     1: 0.00,   # water / non-forest → zero out completely
     2: 0.00,   # logged  <20 yr     → zero out
-    3: 0.08,   # logged 20–40 yr    → heavily suppressed
+    3: 0.00,   # logged 20–40 yr    → zero out (young second-growth, yew absent)
     4: 0.50,   # logged 40–80 yr    → moderately suppressed
-    5: 1.00,   # forest >80 yr      → unchanged
+    5: 0.35,   # forest 80–150 yr   → partial suppression (maturing second-growth)
     6: 0.00,   # alpine / barren    → zero out
+    7: 1.00,   # old-growth >150 yr → unchanged
 }
 
 
@@ -369,12 +371,13 @@ def main():
 
             total_px = log_grid.size
             entry['logging_stats'] = {
-                'water_pct':       round(float(np.sum(log_grid == 1)) / total_px * 100, 1),
-                'logged_lt20_pct': round(float(np.sum(log_grid == 2)) / total_px * 100, 1),
-                'logged_20_40_pct':round(float(np.sum(log_grid == 3)) / total_px * 100, 1),
-                'logged_40_80_pct':round(float(np.sum(log_grid == 4)) / total_px * 100, 1),
-                'forest_gt80_pct': round(float(np.sum(log_grid == 5)) / total_px * 100, 1),
-                'alpine_pct':      round(float(np.sum(log_grid == 6)) / total_px * 100, 1),
+                'water_pct':          round(float(np.sum(log_grid == 1)) / total_px * 100, 1),
+                'logged_lt20_pct':    round(float(np.sum(log_grid == 2)) / total_px * 100, 1),
+                'logged_20_40_pct':   round(float(np.sum(log_grid == 3)) / total_px * 100, 1),
+                'logged_40_80_pct':   round(float(np.sum(log_grid == 4)) / total_px * 100, 1),
+                'forest_80_150_pct':  round(float(np.sum(log_grid == 5)) / total_px * 100, 1),
+                'alpine_pct':         round(float(np.sum(log_grid == 6)) / total_px * 100, 1),
+                'oldgrowth_pct':      round(float(np.sum(log_grid == 7)) / total_px * 100, 1),
             }
             print(f'  ✓ {name}: {H}×{W} → '
                   f'yew {size/1024:.0f} KB + logging {log_size/1024:.0f} KB '

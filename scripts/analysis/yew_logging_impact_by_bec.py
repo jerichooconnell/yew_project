@@ -203,17 +203,19 @@ LOG_LABELS = {
     2: "Logged <20 yr",
     3: "Logged 20-40 yr",
     4: "Logged 40-80 yr",
-    5: "Forest >80 yr",
+    5: "Forest 80-150 yr",
     6: "Alpine / barren",
+    7: "Old-growth >150 yr",
 }
 
 LOG_SUPPRESS = {
     1: 0.00,
     2: 0.00,
-    3: 0.08,
+    3: 0.00,   # changed from 0.08 — <40yr forests now ×0
     4: 0.50,
-    5: 1.00,
+    5: 0.35,   # changed from 1.00 — 80-150yr maturing forest
     6: 0.00,
+    7: 1.00,   # new: old-growth >150yr — unchanged
 }
 
 
@@ -234,18 +236,20 @@ def main():
 
     # Accumulators per BEC subzone
     # For each MAP_LABEL we track:
-    #   total_px           – total pixels in that BEC zone across all tiles
-    #   oldgrowth_px       – cat 5 pixels
-    #   oldgrowth_yew_px   – cat 5 pixels with P ≥ threshold
-    #   logged_px          – cat 2+3+4 pixels (all logged categories)
-    #   logged_cat2_px     – cat 2 pixels specifically
-    #   logged_cat3_px     – cat 3 pixels specifically
-    #   logged_cat4_px     – cat 4 pixels specifically
-    #   water_px           – cat 1 pixels
-    #   alpine_px          – cat 6 pixels
-    #   nodata_px          – cat 0 pixels
-    #   current_yew_px     – pixels with suppressed P ≥ threshold
-    #   raw_yew_px         – pixels with raw P ≥ threshold (regardless of logging)
+    #   total_px              – total pixels in that BEC zone across all tiles
+    #   oldgrowth_px          – cat 5+7 pixels (all forests ≥80yr = unlogged reference)
+    #   oldgrowth_yew_px      – cat 5+7 pixels with P ≥ threshold
+    #   mature_forest_px      – cat 5 pixels (80–150yr maturing forest)
+    #   old_growth_true_px    – cat 7 pixels (>150yr old-growth)
+    #   logged_px             – cat 2+3+4 pixels (all logged categories)
+    #   logged_cat2_px        – cat 2 pixels specifically
+    #   logged_cat3_px        – cat 3 pixels specifically
+    #   logged_cat4_px        – cat 4 pixels specifically
+    #   water_px              – cat 1 pixels
+    #   alpine_px             – cat 6 pixels
+    #   nodata_px             – cat 0 pixels
+    #   current_yew_px        – pixels with suppressed P ≥ threshold
+    #   raw_yew_px            – pixels with raw P ≥ threshold (regardless of logging)
     from collections import defaultdict
     stats = defaultdict(lambda: defaultdict(float))
 
@@ -299,8 +303,10 @@ def main():
             s = stats[lbl]
 
             s["total_px"]         += int(bec_mask.sum())
-            s["oldgrowth_px"]     += int(((log_grid == 5) & bec_mask).sum())
-            s["oldgrowth_yew_px"] += int(((log_grid == 5) & bec_mask & (grid >= THRESHOLD)).sum())
+            s["oldgrowth_px"]     += int((((log_grid == 5) | (log_grid == 7)) & bec_mask).sum())
+            s["oldgrowth_yew_px"] += int((((log_grid == 5) | (log_grid == 7)) & bec_mask & (grid >= THRESHOLD)).sum())
+            s["mature_forest_px"] += int(((log_grid == 5) & bec_mask).sum())
+            s["old_growth_true_px"] += int(((log_grid == 7) & bec_mask).sum())
             s["logged_cat2_px"]   += int(((log_grid == 2) & bec_mask).sum())
             s["logged_cat3_px"]   += int(((log_grid == 3) & bec_mask).sum())
             s["logged_cat4_px"]   += int(((log_grid == 4) & bec_mask).sum())
@@ -327,8 +333,10 @@ def main():
     for lbl in sorted(stats.keys()):
         s = stats[lbl]
         total        = s["total_px"]
-        og           = s["oldgrowth_px"]
+        og           = s["oldgrowth_px"]          # all forests ≥80yr (cat5+cat7)
         og_yew       = s["oldgrowth_yew_px"]
+        mature       = s["mature_forest_px"]       # cat5: 80–150yr
+        og_true      = s["old_growth_true_px"]     # cat7: >150yr
         logged       = s["logged_px"]
         logged_2     = s["logged_cat2_px"]
         logged_3     = s["logged_cat3_px"]
@@ -358,7 +366,9 @@ def main():
             "bec_subzone":           lbl,
             "bec_zone":              lbl[:3] if len(lbl) >= 3 else lbl,
             "total_ha":              round(total * HA_PER_PX, 1),
-            "oldgrowth_ha":          round(og * HA_PER_PX, 1),
+            "oldgrowth_ha":          round(og * HA_PER_PX, 1),        # ≥80yr (cat5+cat7)
+            "mature_forest_ha":      round(mature * HA_PER_PX, 1),    # cat5: 80-150yr
+            "old_growth_ha":         round(og_true * HA_PER_PX, 1),   # cat7: >150yr
             "logged_ha":             round(logged * HA_PER_PX, 1),
             "logged_lt20yr_ha":      round(logged_2 * HA_PER_PX, 1),
             "logged_20_40yr_ha":     round(logged_3 * HA_PER_PX, 1),

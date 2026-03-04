@@ -112,10 +112,10 @@ Embeddings are pre-computed by Google using a deep neural network trained on glo
 | Category | Condition | Suppression | Rationale |
 |---|---|---|---|
 | Water/non-forest | BCLCS water/urban/agriculture | ×0.00 | Yew absent |
-| Logged <20 yr | Stand age <20 yr | ×0.00 | No mature regeneration |
-| Logged 20–40 yr | Stand age 20–40 yr | ×0.08 | Young second-growth, sparse yew |
-| Logged 40–80 yr | Stand age 40–80 yr | ×0.30 | Maturing second-growth, partial recovery |
-| Forest >80 yr | Stand age ≥80 yr, old-growth | ×1.00 | No suppression |
+| Logged <40 yr | Stand age <40 yr | ×0.00 | Young second-growth, yew absent |
+| Logged 40–80 yr | Stand age 40–80 yr | ×0.50 | Maturing second-growth, partial recovery |
+| Forest 80–150 yr | Stand age 80–150 yr | ×0.35 | Established but regenerating; yew present but sparse |
+| Old-growth >150 yr | Stand age >150 yr | ×1.00 | No suppression |
 | Alpine/barren | Designated alpine, rock/ice | ×0.00 | Above treeline, yew absent |
 
 This approach preserves raw model predictions in old-growth areas while suppressing probabilities in recently disturbed or unsuitable terrain.

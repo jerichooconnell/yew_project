@@ -54,21 +54,25 @@ VEG_COMP_GDB   = Path('data/VEG_COMP_LYR_R1_POLY_2024.gdb')
 VEG_COMP_LAYER = 'VEG_COMP_LYR_R1_POLY'
 
 # Logging-category RGBA colours matching the annotation_tool forestry overlay
+# cat 1=water/non-forest, 2=logged<20yr, 3=logged 20-40yr, 4=logged 40-80yr,
+# 5=forest 80-150yr, 6=alpine/barren, 7=old-growth >150yr
 LOG_RGBA = {
     1: (30,  100, 220, 180),   # water / non-forest
     2: (220, 50,  50,  170),   # logged  <20 yr
     3: (230, 120, 30,  150),   # logged 20–40 yr
     4: (220, 200, 50,  110),   # logged 40–80 yr
-    5: (100, 200, 100,  70),   # forest  >80 yr / unlogged
+    5: (100, 200, 100,  70),   # forest 80–150 yr
     6: (175, 155, 125, 160),   # alpine / barren (rock, rubble, non-treed veg)
+    7: (20,  100,  40,  70),   # old-growth >150 yr
 }
 LOG_LABELS = {
     1: 'Water / non-forest',
     2: 'Logged  < 20 yr',
     3: 'Logged 20–40 yr',
     4: 'Logged 40–80 yr',
-    5: 'Forest  > 80 yr',
+    5: 'Forest 80–150 yr',
     6: 'Alpine / barren',
+    7: 'Old-growth > 150 yr',
 }
 # ── CSS hex equivalents (for HTML legend)
 LOG_HEX = {
@@ -78,6 +82,7 @@ LOG_HEX = {
     4: '#dcc832',
     5: '#64c864',
     6: '#af9b7d',
+    7: '#146428',
 }
 
 # PROJ_AGE_CLASS_CD_1 midpoint ages (years).  BC VRI age class codes:
@@ -517,7 +522,9 @@ def _classify_vri_row(row, current_year):
         return 3
     if age < 80:
         return 4
-    return 5
+    if age < 150:
+        return 5   # maturing forest 80–150 yr
+    return 7       # old-growth >150 yr
 
 
 def extract_logging_grid(bbox, grid_h, grid_w, cache_path=None):
@@ -600,15 +607,16 @@ def logging_to_png_b64(log_grid):
 
 # Suppression factors by VRI logging category
 # cat 0 = no data (unchanged), 1 = water/non-forest, 2 = logged <20 yr,
-# 3 = logged 20–40 yr, 4 = logged 40–80 yr, 5 = forest >80 yr,
-# 6 = alpine / barren (rock, rubble, non-treed vegetation with no harvest history)
+# 3 = logged 20–40 yr, 4 = logged 40–80 yr, 5 = forest 80–150 yr,
+# 6 = alpine / barren, 7 = old-growth >150 yr
 LOG_SUPPRESS = {
     1: 0.00,   # water / non-forest → zero out completely
     2: 0.00,   # logged  <20 yr     → zero out (bare ground, no yew)
-    3: 0.08,   # logged 20–40 yr    → heavily suppressed
-    4: 0.30,   # logged 40–80 yr    → moderately suppressed
-    5: 1.00,   # forest >80 yr      → unchanged
+    3: 0.00,   # logged 20–40 yr    → zero out (young second-growth, yew absent)
+    4: 0.50,   # logged 40–80 yr    → moderately suppressed
+    5: 0.35,   # forest 80–150 yr   → partial suppression (maturing second-growth)
     6: 0.00,   # alpine / barren    → zero out (trees don't grow here)
+    7: 1.00,   # old-growth >150 yr → unchanged
 }
 
 

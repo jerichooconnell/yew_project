@@ -5,7 +5,7 @@
       "decade_label": "1910s",
       "fire_years_in_study": 2,
       "burned_ha": 2057.5,
-      "yew_suppressed_ha": 82.81,
+      "yew_suppressed_ha": 76.62,
       "mean_modifier": 0.847
     },
     {
@@ -13,7 +13,7 @@
       "decade_label": "1920s",
       "fire_years_in_study": 17,
       "burned_ha": 8364.0,
-      "yew_suppressed_ha": 510.22,
+      "yew_suppressed_ha": 259.7,
       "mean_modifier": 0.797
     },
     {
@@ -21,7 +21,7 @@
       "decade_label": "1930s",
       "fire_years_in_study": 16,
       "burned_ha": 7328.6,
-      "yew_suppressed_ha": 374.94,
+      "yew_suppressed_ha": 229.95,
       "mean_modifier": 0.717
     },
     {
@@ -29,7 +29,7 @@
       "decade_label": "1940s",
       "fire_years_in_study": 10,
       "burned_ha": 1800.8,
-      "yew_suppressed_ha": 75.54,
+      "yew_suppressed_ha": 55.43,
       "mean_modifier": 0.641
     },
     {
@@ -37,7 +37,7 @@
       "decade_label": "1950s",
       "fire_years_in_study": 12,
       "burned_ha": 13657.1,
-      "yew_suppressed_ha": 435.2,
+      "yew_suppressed_ha": 362.23,
       "mean_modifier": 0.563
     },
     {
@@ -45,7 +45,7 @@
       "decade_label": "1960s",
       "fire_years_in_study": 7,
       "burned_ha": 6956.5,
-      "yew_suppressed_ha": 477.42,
+      "yew_suppressed_ha": 455.79,
       "mean_modifier": 0.474
     },
     {
@@ -53,7 +53,7 @@
       "decade_label": "1970s",
       "fire_years_in_study": 3,
       "burned_ha": 1454.3,
-      "yew_suppressed_ha": 75.56,
+      "yew_suppressed_ha": 70.4,
       "mean_modifier": 0.382
     },
     {
@@ -61,7 +61,7 @@
       "decade_label": "1980s",
       "fire_years_in_study": 1,
       "burned_ha": 191.5,
-      "yew_suppressed_ha": 3.21,
+      "yew_suppressed_ha": 3.09,
       "mean_modifier": 0.29
     },
     {
@@ -69,7 +69,7 @@
       "decade_label": "2000s",
       "fire_years_in_study": 3,
       "burned_ha": 1305.4,
-      "yew_suppressed_ha": 28.5,
+      "yew_suppressed_ha": 24.38,
       "mean_modifier": 0.121
     },
     {
@@ -77,7 +77,7 @@
       "decade_label": "2010s",
       "fire_years_in_study": 1,
       "burned_ha": 2512.2,
-      "yew_suppressed_ha": 23.42,
+      "yew_suppressed_ha": 22.01,
       "mean_modifier": 0.113
     },
     {
@@ -85,16 +85,16 @@
       "decade_label": "2020s",
       "fire_years_in_study": 2,
       "burned_ha": 816.0,
-      "yew_suppressed_ha": 0.13,
+      "yew_suppressed_ha": 7.76,
       "mean_modifier": 0.008
     }
   ],
-  "total_yew_suppressed_ha": 2086.95,
+  "total_yew_suppressed_ha": 1567.36,
   "total_burned_ha": 46443.9,
   "modifier_formula": "(2024 - fire_year) / 124, clamped [0, 1]",
   "lower_mainland_tiles": [
-    "stave_lake",
-    "chilliwack_uplands"
+    "chilliwack_uplands",
+    "stave_lake"
   ],
   "lower_mainland_note": "Additional -0.2 suppression applied outside protected areas"
 }
