@@ -363,6 +363,21 @@
       <div class="fire-decade-chart" id="fire-decade-chart">Loading…</div>
 
       <div class="fire-notes" id="fire-notes"></div>
+
+      <hr style="margin:10px 0; border-color:#ddd;">
+
+      <h3 style="font-size:13px; margin-bottom:4px;">🌲 Total area burned in CWH zone by decade</h3>
+      <p style="font-size:11px;color:#555;margin-bottom:6px;">
+        Full CWH zone (3.60 Mha) — all recorded fires since 1910, clipped to the CWH boundary.
+        <b>6.6%</b> of the CWH zone has burned at least once in recorded history.
+      </p>
+      <div class="fire-summary-cards" id="cwh-summary-cards"></div>
+      <div class="fire-chart-legend">
+        <span><span class="swatch" style="background:#cc3300"></span>Higher fire activity</span>
+        <span><span class="swatch" style="background:#2255aa"></span>Lower fire activity</span>
+      </div>
+      <div class="fire-decade-chart" id="cwh-decade-chart">Loading…</div>
+      <div class="fire-notes" id="cwh-notes"></div>
     </div>
   </div>
 </div>
@@ -814,16 +829,18 @@ function switchTab(tab) {
 
 // ── Fire Impact Tab ───────────────────────────────────────────────────────────
 function loadFireTab() {
-  loadJSON('tiles/fire_stats.json')
-    .then(data => {
-      fireStats = data;
-      renderFireChart(data);
-    })
-    .catch(err => {
-      document.getElementById('fire-decade-chart').textContent =
-        'Fire stats not yet generated. Re-run export_tiles_for_web.py.';
-      console.warn('fire_stats.json not found:', err);
-    });
+  // Load both JSON files in parallel
+  Promise.all([
+    loadJSON('tiles/fire_stats.json').catch(e => null),
+    loadJSON('tiles/cwh_fire_by_decade.json').catch(e => null),
+  ]).then(([statsData, cwhData]) => {
+    if (statsData) { fireStats = statsData; renderFireChart(statsData); }
+    else document.getElementById('fire-decade-chart').textContent =
+      'fire_stats.json not found. Re-run export_tiles_for_web.py.';
+    if (cwhData) renderCWHFireChart(cwhData);
+    else document.getElementById('cwh-decade-chart').textContent =
+      'cwh_fire_by_decade.json not found. Run scripts/analysis/cwh_fire_decades.py.';
+  });
 }
 
 function renderFireChart(data) {
@@ -881,6 +898,55 @@ function renderFireChart(data) {
     <b>Recovery %</b>: mean modifier value — 100% means fires old enough for full yew recovery.<br>
     <b>Formula:</b> modifier = (2024 − fire_year) / 124, applied per pixel.<br>
     <b>Source:</b> BC Historical Fire Perimeters ≥50 ha &times; XGBoost yew probability tiles.
+  `;
+}
+
+function renderCWHFireChart(data) {
+  const decades = data.decades;
+  const cwhHa   = data.cwh_area_ha;
+  const totalBurned = data.total_burned_ha;
+  const uniqueHa    = data.unique_burned_ha;
+
+  // Summary cards
+  const cards = document.getElementById('cwh-summary-cards');
+  cards.innerHTML = `
+    <div class="fire-card"><b>${(cwhHa/1e6).toFixed(2)} Mha</b>CWH zone total area</div>
+    <div class="fire-card"><b>${(totalBurned/1000).toFixed(0)}k ha</b>Total burned 1910–2020s (w/ repeats)</div>
+    <div class="fire-card green"><b>${uniqueHa ? (uniqueHa/1000).toFixed(0)+'k ha' : '?'}</b>Unique area ever burned</div>
+    <div class="fire-card green"><b>${data.unique_burned_pct ? data.unique_burned_pct.toFixed(1)+'%' : '?'}</b>% of CWH zone ever burned</div>
+  `;
+
+  // Bar chart
+  const maxBurned = Math.max(...decades.map(d => d.burned_ha), 1);
+  const chart = document.getElementById('cwh-decade-chart');
+  let html = `<div style="font-size:10px;color:#888;margin-bottom:4px;">Bar width ∝ total area burned (ha) · label = % of CWH zone · hover for fire count</div>`;
+
+  decades.forEach(d => {
+    const pct = Math.max(2, d.burned_ha / maxBurned * 100);
+    // Intensity colour: high burned = dark red, low = steel blue
+    const intensity = d.burned_ha / maxBurned;  // 0–1
+    const r = Math.round(30  + 170 * intensity);
+    const g = Math.round(100 -  90 * intensity);
+    const b = Math.round(180 - 170 * intensity);
+    const color = `rgb(${r},${g},${b})`;
+    html += `
+      <div class="fire-decade-row"
+        title="${d.decade_label}: ${d.fire_count} fires, ${d.burned_ha.toLocaleString()} ha burned (${d.cwh_pct}% of CWH)">
+        <span class="fire-decade-label">${d.decade_label}</span>
+        <div class="fire-bar-track">
+          <div class="fire-bar-fill" style="width:${pct.toFixed(1)}%;background:${color};"></div>
+          <span class="fire-bar-val">${d.cwh_pct.toFixed(2)}%</span>
+        </div>
+        <span class="fire-decade-suppressed">${(d.burned_ha/1000).toFixed(0)}k ha</span>
+      </div>`;
+  });
+  chart.innerHTML = html;
+
+  document.getElementById('cwh-notes').innerHTML = `
+    <b>Source:</b> BC Historical Fire Perimeters GDB, all fires, clipped to CWH zone boundary.<br>
+    <b>Note:</b> The same area may burn in multiple decades; total burned exceeds unique burned footprint.<br>
+    <b>Peak:</b> 1920s (98k ha) and 1930s (66k ha) dominated by early industrial logging slash fires.
+    The dramatic decline after 1940 reflects modern fire suppression and reduced slash burning.
   `;
 }
 

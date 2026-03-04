@@ -1,0 +1,94 @@
+{
+  "cwh_area_ha": 3595194.0,
+  "total_burned_ha": 268853.3,
+  "total_fire_count": 1290,
+  "unique_burned_ha": 238452.0,
+  "unique_burned_pct": 6.63,
+  "note": "Burned ha per decade may count same land multiple times. unique_burned_ha is the true once-burned footprint.",
+  "decades": [
+    {
+      "decade_start": 1910,
+      "decade_label": "1910s",
+      "fire_count": 26,
+      "burned_ha": 9431.4,
+      "cwh_pct": 0.262
+    },
+    {
+      "decade_start": 1920,
+      "decade_label": "1920s",
+      "fire_count": 257,
+      "burned_ha": 98121.8,
+      "cwh_pct": 2.729
+    },
+    {
+      "decade_start": 1930,
+      "decade_label": "1930s",
+      "fire_count": 309,
+      "burned_ha": 65505.3,
+      "cwh_pct": 1.822
+    },
+    {
+      "decade_start": 1940,
+      "decade_label": "1940s",
+      "fire_count": 156,
+      "burned_ha": 20676.6,
+      "cwh_pct": 0.575
+    },
+    {
+      "decade_start": 1950,
+      "decade_label": "1950s",
+      "fire_count": 95,
+      "burned_ha": 35286.3,
+      "cwh_pct": 0.981
+    },
+    {
+      "decade_start": 1960,
+      "decade_label": "1960s",
+      "fire_count": 113,
+      "burned_ha": 15543.0,
+      "cwh_pct": 0.432
+    },
+    {
+      "decade_start": 1970,
+      "decade_label": "1970s",
+      "fire_count": 71,
+      "burned_ha": 5673.2,
+      "cwh_pct": 0.158
+    },
+    {
+      "decade_start": 1980,
+      "decade_label": "1980s",
+      "fire_count": 31,
+      "burned_ha": 2162.1,
+      "cwh_pct": 0.06
+    },
+    {
+      "decade_start": 1990,
+      "decade_label": "1990s",
+      "fire_count": 17,
+      "burned_ha": 2232.4,
+      "cwh_pct": 0.062
+    },
+    {
+      "decade_start": 2000,
+      "decade_label": "2000s",
+      "fire_count": 39,
+      "burned_ha": 1313.8,
+      "cwh_pct": 0.037
+    },
+    {
+      "decade_start": 2010,
+      "decade_label": "2010s",
+      "fire_count": 117,
+      "burned_ha": 9747.5,
+      "cwh_pct": 0.271
+    },
+    {
+      "decade_start": 2020,
+      "decade_label": "2020s",
+      "fire_count": 59,
+      "burned_ha": 3159.8,
+      "cwh_pct": 0.088
+    }
+  ]
+}
