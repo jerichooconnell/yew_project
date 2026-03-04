@@ -191,6 +191,46 @@
     .sort-row label { font-size: 11px; color: #555; }
     .sort-row select { font-size: 11px; padding: 2px 4px; border-radius: 3px; border: 1px solid #ccc; }
 
+    /* ── Fire Impact Chart ─────────────────────────── */
+    .fire-chart-wrap { padding: 10px 14px; overflow-y: auto; flex: 1; }
+    .fire-chart-wrap h3 { font-size: 14px; color: #2d5a27; margin-bottom: 6px; }
+    .fire-chart-wrap p { font-size: 11px; color: #555; line-height: 1.4; margin-bottom: 8px; }
+    .fire-summary-cards {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6px; margin-bottom: 12px;
+    }
+    .fire-card {
+      background: #f5f5f5; border-radius: 5px; padding: 7px 9px;
+      font-size: 11px; border-left: 3px solid #cc4400;
+    }
+    .fire-card b { display: block; font-size: 15px; color: #cc4400; }
+    .fire-card.green { border-left-color: #2d5a27; }
+    .fire-card.green b { color: #2d5a27; }
+    .fire-decade-chart { margin-bottom: 12px; }
+    .fire-decade-row {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 4px; font-size: 11px;
+    }
+    .fire-decade-label { width: 40px; text-align: right; flex-shrink: 0; color: #555; font-weight: 600; }
+    .fire-bar-track { flex: 1; height: 16px; background: #eee; border-radius: 3px; overflow: hidden; position: relative; }
+    .fire-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+    .fire-bar-val { position: absolute; right: 3px; top: 0; line-height: 16px; font-size: 10px; color: #333; white-space: nowrap; }
+    .fire-decade-suppressed { width: 54px; text-align: right; flex-shrink: 0; font-size: 10px; color: #666; }
+    .fire-chart-legend {
+      display: flex; gap: 10px; flex-wrap: wrap; font-size: 10px;
+      color: #666; margin-bottom: 8px;
+    }
+    .fire-chart-legend span { display: flex; align-items: center; gap: 3px; }
+    .fire-chart-legend .swatch { width: 12px; height: 12px; border-radius: 2px; }
+    .fire-notes {
+      font-size: 10px; color: #777; line-height: 1.5;
+      background: #f5f5f5; border-radius: 5px; padding: 8px 10px;
+    }
+    .lm-note {
+      background: #fff3e0; border-left: 3px solid #ff8f00; border-radius: 4px;
+      padding: 7px 10px; font-size: 11px; color: #555; margin-bottom: 8px;
+    }
+
     /* Mobile */
     @media (max-width: 700px) {
       #sidebar { width: 280px; }
@@ -220,7 +260,8 @@
   <!-- Sidebar Tabs -->
   <div class="sidebar-tabs">
     <button class="sidebar-tab active" onclick="switchTab('map')">🗺️ Map</button>
-    <button class="sidebar-tab" onclick="switchTab('logging')">🪓 Logging Impact</button>
+    <button class="sidebar-tab" onclick="switchTab('logging')">🪓 Logging</button>
+    <button class="sidebar-tab" onclick="switchTab('fire')">🔥 Fire Impact</button>
   </div>
 
   <!-- Tab 1: Map -->
@@ -293,6 +334,35 @@
         4. Logging suppression: &lt;20yr &rarr; &times;0, 20-40yr &rarr; &times;0.08, 40-80yr &rarr; &times;0.30<br>
         5. Data: XGBoost model on 2024 GEE embeddings, BC VRI 2024, BC BEC zones
       </div>
+    </div>
+  </div>
+
+  <!-- Tab 3: Fire Impact -->
+  <div id="tab-fire" class="tab-content">
+    <div class="fire-chart-wrap">
+      <h3>🔥 Fire Impact on Yew Habitat</h3>
+      <p>
+        Yew probability is scaled by a linear fire-recovery modifier:
+        <b>0</b> for a fire in 2024 (complete suppression) &rarr; <b>1</b> for a fire in 1900 (full recovery).
+        Formula: <code style="font-size:10px">(2024 &minus; fire_year) / 124</code>.
+      </p>
+
+      <div class="lm-note">
+        ⚠️ <b>Lower mainland tiles</b> (Stave Lake, Chilliwack Uplands):
+        an additional <b>&minus;0.2</b> suppression is applied outside protected areas
+        to correct for logging activity not captured by VRI stand-age data.
+      </div>
+
+      <div class="fire-summary-cards" id="fire-summary-cards"></div>
+
+      <h3 style="font-size:12px; margin-bottom:4px; margin-top:2px;">Yew habitat suppressed by decade</h3>
+      <div class="fire-chart-legend">
+        <span><span class="swatch" style="background:#cc2200"></span>Recent (suppressive)</span>
+        <span><span class="swatch" style="background:#228822"></span>Historic (recovered)</span>
+      </div>
+      <div class="fire-decade-chart" id="fire-decade-chart">Loading…</div>
+
+      <div class="fire-notes" id="fire-notes"></div>
     </div>
   </div>
 </div>
@@ -407,6 +477,7 @@ let observations = [];
 let obsMarkers = [];
 let fireLayer = null;
 let parksLayer = null;
+let fireStats = null;
 
 // ── JSON loader (works on file:// and http://) ──────────────────────────────
 function loadJSON(url) {
@@ -735,7 +806,82 @@ function switchTab(tab) {
   if (tab === 'logging' && !window._loggingStatsRendered) {
     renderLoggingStats();
     window._loggingStatsRendered = true;
+  }  if (tab === 'fire' && !window._fireStatsRendered) {
+    loadFireTab();
+    window._fireStatsRendered = true;
   }
+}
+
+// ── Fire Impact Tab ───────────────────────────────────────────────────────────
+function loadFireTab() {
+  loadJSON('tiles/fire_stats.json')
+    .then(data => {
+      fireStats = data;
+      renderFireChart(data);
+    })
+    .catch(err => {
+      document.getElementById('fire-decade-chart').textContent =
+        'Fire stats not yet generated. Re-run export_tiles_for_web.py.';
+      console.warn('fire_stats.json not found:', err);
+    });
+}
+
+function renderFireChart(data) {
+  // Summary cards
+  const cards = document.getElementById('fire-summary-cards');
+  const suppHa = data.total_yew_suppressed_ha.toFixed(1);
+  const burnHa = (data.total_burned_ha / 1000).toFixed(0);
+  const decades = data.decades;
+  const recentDecade = [...decades].sort((a, b) => b.yew_suppressed_ha - a.yew_suppressed_ha)[0];
+  cards.innerHTML = `
+    <div class="fire-card"><b>${suppHa} ha</b>Yew habitat suppressed by fires</div>
+    <div class="fire-card"><b>${burnHa}k ha</b>Total fire-scarred area in study region</div>
+    <div class="fire-card green"><b>${decades.length}</b>Decades with recorded fires</div>
+    <div class="fire-card"><b>${recentDecade ? recentDecade.decade_label : '—'}</b>Decade with most suppression</div>
+  `;
+
+  // Bar chart — one row per decade
+  const maxSupp = Math.max(...decades.map(d => d.yew_suppressed_ha), 0.01);
+  const chart = document.getElementById('fire-decade-chart');
+
+  if (decades.length === 0) {
+    chart.textContent = 'No fire data intersects the study tiles.';
+    return;
+  }
+
+  let html = '';
+  decades.forEach(d => {
+    const pct = Math.max(2, (d.yew_suppressed_ha / maxSupp * 100));
+    // Recovery: 0 = recent (red), 1 = historic (green)
+    const rec = d.mean_modifier;
+    const r = Math.round(200 * (1 - rec) + 30 * rec);
+    const g = Math.round(30 * (1 - rec) + 160 * rec);
+    const color = `rgb(${r},${g},30)`;
+    const recovPct = Math.round(rec * 100);
+    html += `
+      <div class="fire-decade-row" title="Decade: ${d.decade_label} | Burned: ${d.burned_ha.toLocaleString()} ha | Suppressed: ${d.yew_suppressed_ha.toFixed(1)} ha | Recovery: ${recovPct}%">
+        <span class="fire-decade-label">${d.decade_label}</span>
+        <div class="fire-bar-track">
+          <div class="fire-bar-fill" style="width:${pct.toFixed(1)}%; background:${color};"></div>
+          <span class="fire-bar-val">${recovPct}% rec.</span>
+        </div>
+        <span class="fire-decade-suppressed">${d.yew_suppressed_ha.toFixed(1)} ha</span>
+      </div>`;
+  });
+  chart.innerHTML = `<div style="font-size:10px;color:#888;margin-bottom:4px;">
+    Bar width \u221d yew suppressed (ha) &nbsp;|&nbsp; Label = fire-recovery % &nbsp;|&nbsp; Hover for details
+  </div>` + html;
+
+  // Notes
+  document.getElementById('fire-notes').innerHTML = `
+    <b>How to read:</b><br>
+    Each bar represents one <b>decade</b> of fire history (1900s–2020s).<br>
+    <b>Bar width</b>: proportional to estimated yew habitat suppressed (ha) in that decade.<br>
+    <b>Colour</b>: red = recent fire decade (low recovery), green = historic (high recovery).<br>
+    <b>Recovery %</b>: mean modifier value — 100% means fires old enough for full yew recovery.<br>
+    <b>Formula:</b> modifier = (2024 − fire_year) / 124, applied per pixel.<br>
+    <b>Source:</b> BC Historical Fire Perimeters ≥50 ha &times; XGBoost yew probability tiles.
+  `;
 }
 
 // ── Logging Impact Statistics ────────────────────────────────────────────────
