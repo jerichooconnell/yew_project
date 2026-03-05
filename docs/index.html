@@ -425,7 +425,9 @@
   </div>
   <div id="parks-legend" style="display:none;">
     <h4 style="margin-top:4px;">🏞️ Protected Areas</h4>
-    <div class="legend-row"><span class="legend-swatch" style="background:rgba(0,180,0,0.25);border:2px solid #00aa00;"></span> Park / protected area</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(0,180,0,0.25);border:2px solid #00aa00;"></span> Provincial Park</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(0,136,170,0.25);border:2px dashed #0088aa;"></span> Ecological Reserve</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(200,100,0,0.25);border:2px solid #cc6600;"></span> National Park / Reserve</div>
     <hr style="margin:6px 0">
   </div>
   <div style="font-size:10px;color:#666;">
@@ -681,25 +683,35 @@ function toggleParksLayer(show) {
       .then(data => {
         parksLayer = L.geoJSON(data, {
           style: function(feature) {
-            const desig = (feature.properties.PROTECTED_LANDS_DESIGNATION || '').toLowerCase();
-            let color = '#00aa00';
-            if (desig.includes('ecological')) color = '#0088aa';
+            const desig = (feature.properties.PROTECTED_LANDS_DESIGNATION || '').toUpperCase();
+            let color = '#00aa00';    // Provincial Park (default)
+            let dash = null;
+            if (desig.includes('ECOLOGICAL')) {
+              color = '#0088aa';      // Ecological Reserve — teal
+              dash = '5,5';
+            } else if (desig.includes('NATIONAL') || desig.includes('FEDERAL')) {
+              color = '#cc6600';      // National Park — orange-brown
+            } else if (desig.includes('RECREATION')) {
+              color = '#888800';      // Recreation Area — olive
+              dash = '3,6';
+            }
             return {
               color: color,
-              weight: 2,
+              weight: desig.includes('NATIONAL') ? 2.5 : 1.5,
               fillColor: color,
-              fillOpacity: 0.15,
-              opacity: 0.7,
-              dashArray: desig.includes('ecological') ? '5,5' : null,
+              fillOpacity: 0.12,
+              opacity: 0.8,
+              dashArray: dash,
             };
           },
           onEachFeature: function(feature, layer) {
             const p = feature.properties;
+            const source = p.SOURCE ? ` <span style="color:#888;font-size:10px">(${p.SOURCE})</span>` : '';
             layer.bindPopup(
-              `<b>🏞️ ${p.PROTECTED_LANDS_NAME || 'Protected Area'}</b><br>` +
+              `<b>🏞️ ${p.PROTECTED_LANDS_NAME || 'Protected Area'}</b>${source}<br>` +
               `Type: ${p.PROTECTED_LANDS_DESIGNATION || '?'}<br>` +
               `Class: ${p.PARK_CLASS || '?'}<br>` +
-              `Area: ${p.OFFICIAL_AREA_HA ? p.OFFICIAL_AREA_HA.toLocaleString() + ' ha' : '?'}`
+              `Area: ${p.OFFICIAL_AREA_HA ? Number(p.OFFICIAL_AREA_HA).toLocaleString() + ' ha' : '?'}`
             );
           },
         }).addTo(map);

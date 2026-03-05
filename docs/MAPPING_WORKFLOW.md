@@ -13,6 +13,7 @@ This project maps Pacific yew habitat suitability across British Columbia's Coas
 **Key findings:**
 - **~39,000 hectares** of high-probability yew habitat (P≥0.5) identified across 45 study tiles
 - **~38,000 hectares** of yew habitat estimated destroyed by logging since 1920s in CWH zone
+- **Only 3.5% of modelled yew habitat (898 ha) falls inside protected areas** — 96.5% is unprotected and potentially at risk
 - Highest habitat concentrations in south-central Vancouver Island, Sunshine Coast, and mid-coast mainland fjords
 - XGBoost classifier achieves **AUC 0.9957** on validation data
 
@@ -132,12 +133,18 @@ Fire history provides context for stand age and disturbance patterns, complement
 
 ### 3.4 Protected Areas
 
-**Source:** BC Data Catalogue WFS — `WHSE_TANTALIS.TA_PARK_ECORES_PA_SVW` (live service) supplemented by local `TA_PARK_ECORES_PA_SVW.gdb` for northern BC  
-**Coverage:** 512 provincial parks, ecological reserves, and conservancies in coastal BC from 47.5°N–56°N (including all of Vancouver Island, Sunshine Coast, Haida Gwaii)  
-**Web display:** Green polygons, ecological reserves shown with dashed borders  
-**GeoJSON export:** `docs/tiles/park_contours.geojson` (0.8 MB, created by combining WFS download with local GDB)
+**Provincial parks source:** BC Data Catalogue WFS — `WHSE_TANTALIS.TA_PARK_ECORES_PA_SVW` (live service, fetched province-wide at runtime)  
+**National/federal parks source:** OpenStreetMap Overpass API — targeted queries per park boundary  
+**Coverage:** 936 features — 930 provincial parks / ecological reserves / protected areas + 6 federal national parks  
+**Federal parks included:** Gwaii Haanas National Park Reserve & Haida Heritage Site, Pacific Rim National Park Reserve, Gulf Islands National Park Reserve, Glacier NP, Kootenay NP, Yoho NP  
+**Geometry:** Full-resolution polygons simplified at 100 m tolerance (0.001°) for web delivery  
+**Web display:** Green = Provincial Park, teal dashed = Ecological Reserve, orange = National Park  
+**GeoJSON export:** `docs/tiles/park_contours.geojson` (1.7 MB)  
+**Protected areas script:** `scripts/analysis/yew_in_protected_areas.py`
 
-Protected areas highlight where yew habitat may be conserved from future logging.
+The local `TA_PARK_ECORES_PA_SVW.gdb` is retained for reference but is a **northern BC subset only** (southern boundary ≈50.2°N). All analysis uses the WFS endpoint which covers the full province to 48.3°N.
+
+Protected areas highlight where yew habitat may be conserved from future logging. Analysis shows **only 3.5% of modelled yew habitat falls inside protected areas** — see §5.2.
 
 ---
 
@@ -166,9 +173,10 @@ Protected areas highlight where yew habitat may be conserved from future logging
 - Color gradient by age (bright red = 2020s, orange = pre-1950)
 
 **Protected areas (🏞️):**
-- 255 parks, ecological reserves, conservancies
-- Clickable popups: name, designation, official area
-- Green fill with dashed borders for ecological reserves
+- 936 parks and protected areas — provincial (BC Parks WFS) + federal national parks (OSM)
+- Clickable popups: name, designation, official area, source
+- Green fill = Provincial Park; teal dashed = Ecological Reserve; orange = National Park / Reserve
+- National parks include Gwaii Haanas, Pacific Rim NP Reserve, Gulf Islands NP Reserve
 
 **Observation reporting:**
 - Users can click "✔ Yew Present" or "✘ No Yew" then click the map to add field observations
@@ -201,6 +209,90 @@ Protected areas highlight where yew habitat may be conserved from future logging
 
 **Total across 45 tiles:** ~39,000 ha with P≥0.5 (390 km²)
 
+### 5.2 Protected areas coverage of yew habitat
+
+Analysis script: `scripts/analysis/yew_in_protected_areas.py`  
+Protected areas data: BC WFS (930 provincial features) + OSM national parks  
+Threshold: P≥0.5 after logging suppression (25,747 ha total)
+
+| Protection status | ha | % of yew habitat |
+|---|---|---|
+| **Inside protected areas** | **898** | **3.5%** |
+| Outside protected areas | 24,849 | 96.5% |
+
+**By designation:**
+| Designation | ha | % |
+|---|---|---|
+| Provincial Park (Class A) | 881.6 | 3.4% |
+| Ecological Reserve | 16.4 | 0.1% |
+| Protected Area / Conservancy | 0.2 | <0.1% |
+
+**Tiles with most yew inside parks:**
+| Tile | Yew ha | Protected ha | % |
+|---|---|---|---|
+| Port Renfrew | 1,481 | 335 | 22.6% |
+| Gold River Forest | 799 | 254 | 31.8% |
+| Carmanah-Walbran | 294 | 89 | 30.4% |
+| Stave Lake | 902 | 86 | 9.5% |
+| Clayoquot Sound | 535 | 48 | 8.9% |
+
+Notably, the tiles with the largest total yew habitat — Alberni Valley (4,287 ha), Rivers Inlet (3,114 ha), Port Hardy (2,081 ha) — have **0% inside protected areas**.
+
+---
+
+## 6. Threats to Pacific Yew Populations and How They Are Modelled
+
+Pacific yew faces a suite of interacting threats across its range in coastal BC. The table below summarises each threat, its ecological mechanism, and whether / how it is currently incorporated in the model.
+
+### 6.1 Threat inventory
+
+| Threat | Mechanism | Modelled? | How |
+|---|---|---|---|
+| Commercial logging | Canopy removal and skid-trail compaction eliminate the shade understorey yew requires; root system damage during harvesting is high | **Yes — primary suppression** | VRI stand-age suppression: ×0.00 for <40 yr, ×0.20 for 40–80 yr, ×0.35 for 80–150 yr |
+| Forest fire | Destroys standing yew; saplings recolonise slowly; short-return fire regimes prevent recovery | **Partial — context layer** | Fire perimeters (1918–2024) displayed on map; stand-age VRI records post-fire regeneration |
+| Road construction / riparian disturbance | Culverts and road fill disrupt stream hydrology; yew is disproportionately common on moist streamside terraces | **Sensitivity analysis** | `water_buffer_sensitivity.py`: ×10 m water buffer → −562 ha (−2.2%); ×20 m → −741 ha (−2.9%) |
+| Water body proximity (existing mask) | Water pixels (ocean, lake, river) are unsuitable by definition | **Yes** | VRI `BCLCS_LEVEL_2='W'` suppressed ×0.00 |
+| Alpine / non-forest exclusion | Rock, ice, and bog do not support yew | **Yes** | VRI `BCLCS_LEVEL_1` non-vegetated and alpine designation → ×0.00 |
+| Climate warming / drought | Increased vapour pressure deficit in summer reduces yew regeneration success; range margin contracts inland | **Not modelled** | Would require future climate projections (ClimateBC) overlaid on suitability |
+| Ungulate browsing (deer, elk) | Yew is highly palatable; heavy deer browse suppresses regeneration in early seral and fragmented landscapes | **Not modelled** | No province-wide browse pressure layer exists; site-level field validation could provide data |
+| Taxol harvesting / bark stripping | Bark-stripping for paclitaxel extraction (historical, 1990s) directly kills trees; practice now largely discontinued | **Not modelled** | Historical and spatially uneven; no GIS record |
+| Pathogen / fungal disease | *Phytophthora ramorum* (sudden oak death) poses a latent threat in the south coast; root rots in waterlogged soils | **Not modelled** | No province-wide pathogen distribution layer |
+| Inadequate protection | 96.5% of modelled yew habitat lies outside provincial parks or ecological reserves | **Quantified — not a suppressor** | `yew_in_protected_areas.py`: 898 ha protected vs 24,849 ha unprotected |
+
+### 6.2 Logging suppression detail
+
+The suppression scheme is based on the following ecological rationale for Pacific yew recovery post-harvest:
+
+| Age class | Years since disturbance | Suppression factor | Rationale |
+|---|---|---|---|
+| Young second-growth | <40 yr | ×0.00 | Dense conifer regeneration entirely fills the understorey; yew seedlings cannot establish in high-light competition |
+| Mid-seral | 40–80 yr | ×0.20 | Canopy closure partial; occasional yew plants present but cover sparse; slow clonal recovery from root suckers |
+| Late second-growth | 80–150 yr | ×0.35 | Multilayered canopy permits understorey; yew well-represented but below old-growth density |
+| Old-growth / unlogged | >150 yr | ×1.00 | Full model confidence retained; yew at maximum expected density |
+
+These multipliers are applied **per pixel** after the raw XGBoost probability is computed, using the VRI `PROJ_AGE_CLASS_CD_1` and disturbance history attributes.
+
+### 6.3 Water buffer sensitivity analysis
+
+Script: `scripts/analysis/water_buffer_by_type.py`  
+Method: `scipy.ndimage.distance_transform_edt` on per-class water masks; suppression to ×0.00 within buffer
+
+| Buffer size | Ocean | River | Lake | All water | Total change |
+|---|---|---|---|---|---|
+| Baseline (no buffer) | — | — | — | — | 25,747 ha |
+| +10 m | −267 ha | −53 ha | −242 ha | −562 ha | −2.2% |
+| +20 m | −505 ha | −98 ha | −446 ha | −1,049 ha | −4.1% |
+
+Rivers contribute far less than ocean/lake margins despite their ecological importance, because rivers are often only 1–2 pixels wide at 10 m resolution and already partially masked by the existing water category.
+
+### 6.4 Research gaps and future modelling priorities
+
+1. **Climate niche projections** — overlay ClimateBC 2050/2080 scenarios on current habitat suitability to identify areas at risk of range contraction or expansion.
+2. **Deer browse pressure** — incorporate B.C. Wildlife Branch ungulate density estimates or remote-sensing proxies (NDVI anomalies) as suppression covariates.
+3. **Connectivity analysis** — identify isolated patches (<50 ha, >5 km from nearest connected patch) as particularly vulnerable to local extirpation.
+4. **Taxol extraction legacy sites** — digitise known 1990s collection areas from historical records for a local suppression layer.
+5. **Riparian buffer formal inclusion** — incorporate a ×0.70 multiplier within 20 m of streams as a standard model layer (pilot: 4.1% habitat reduction at 20 m).
+
 ---
 
 ## 9. Key Files Reference
@@ -219,6 +311,13 @@ Protected areas highlight where yew habitat may be conserved from future logging
 | `results/analysis/cwh_spot_comparisons/` | 15-area spot comparison maps |
 | `data/processed/coastal_study_region.geojson` | Coastal BC study region boundary (87-part MultiPolygon) |
 | `results/analysis/cwh_yew_population_100k/proposed_region.html` | Interactive Leaflet map of study region |
+| `docs/tiles/park_contours.geojson` | 936 park/protected-area polygons (provincial + federal, 1.7 MB) |
+| `docs/tiles/fire_contours.geojson` | 3,603 historical fire perimeters ≥0.5 ha (1.8 MB) |
+| `scripts/analysis/yew_in_protected_areas.py` | Calculates yew habitat % inside parks via BC WFS |
+| `scripts/analysis/build_park_contours.py` | Regenerates park_contours.geojson (BC WFS + OSM federal parks) |
+| `scripts/analysis/water_buffer_sensitivity.py` | All-water 5/10/15 m buffer sensitivity analysis |
+| `scripts/analysis/water_buffer_by_type.py` | Per-type (ocean/river/lake) 10/20 m buffer analysis |
+| `scripts/analysis/yew_logging_impact_by_bec.py` | BEC-zone breakdown of logging impact on yew habitat |
 
 ---
 
