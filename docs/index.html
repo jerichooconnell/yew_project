@@ -990,39 +990,38 @@ function renderCWHFireChart(data) {
   });
   chart.innerHTML = html;
 
-  // Build decade-by-decade decline table (post-peak)
-  const peakDecade   = [...decades].sort((a,b) => b.burned_ha - a.burned_ha)[0];
-  const peakHa       = peakDecade.burned_ha;
-  const postPeak     = decades.filter(d => d.decade_start > peakDecade.decade_start);
-  const declineRows  = postPeak.map(d => {
-    const drop = ((1 - d.burned_ha / peakHa) * 100).toFixed(0);
-    const bar  = Math.round(d.burned_ha / peakHa * 60);  // max ~60 chars wide
-    return `<tr>
-      <td style="padding:1px 6px;color:#555;">${d.decade_label}</td>
-      <td style="padding:1px 6px;text-align:right;">${Math.round(d.burned_ha).toLocaleString()} ha</td>
-      <td style="padding:1px 6px;text-align:right;color:#c0392b;">−${drop}%</td>
-      <td style="padding:1px 4px;">${d.fire_count} fires</td>
-    </tr>`;
-  }).join('');
+  // Compute total yew decline from all sources using BEC_STATS (global)
+  const totalOrig = BEC_STATS.reduce((s,r) => s + r.orig, 0);
+  const totalDest = BEC_STATS.reduce((s,r) => s + r.dest, 0);
+  const totalFire = BEC_STATS.reduce((s,r) => s + r.fire, 0);
+  const totalLost = totalDest + totalFire;
+  const pctLost   = totalOrig > 0 ? (totalLost / totalOrig * 100).toFixed(0) : '?';
+  const pctLog    = totalOrig > 0 ? (totalDest  / totalOrig * 100).toFixed(0) : '?';
+  const pctFire   = totalOrig > 0 ? (totalFire  / totalOrig * 100).toFixed(0) : '?';
+
+  const peakDecade = [...decades].sort((a,b) => b.burned_ha - a.burned_ha)[0];
+  const latestDecade = [...decades].sort((a,b) => b.decade_start - a.decade_start)[0];
+  const fireDrop = peakDecade ? ((1 - latestDecade.burned_ha / peakDecade.burned_ha) * 100).toFixed(0) : '?';
 
   document.getElementById('cwh-notes').innerHTML = `
-    <b>Source:</b> BC Historical Fire Perimeters GDB, all fires, clipped to CWH zone boundary.<br>
-    <b>Note:</b> The same area may burn in multiple decades; total burned exceeds unique burned footprint.<br><br>
-    <b>Peak decade:</b> ${peakDecade.decade_label} — <b>${Math.round(peakHa).toLocaleString()} ha</b>
-    (${peakDecade.fire_count} fires, ${peakDecade.cwh_pct.toFixed(2)}% of CWH zone),
-    dominated by early industrial logging slash fires.<br>
-    <b>Decline from peak (${peakDecade.decade_label}):</b>
-    <table style="border-collapse:collapse;font-size:10px;margin-top:4px;">
-      <thead><tr style="color:#888;">
-        <th style="padding:1px 6px;text-align:left;">Decade</th>
-        <th style="padding:1px 6px;text-align:right;">Area burned</th>
-        <th style="padding:1px 6px;text-align:right;">vs. peak</th>
-        <th style="padding:1px 4px;">Fires</th>
-      </tr></thead>
-      <tbody>${declineRows}</tbody>
-    </table>
-    <span style="color:#888;font-size:9px;">Note: 2010s uptick (+${Math.round(postPeak.find(d=>d.decade_start===2010)?.burned_ha||0).toLocaleString()} ha)
-    driven by climate-related fire increase; 2020s partial decade.</span>
+    <b>Total yew habitat decline (all sources, study tiles):</b><br>
+    <span style="font-size:13px;">
+      <b style="color:#c0392b;">${pctLost}%</b> of estimated original yew habitat lost
+      — <b>${fmt(totalLost)} ha</b> of <b>${fmt(totalOrig)} ha</b> original
+    </span><br>
+    <span style="color:#555;font-size:10px;">
+      Logging: ${fmt(totalDest)} ha (${pctLog}%) &nbsp;|&nbsp;
+      Fire suppression: ${fmt(totalFire)} ha (${pctFire}%) &nbsp;|&nbsp;
+      Current remaining: ${fmt(totalOrig - totalDest)} ha
+    </span><br><br>
+    <b>CWH-zone fire trend:</b> Peak in ${peakDecade ? peakDecade.decade_label : '—'}
+    (${peakDecade ? Math.round(peakDecade.burned_ha).toLocaleString() : '?'} ha),
+    falling <b>${fireDrop}%</b> to ${Math.round(latestDecade.burned_ha).toLocaleString()} ha
+    in the ${latestDecade.decade_label} — driven by fire suppression policy after 1940.<br>
+    <span style="color:#888;font-size:9px;">
+      Source: BC Historical Fire Perimeters GDB × XGBoost yew tile model.
+      Fire suppression in study tiles = yew pixels driven below P=0.5 threshold by fire-date modifier.
+    </span>
   `;
 }
 
