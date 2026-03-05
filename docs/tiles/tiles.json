@@ -1236,12 +1236,12 @@
       "east": -122.181191
     },
     "stats": {
-      "mean": 0.053965404629707336,
+      "mean": 0.055555492639541626,
       "median": 0.0,
-      "max": 0.79885333776474,
-      "p30_ha": 890.06,
-      "p50_ha": 552.25,
-      "p70_ha": 194.35,
+      "max": 0.9971991777420044,
+      "p30_ha": 904.21,
+      "p50_ha": 568.94,
+      "p70_ha": 233.83,
       "h": 1001,
       "w": 1533
     },
@@ -1527,6 +1527,1366 @@
       "forest_80_150_pct": 5.1,
       "alpine_pct": 0.1,
       "oldgrowth_pct": 82.7
+    }
+  },
+  {
+    "slug": "sayward_forest",
+    "name": "Sayward Forest",
+    "desc": "NE VI CWHmm, upper valley forests",
+    "lat": 50.4,
+    "lon": -126.05,
+    "bbox": {
+      "south": 50.355084,
+      "north": 50.444916,
+      "west": -126.120464,
+      "east": -125.979536
+    },
+    "stats": {
+      "mean": 0.03683223947882652,
+      "median": 0.0002361103834118694,
+      "max": 0.9966096878051758,
+      "p30_ha": 690.84,
+      "p50_ha": 420.16,
+      "p70_ha": 217.4,
+      "h": 1001,
+      "w": 1570
+    },
+    "png": "sayward_forest.png",
+    "logging_png": "sayward_forest_logging.png",
+    "logging_stats": {
+      "water_pct": 13.1,
+      "logged_lt20_pct": 14.6,
+      "logged_20_40_pct": 5.1,
+      "logged_40_80_pct": 15.2,
+      "forest_80_150_pct": 3.7,
+      "alpine_pct": 0.3,
+      "oldgrowth_pct": 47.9
+    }
+  },
+  {
+    "slug": "cape_scott_lowlands",
+    "name": "Cape Scott Lowlands",
+    "desc": "NW VI CWHvh1, inland plateau",
+    "lat": 50.6,
+    "lon": -128.0,
+    "bbox": {
+      "south": 50.555084,
+      "north": 50.644916,
+      "west": -128.070763,
+      "east": -127.929237
+    },
+    "stats": {
+      "mean": 0.004462621174752712,
+      "median": 5.660792157868855e-05,
+      "max": 0.9912481307983398,
+      "p30_ha": 65.85,
+      "p50_ha": 31.66,
+      "p70_ha": 10.88,
+      "h": 1001,
+      "w": 1577
+    },
+    "png": "cape_scott_lowlands.png",
+    "logging_png": "cape_scott_lowlands_logging.png",
+    "logging_stats": {
+      "water_pct": 5.1,
+      "logged_lt20_pct": 22.8,
+      "logged_20_40_pct": 11.3,
+      "logged_40_80_pct": 33.1,
+      "forest_80_150_pct": 4.1,
+      "alpine_pct": 0.1,
+      "oldgrowth_pct": 23.0
+    }
+  },
+  {
+    "slug": "holberg_inlet",
+    "name": "Holberg Inlet",
+    "desc": "NW VI CWHvh1, remote",
+    "lat": 50.54,
+    "lon": -127.76,
+    "bbox": {
+      "south": 50.495084,
+      "north": 50.584916,
+      "west": -127.830673,
+      "east": -127.689327
+    },
+    "stats": {
+      "mean": 0.00216671428643167,
+      "median": 0.0,
+      "max": 0.9969654679298401,
+      "p30_ha": 21.67,
+      "p50_ha": 12.77,
+      "p70_ha": 7.28,
+      "h": 1001,
+      "w": 1574
+    },
+    "png": "holberg_inlet.png",
+    "logging_png": "holberg_inlet_logging.png",
+    "logging_stats": {
+      "water_pct": 11.6,
+      "logged_lt20_pct": 22.1,
+      "logged_20_40_pct": 26.4,
+      "logged_40_80_pct": 8.5,
+      "forest_80_150_pct": 4.0,
+      "alpine_pct": 7.3,
+      "oldgrowth_pct": 19.7
+    }
+  },
+  {
+    "slug": "barkley_sound_slopes",
+    "name": "Barkley Sound Slopes",
+    "desc": "SW VI CWHmm1, Kennedy Lake area",
+    "lat": 48.97,
+    "lon": -125.25,
+    "bbox": {
+      "south": 48.925084,
+      "north": 49.014916,
+      "west": -125.318421,
+      "east": -125.181579
+    },
+    "stats": {
+      "mean": 0.0957435593008995,
+      "median": 0.0,
+      "max": 0.9998550415039062,
+      "p30_ha": 1691.77,
+      "p50_ha": 1404.69,
+      "p70_ha": 1164.38,
+      "h": 1001,
+      "w": 1525
+    },
+    "png": "barkley_sound_slopes.png",
+    "logging_png": "barkley_sound_slopes_logging.png",
+    "logging_stats": {
+      "water_pct": 44.3,
+      "logged_lt20_pct": 8.4,
+      "logged_20_40_pct": 3.8,
+      "logged_40_80_pct": 6.0,
+      "forest_80_150_pct": 3.6,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 33.8
+    }
+  },
+  {
+    "slug": "courtenay_uplands",
+    "name": "Courtenay Uplands",
+    "desc": "Central-east VI CWHmm1",
+    "lat": 49.45,
+    "lon": -124.7,
+    "bbox": {
+      "south": 49.405084,
+      "north": 49.494916,
+      "west": -124.769089,
+      "east": -124.630911
+    },
+    "stats": {
+      "mean": 0.027200551703572273,
+      "median": 0.0,
+      "max": 0.9991366267204285,
+      "p30_ha": 535.62,
+      "p50_ha": 44.6,
+      "p70_ha": 37.66,
+      "h": 1001,
+      "w": 1540
+    },
+    "png": "courtenay_uplands.png",
+    "logging_png": "courtenay_uplands_logging.png",
+    "logging_stats": {
+      "water_pct": 47.6,
+      "logged_lt20_pct": 4.3,
+      "logged_20_40_pct": 7.9,
+      "logged_40_80_pct": 21.5,
+      "forest_80_150_pct": 16.9,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 1.5
+    }
+  },
+  {
+    "slug": "ucluelet_peninsula",
+    "name": "Ucluelet Peninsula",
+    "desc": "West VI CWHvh1, Ucluelet forest",
+    "lat": 49.05,
+    "lon": -125.45,
+    "bbox": {
+      "south": 49.005084,
+      "north": 49.094916,
+      "west": -125.518532,
+      "east": -125.381468
+    },
+    "stats": {
+      "mean": 0.06578946858644485,
+      "median": 2.0645678887376562e-05,
+      "max": 0.9995360374450684,
+      "p30_ha": 1176.52,
+      "p50_ha": 932.27,
+      "p70_ha": 714.09,
+      "h": 1001,
+      "w": 1526
+    },
+    "png": "ucluelet_peninsula.png",
+    "logging_png": "ucluelet_peninsula_logging.png",
+    "logging_stats": {
+      "water_pct": 17.2,
+      "logged_lt20_pct": 3.9,
+      "logged_20_40_pct": 25.0,
+      "logged_40_80_pct": 28.5,
+      "forest_80_150_pct": 0.3,
+      "alpine_pct": 0.1,
+      "oldgrowth_pct": 25.0
+    }
+  },
+  {
+    "slug": "tahsis_narrows",
+    "name": "Tahsis Narrows",
+    "desc": "West-central VI inner CWH",
+    "lat": 49.65,
+    "lon": -126.7,
+    "bbox": {
+      "south": 49.605084,
+      "north": 49.694916,
+      "west": -126.769372,
+      "east": -126.630628
+    },
+    "stats": {
+      "mean": 0.06499511003494263,
+      "median": 9.457825217396021e-05,
+      "max": 0.9989860653877258,
+      "p30_ha": 1219.9,
+      "p50_ha": 991.59,
+      "p70_ha": 758.5,
+      "h": 1001,
+      "w": 1546
+    },
+    "png": "tahsis_narrows.png",
+    "logging_png": "tahsis_narrows_logging.png",
+    "logging_stats": {
+      "water_pct": 1.1,
+      "logged_lt20_pct": 14.1,
+      "logged_20_40_pct": 16.7,
+      "logged_40_80_pct": 17.4,
+      "forest_80_150_pct": 1.3,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 49.4
+    }
+  },
+  {
+    "slug": "kelsey_bay_forest",
+    "name": "Kelsey Bay Forest",
+    "desc": "NE VI CWHmm1 valley",
+    "lat": 50.48,
+    "lon": -126.0,
+    "bbox": {
+      "south": 50.435084,
+      "north": 50.524916,
+      "west": -126.070583,
+      "east": -125.929417
+    },
+    "stats": {
+      "mean": 0.006702915765345097,
+      "median": 0.0,
+      "max": 0.9986735582351685,
+      "p30_ha": 102.69,
+      "p50_ha": 51.7,
+      "p70_ha": 30.97,
+      "h": 1001,
+      "w": 1573
+    },
+    "png": "kelsey_bay_forest.png",
+    "logging_png": "kelsey_bay_forest_logging.png",
+    "logging_stats": {
+      "water_pct": 50.4,
+      "logged_lt20_pct": 9.4,
+      "logged_20_40_pct": 10.1,
+      "logged_40_80_pct": 11.6,
+      "forest_80_150_pct": 12.2,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 6.3
+    }
+  },
+  {
+    "slug": "whistler_callaghan",
+    "name": "Whistler Callaghan",
+    "desc": "Coast Mtns CWH/MH, upper slopes",
+    "lat": 50.05,
+    "lon": -122.85,
+    "bbox": {
+      "south": 50.005084,
+      "north": 50.094916,
+      "west": -122.919949,
+      "east": -122.780051
+    },
+    "stats": {
+      "mean": 0.06611187756061554,
+      "median": 0.0,
+      "max": 0.99955815076828,
+      "p30_ha": 1228.88,
+      "p50_ha": 1006.7,
+      "p70_ha": 797.41,
+      "h": 1001,
+      "w": 1558
+    },
+    "png": "whistler_callaghan.png",
+    "logging_png": "whistler_callaghan_logging.png",
+    "logging_stats": {
+      "water_pct": 1.0,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 0.0,
+      "forest_80_150_pct": 0.6,
+      "alpine_pct": 73.9,
+      "oldgrowth_pct": 24.2
+    }
+  },
+  {
+    "slug": "coquitlam_watershed",
+    "name": "Coquitlam Watershed",
+    "desc": "Lower mainland CWHvm1",
+    "lat": 49.7,
+    "lon": -122.3,
+    "bbox": {
+      "south": 49.655084,
+      "north": 49.744916,
+      "west": -122.369444,
+      "east": -122.230556
+    },
+    "stats": {
+      "mean": 0.04957657307386398,
+      "median": 0.0005101690767332911,
+      "max": 0.9976590871810913,
+      "p30_ha": 867.61,
+      "p50_ha": 587.64,
+      "p70_ha": 384.03,
+      "h": 1001,
+      "w": 1547
+    },
+    "png": "coquitlam_watershed.png",
+    "logging_png": "coquitlam_watershed_logging.png",
+    "logging_stats": {
+      "water_pct": 0.8,
+      "logged_lt20_pct": 4.6,
+      "logged_20_40_pct": 4.5,
+      "logged_40_80_pct": 11.8,
+      "forest_80_150_pct": 8.3,
+      "alpine_pct": 10.4,
+      "oldgrowth_pct": 58.3
+    }
+  },
+  {
+    "slug": "lillooet_r_corridor",
+    "name": "Lillooet R Corridor",
+    "desc": "Transition CWH-IDF upper valley",
+    "lat": 50.42,
+    "lon": -122.6,
+    "bbox": {
+      "south": 50.375084,
+      "north": 50.464916,
+      "west": -122.670494,
+      "east": -122.529506
+    },
+    "stats": {
+      "mean": 0.015994800254702568,
+      "median": 0.0,
+      "max": 0.9950315952301025,
+      "p30_ha": 278.21,
+      "p50_ha": 181.89,
+      "p70_ha": 118.48,
+      "h": 1001,
+      "w": 1570
+    },
+    "png": "lillooet_r_corridor.png",
+    "logging_png": "lillooet_r_corridor_logging.png",
+    "logging_stats": {
+      "water_pct": 0.4,
+      "logged_lt20_pct": 10.7,
+      "logged_20_40_pct": 2.8,
+      "logged_40_80_pct": 2.0,
+      "forest_80_150_pct": 4.1,
+      "alpine_pct": 55.2,
+      "oldgrowth_pct": 23.7
+    }
+  },
+  {
+    "slug": "harrison_lowlands",
+    "name": "Harrison Lowlands",
+    "desc": "Fraser CWHdm, logged valley",
+    "lat": 49.05,
+    "lon": -122.05,
+    "bbox": {
+      "south": 49.005084,
+      "north": 49.094916,
+      "west": -122.118532,
+      "east": -121.981468
+    },
+    "stats": {
+      "mean": 0.04728241264820099,
+      "median": 0.00032152479980140924,
+      "max": 0.9902440905570984,
+      "p30_ha": 683.42,
+      "p50_ha": 76.08,
+      "p70_ha": 52.19,
+      "h": 1001,
+      "w": 1527
+    },
+    "png": "harrison_lowlands.png",
+    "logging_png": "harrison_lowlands_logging.png",
+    "logging_stats": {
+      "water_pct": 4.8,
+      "logged_lt20_pct": 3.0,
+      "logged_20_40_pct": 4.4,
+      "logged_40_80_pct": 22.1,
+      "forest_80_150_pct": 36.7,
+      "alpine_pct": 6.6,
+      "oldgrowth_pct": 21.4
+    }
+  },
+  {
+    "slug": "theodosia_inlet",
+    "name": "Theodosia Inlet",
+    "desc": "Upper Sunshine Coast CWHvm2",
+    "lat": 49.98,
+    "lon": -124.5,
+    "bbox": {
+      "south": 49.935084,
+      "north": 50.024916,
+      "west": -124.569847,
+      "east": -124.430153
+    },
+    "stats": {
+      "mean": 0.05903362110257149,
+      "median": 0.00032209171331487596,
+      "max": 0.9996857643127441,
+      "p30_ha": 1055.1,
+      "p50_ha": 626.95,
+      "p70_ha": 473.44,
+      "h": 1001,
+      "w": 1556
+    },
+    "png": "theodosia_inlet.png",
+    "logging_png": "theodosia_inlet_logging.png",
+    "logging_stats": {
+      "water_pct": 32.3,
+      "logged_lt20_pct": 5.5,
+      "logged_20_40_pct": 2.4,
+      "logged_40_80_pct": 2.7,
+      "forest_80_150_pct": 25.1,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 31.7
+    }
+  },
+  {
+    "slug": "lillooet_lake_slopes",
+    "name": "Lillooet Lake Slopes",
+    "desc": "Pemberton-Squamish CWHvm1",
+    "lat": 50.6,
+    "lon": -123.8,
+    "bbox": {
+      "south": 50.555084,
+      "north": 50.644916,
+      "west": -123.870763,
+      "east": -123.729237
+    },
+    "stats": {
+      "mean": 0.04015638306736946,
+      "median": 0.0,
+      "max": 0.9992747902870178,
+      "p30_ha": 788.34,
+      "p50_ha": 611.38,
+      "p70_ha": 444.12,
+      "h": 1001,
+      "w": 1577
+    },
+    "png": "lillooet_lake_slopes.png",
+    "logging_png": "lillooet_lake_slopes_logging.png",
+    "logging_stats": {
+      "water_pct": 0.1,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 0.1,
+      "forest_80_150_pct": 0.6,
+      "alpine_pct": 79.7,
+      "oldgrowth_pct": 19.5
+    }
+  },
+  {
+    "slug": "loughborough_inlet",
+    "name": "Loughborough Inlet",
+    "desc": "Northern Sunshine Coast fjord CWH",
+    "lat": 50.38,
+    "lon": -124.65,
+    "bbox": {
+      "south": 50.335084,
+      "north": 50.424916,
+      "west": -124.720434,
+      "east": -124.579566
+    },
+    "stats": {
+      "mean": 0.011607903987169266,
+      "median": 0.0,
+      "max": 0.9992243051528931,
+      "p30_ha": 174.95,
+      "p50_ha": 115.66,
+      "p70_ha": 75.58,
+      "h": 1001,
+      "w": 1569
+    },
+    "png": "loughborough_inlet.png",
+    "logging_png": "loughborough_inlet_logging.png",
+    "logging_stats": {
+      "water_pct": 36.5,
+      "logged_lt20_pct": 1.5,
+      "logged_20_40_pct": 5.9,
+      "logged_40_80_pct": 8.3,
+      "forest_80_150_pct": 8.9,
+      "alpine_pct": 13.9,
+      "oldgrowth_pct": 24.9
+    }
+  },
+  {
+    "slug": "homathko_canyon",
+    "name": "Homathko Canyon",
+    "desc": "Upper Bute tributary CWHxm2",
+    "lat": 51.45,
+    "lon": -124.65,
+    "bbox": {
+      "south": 51.405084,
+      "north": 51.494916,
+      "west": -124.722073,
+      "east": -124.577927
+    },
+    "stats": {
+      "mean": 0.0017033409094437957,
+      "median": 0.0,
+      "max": 0.9833404421806335,
+      "p30_ha": 24.22,
+      "p50_ha": 9.58,
+      "p70_ha": 5.34,
+      "h": 1001,
+      "w": 1605
+    },
+    "png": "homathko_canyon.png",
+    "logging_png": "homathko_canyon_logging.png",
+    "logging_stats": {
+      "water_pct": 0.2,
+      "logged_lt20_pct": 3.6,
+      "logged_20_40_pct": 0.2,
+      "logged_40_80_pct": 0.2,
+      "forest_80_150_pct": 4.6,
+      "alpine_pct": 80.3,
+      "oldgrowth_pct": 11.0
+    }
+  },
+  {
+    "slug": "klinaklini_valley",
+    "name": "Klinaklini Valley",
+    "desc": "Central coast fjord CWHmm1",
+    "lat": 51.75,
+    "lon": -125.75,
+    "bbox": {
+      "south": 51.705084,
+      "north": 51.794916,
+      "west": -125.82255,
+      "east": -125.67745
+    },
+    "stats": {
+      "mean": 0.015943605452775955,
+      "median": 0.0,
+      "max": 0.9983394145965576,
+      "p30_ha": 303.93,
+      "p50_ha": 210.46,
+      "p70_ha": 142.73,
+      "h": 1001,
+      "w": 1617
+    },
+    "png": "klinaklini_valley.png",
+    "logging_png": "klinaklini_valley_logging.png",
+    "logging_stats": {
+      "water_pct": 0.7,
+      "logged_lt20_pct": 1.8,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 0.0,
+      "forest_80_150_pct": 0.0,
+      "alpine_pct": 77.0,
+      "oldgrowth_pct": 20.4
+    }
+  },
+  {
+    "slug": "dean_river_lower",
+    "name": "Dean River Lower",
+    "desc": "Lower Dean valley CWH, alluvial flats",
+    "lat": 52.3,
+    "lon": -126.65,
+    "bbox": {
+      "south": 52.255084,
+      "north": 52.344916,
+      "west": -126.723448,
+      "east": -126.576552
+    },
+    "stats": {
+      "mean": 0.01308237574994564,
+      "median": 2.8394828404998407e-05,
+      "max": 0.9959366321563721,
+      "p30_ha": 247.07,
+      "p50_ha": 176.79,
+      "p70_ha": 121.04,
+      "h": 1001,
+      "w": 1636
+    },
+    "png": "dean_river_lower.png",
+    "logging_png": "dean_river_lower_logging.png",
+    "logging_stats": {
+      "water_pct": 0.4,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 1.1,
+      "logged_40_80_pct": 4.8,
+      "forest_80_150_pct": 22.9,
+      "alpine_pct": 29.1,
+      "oldgrowth_pct": 41.8
+    }
+  },
+  {
+    "slug": "gardner_canal_slopes",
+    "name": "Gardner Canal Slopes",
+    "desc": "Kemano valley inner CWH",
+    "lat": 53.0,
+    "lon": -127.5,
+    "bbox": {
+      "south": 52.955084,
+      "north": 53.044916,
+      "west": -127.574633,
+      "east": -127.425367
+    },
+    "stats": {
+      "mean": 0.001674977014772594,
+      "median": 1.9320063074701466e-05,
+      "max": 0.9866740703582764,
+      "p30_ha": 26.66,
+      "p50_ha": 14.96,
+      "p70_ha": 9.29,
+      "h": 1001,
+      "w": 1663
+    },
+    "png": "gardner_canal_slopes.png",
+    "logging_png": "gardner_canal_slopes_logging.png",
+    "logging_stats": {
+      "water_pct": 3.7,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 1.7,
+      "logged_40_80_pct": 5.0,
+      "forest_80_150_pct": 20.7,
+      "alpine_pct": 22.5,
+      "oldgrowth_pct": 46.4
+    }
+  },
+  {
+    "slug": "porcher_island",
+    "name": "Porcher Island",
+    "desc": "Outer north coast CWHvh2",
+    "lat": 53.35,
+    "lon": -129.0,
+    "bbox": {
+      "south": 53.305084,
+      "north": 53.394916,
+      "west": -129.075245,
+      "east": -128.924755
+    },
+    "stats": {
+      "mean": 0.012264206074178219,
+      "median": 0.0,
+      "max": 0.9828783273696899,
+      "p30_ha": 216.87,
+      "p50_ha": 105.37,
+      "p70_ha": 37.65,
+      "h": 1001,
+      "w": 1677
+    },
+    "png": "porcher_island.png",
+    "logging_png": "porcher_island_logging.png",
+    "logging_stats": {
+      "water_pct": 29.2,
+      "logged_lt20_pct": 0.1,
+      "logged_20_40_pct": 2.5,
+      "logged_40_80_pct": 1.1,
+      "forest_80_150_pct": 3.8,
+      "alpine_pct": 20.0,
+      "oldgrowth_pct": 42.7
+    }
+  },
+  {
+    "slug": "calvert_island",
+    "name": "Calvert Island",
+    "desc": "Outer CWHvh2, Rivers Inlet area",
+    "lat": 51.65,
+    "lon": -128.05,
+    "bbox": {
+      "south": 51.605084,
+      "north": 51.694916,
+      "west": -128.12239,
+      "east": -127.97761
+    },
+    "stats": {
+      "mean": 0.1493249237537384,
+      "median": 0.007367623969912529,
+      "max": 0.9988840222358704,
+      "p30_ha": 3234.55,
+      "p50_ha": 2213.59,
+      "p70_ha": 1161.32,
+      "h": 1001,
+      "w": 1612
+    },
+    "png": "calvert_island.png",
+    "logging_png": "calvert_island_logging.png",
+    "logging_stats": {
+      "water_pct": 18.6,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 0.1,
+      "forest_80_150_pct": 5.6,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 75.7
+    }
+  },
+  {
+    "slug": "bella_bella_forest",
+    "name": "Bella Bella Forest",
+    "desc": "Denny Island CWHvh2, outer mid-coast",
+    "lat": 52.15,
+    "lon": -128.1,
+    "bbox": {
+      "south": 52.105084,
+      "north": 52.194916,
+      "west": -128.1732,
+      "east": -128.0268
+    },
+    "stats": {
+      "mean": 0.15187442302703857,
+      "median": 0.005412545520812273,
+      "max": 0.9990548491477966,
+      "p30_ha": 3267.38,
+      "p50_ha": 2265.14,
+      "p70_ha": 1151.76,
+      "h": 1001,
+      "w": 1631
+    },
+    "png": "bella_bella_forest.png",
+    "logging_png": "bella_bella_forest_logging.png",
+    "logging_stats": {
+      "water_pct": 34.2,
+      "logged_lt20_pct": 0.6,
+      "logged_20_40_pct": 0.2,
+      "logged_40_80_pct": 0.6,
+      "forest_80_150_pct": 20.0,
+      "alpine_pct": 0.7,
+      "oldgrowth_pct": 43.7
+    }
+  },
+  {
+    "slug": "laredo_sound_east",
+    "name": "Laredo Sound East",
+    "desc": "Inner passage mainland CWHvh",
+    "lat": 52.8,
+    "lon": -128.5,
+    "bbox": {
+      "south": 52.755084,
+      "north": 52.844916,
+      "west": -128.57429,
+      "east": -128.42571
+    },
+    "stats": {
+      "mean": 0.05920122191309929,
+      "median": 0.0005896439542993903,
+      "max": 0.9967100620269775,
+      "p30_ha": 1282.29,
+      "p50_ha": 860.97,
+      "p70_ha": 448.27,
+      "h": 1001,
+      "w": 1655
+    },
+    "png": "laredo_sound_east.png",
+    "logging_png": "laredo_sound_east_logging.png",
+    "logging_stats": {
+      "water_pct": 37.1,
+      "logged_lt20_pct": 1.4,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 0.2,
+      "forest_80_150_pct": 1.1,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 60.1
+    }
+  },
+  {
+    "slug": "banks_island_ne",
+    "name": "Banks Island NE",
+    "desc": "North coast outer CWHvh",
+    "lat": 53.2,
+    "lon": -130.05,
+    "bbox": {
+      "south": 53.155084,
+      "north": 53.244916,
+      "west": -130.124981,
+      "east": -129.975019
+    },
+    "stats": {
+      "mean": 0.029926134273409843,
+      "median": 5.705084549845196e-05,
+      "max": 0.9936991930007935,
+      "p30_ha": 728.43,
+      "p50_ha": 340.94,
+      "p70_ha": 106.87,
+      "h": 1001,
+      "w": 1670
+    },
+    "png": "banks_island_ne.png",
+    "logging_png": "banks_island_ne_logging.png",
+    "logging_stats": {
+      "water_pct": 45.5,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 0.0,
+      "forest_80_150_pct": 0.0,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 12.8
+    }
+  },
+  {
+    "slug": "roscoe_inlet",
+    "name": "Roscoe Inlet",
+    "desc": "Deep mainland fjord CWHvm2",
+    "lat": 51.85,
+    "lon": -127.3,
+    "bbox": {
+      "south": 51.805084,
+      "north": 51.894916,
+      "west": -127.372712,
+      "east": -127.227288
+    },
+    "stats": {
+      "mean": 0.005620426032692194,
+      "median": 0.0001464049710193649,
+      "max": 0.997975766658783,
+      "p30_ha": 79.68,
+      "p50_ha": 48.57,
+      "p70_ha": 29.39,
+      "h": 1001,
+      "w": 1620
+    },
+    "png": "roscoe_inlet.png",
+    "logging_png": "roscoe_inlet_logging.png",
+    "logging_stats": {
+      "water_pct": 7.5,
+      "logged_lt20_pct": 1.1,
+      "logged_20_40_pct": 12.9,
+      "logged_40_80_pct": 8.3,
+      "forest_80_150_pct": 4.0,
+      "alpine_pct": 1.8,
+      "oldgrowth_pct": 64.4
+    }
+  },
+  {
+    "slug": "khutze_inlet",
+    "name": "Khutze Inlet",
+    "desc": "Mid-coast fjord CWHvm2",
+    "lat": 52.25,
+    "lon": -127.75,
+    "bbox": {
+      "south": 52.205084,
+      "north": 52.294916,
+      "west": -127.823365,
+      "east": -127.676635
+    },
+    "stats": {
+      "mean": 0.04260997101664543,
+      "median": 0.0,
+      "max": 0.995952844619751,
+      "p30_ha": 901.34,
+      "p50_ha": 594.54,
+      "p70_ha": 304.03,
+      "h": 1001,
+      "w": 1635
+    },
+    "png": "khutze_inlet.png",
+    "logging_png": "khutze_inlet_logging.png",
+    "logging_stats": {
+      "water_pct": 42.6,
+      "logged_lt20_pct": 6.2,
+      "logged_20_40_pct": 2.7,
+      "logged_40_80_pct": 0.3,
+      "forest_80_150_pct": 0.5,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 47.5
+    }
+  },
+  {
+    "slug": "tsimpsean_peninsula",
+    "name": "Tsimpsean Peninsula",
+    "desc": "Prince Rupert mainland CWHvh",
+    "lat": 54.35,
+    "lon": -130.35,
+    "bbox": {
+      "south": 54.305084,
+      "north": 54.394916,
+      "west": -130.427064,
+      "east": -130.272936
+    },
+    "stats": {
+      "mean": 0.04594452679157257,
+      "median": 0.0028578813653439283,
+      "max": 0.9964396357536316,
+      "p30_ha": 794.46,
+      "p50_ha": 331.26,
+      "p70_ha": 104.96,
+      "h": 1001,
+      "w": 1717
+    },
+    "png": "tsimpsean_peninsula.png",
+    "logging_png": "tsimpsean_peninsula_logging.png",
+    "logging_stats": {
+      "water_pct": 22.0,
+      "logged_lt20_pct": 3.4,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 0.1,
+      "forest_80_150_pct": 1.6,
+      "alpine_pct": 6.2,
+      "oldgrowth_pct": 65.4
+    }
+  },
+  {
+    "slug": "chatham_sound_slopes",
+    "name": "Chatham Sound Slopes",
+    "desc": "Near Prince Rupert mainland CWHvh",
+    "lat": 54.35,
+    "lon": -130.15,
+    "bbox": {
+      "south": 54.305084,
+      "north": 54.394916,
+      "west": -130.227064,
+      "east": -130.072936
+    },
+    "stats": {
+      "mean": 0.020729007199406624,
+      "median": 0.0005231781979091465,
+      "max": 0.9839905500411987,
+      "p30_ha": 395.35,
+      "p50_ha": 183.74,
+      "p70_ha": 42.81,
+      "h": 1001,
+      "w": 1717
+    },
+    "png": "chatham_sound_slopes.png",
+    "logging_png": "chatham_sound_slopes_logging.png",
+    "logging_stats": {
+      "water_pct": 7.6,
+      "logged_lt20_pct": 0.2,
+      "logged_20_40_pct": 2.3,
+      "logged_40_80_pct": 0.1,
+      "forest_80_150_pct": 0.9,
+      "alpine_pct": 18.0,
+      "oldgrowth_pct": 69.3
+    }
+  },
+  {
+    "slug": "haida_gwaii_central",
+    "name": "Haida Gwaii Central",
+    "desc": "Central Moresby Island CWHvh3",
+    "lat": 53.35,
+    "lon": -132.05,
+    "bbox": {
+      "south": 53.305084,
+      "north": 53.394916,
+      "west": -132.125245,
+      "east": -131.974755
+    },
+    "stats": {
+      "mean": 0.008549136109650135,
+      "median": 0.0007651083869859576,
+      "max": 0.9792268872261047,
+      "p30_ha": 67.67,
+      "p50_ha": 15.41,
+      "p70_ha": 2.62,
+      "h": 1001,
+      "w": 1676
+    },
+    "png": "haida_gwaii_central.png",
+    "logging_png": "haida_gwaii_central_logging.png",
+    "logging_stats": {
+      "water_pct": 0.2,
+      "logged_lt20_pct": 0.8,
+      "logged_20_40_pct": 4.1,
+      "logged_40_80_pct": 0.0,
+      "forest_80_150_pct": 11.3,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 81.1
+    }
+  },
+  {
+    "slug": "haida_gwaii_e_graham",
+    "name": "Haida Gwaii E Graham",
+    "desc": "Graham Island east coast CWH",
+    "lat": 53.68,
+    "lon": -132.45,
+    "bbox": {
+      "south": 53.635084,
+      "north": 53.724916,
+      "west": -132.525833,
+      "east": -132.374167
+    },
+    "stats": {
+      "mean": 0.0048924339935183525,
+      "median": 0.0,
+      "max": 0.9979304075241089,
+      "p30_ha": 83.22,
+      "p50_ha": 51.09,
+      "p70_ha": 29.6,
+      "h": 1001,
+      "w": 1689
+    },
+    "png": "haida_gwaii_e_graham.png",
+    "logging_png": "haida_gwaii_e_graham_logging.png",
+    "logging_stats": {
+      "water_pct": 58.2,
+      "logged_lt20_pct": 6.3,
+      "logged_20_40_pct": 8.4,
+      "logged_40_80_pct": 3.3,
+      "forest_80_150_pct": 3.2,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 18.3
+    }
+  },
+  {
+    "slug": "tow_hill_area",
+    "name": "Tow Hill Area",
+    "desc": "N Graham Island CWHvh3",
+    "lat": 54.0,
+    "lon": -132.05,
+    "bbox": {
+      "south": 53.955084,
+      "north": 54.044916,
+      "west": -132.126415,
+      "east": -131.973585
+    },
+    "stats": {
+      "mean": 0.0025884320493787527,
+      "median": 0.0003391487989574671,
+      "max": 0.9831204414367676,
+      "p30_ha": 13.64,
+      "p50_ha": 6.28,
+      "p70_ha": 2.12,
+      "h": 1001,
+      "w": 1702
+    },
+    "png": "tow_hill_area.png",
+    "logging_png": "tow_hill_area_logging.png",
+    "logging_stats": {
+      "water_pct": 16.3,
+      "logged_lt20_pct": 0.6,
+      "logged_20_40_pct": 2.9,
+      "logged_40_80_pct": 5.8,
+      "forest_80_150_pct": 11.4,
+      "alpine_pct": 1.3,
+      "oldgrowth_pct": 60.5
+    }
+  },
+  {
+    "slug": "skidegate_flats",
+    "name": "Skidegate Flats",
+    "desc": "Graham-Moresby narrows CWH",
+    "lat": 53.55,
+    "lon": -132.0,
+    "bbox": {
+      "south": 53.505084,
+      "north": 53.594916,
+      "west": -132.0756,
+      "east": -131.9244
+    },
+    "stats": {
+      "mean": 0.0014701972249895334,
+      "median": 0.00022394229017663747,
+      "max": 0.9971010088920593,
+      "p30_ha": 23.96,
+      "p50_ha": 6.78,
+      "p70_ha": 5.94,
+      "h": 1001,
+      "w": 1684
+    },
+    "png": "skidegate_flats.png",
+    "logging_png": "skidegate_flats_logging.png",
+    "logging_stats": {
+      "water_pct": 10.9,
+      "logged_lt20_pct": 2.1,
+      "logged_20_40_pct": 1.0,
+      "logged_40_80_pct": 1.9,
+      "forest_80_150_pct": 12.8,
+      "alpine_pct": 0.5,
+      "oldgrowth_pct": 69.0
+    }
+  },
+  {
+    "slug": "seaforth_channel",
+    "name": "Seaforth Channel",
+    "desc": "Mid-coast outer passage CWH",
+    "lat": 51.95,
+    "lon": -128.2,
+    "bbox": {
+      "south": 51.905084,
+      "north": 51.994916,
+      "west": -128.272874,
+      "east": -128.127126
+    },
+    "stats": {
+      "mean": 0.1898263692855835,
+      "median": 0.001681285910308361,
+      "max": 0.9989352822303772,
+      "p30_ha": 4272.2,
+      "p50_ha": 3187.89,
+      "p70_ha": 1838.92,
+      "h": 1001,
+      "w": 1624
+    },
+    "png": "seaforth_channel.png",
+    "logging_png": "seaforth_channel_logging.png",
+    "logging_stats": {
+      "water_pct": 47.7,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 0.0,
+      "forest_80_150_pct": 1.1,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 51.0
+    }
+  },
+  {
+    "slug": "mucha_inlet",
+    "name": "Mucha Inlet",
+    "desc": "Dean-Kimsquit corridor CWH",
+    "lat": 52.85,
+    "lon": -127.8,
+    "bbox": {
+      "south": 52.805084,
+      "north": 52.894916,
+      "west": -127.874375,
+      "east": -127.725625
+    },
+    "stats": {
+      "mean": 0.00012505751510616392,
+      "median": 1.726692426018417e-05,
+      "max": 0.974616289138794,
+      "p30_ha": 1.33,
+      "p50_ha": 0.82,
+      "p70_ha": 0.54,
+      "h": 1001,
+      "w": 1657
+    },
+    "png": "mucha_inlet.png",
+    "logging_png": "mucha_inlet_logging.png",
+    "logging_stats": {
+      "water_pct": 1.4,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 8.9,
+      "forest_80_150_pct": 26.2,
+      "alpine_pct": 30.6,
+      "oldgrowth_pct": 32.8
+    }
+  },
+  {
+    "slug": "observatory_inlet",
+    "name": "Observatory Inlet",
+    "desc": "North fjord CWHvh3",
+    "lat": 54.65,
+    "lon": -130.35,
+    "bbox": {
+      "south": 54.605084,
+      "north": 54.694916,
+      "west": -130.427632,
+      "east": -130.272368
+    },
+    "stats": {
+      "mean": 0.02448973059654236,
+      "median": 0.0003088464727625251,
+      "max": 0.9957364797592163,
+      "p30_ha": 490.3,
+      "p50_ha": 226.94,
+      "p70_ha": 54.02,
+      "h": 1001,
+      "w": 1729
+    },
+    "png": "observatory_inlet.png",
+    "logging_png": "observatory_inlet_logging.png",
+    "logging_stats": {
+      "water_pct": 27.2,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 0.8,
+      "logged_40_80_pct": 0.2,
+      "forest_80_150_pct": 2.3,
+      "alpine_pct": 7.7,
+      "oldgrowth_pct": 61.2
+    }
+  },
+  {
+    "slug": "blunden_harbour",
+    "name": "Blunden Harbour",
+    "desc": "Broughton area CWHvh inner",
+    "lat": 50.95,
+    "lon": -127.35,
+    "bbox": {
+      "south": 50.905084,
+      "north": 50.994916,
+      "west": -127.421295,
+      "east": -127.278705
+    },
+    "stats": {
+      "mean": 0.27578410506248474,
+      "median": 0.028816137462854385,
+      "max": 0.9990317821502686,
+      "p30_ha": 5527.76,
+      "p50_ha": 4608.74,
+      "p70_ha": 3541.45,
+      "h": 1001,
+      "w": 1588
+    },
+    "png": "blunden_harbour.png",
+    "logging_png": "blunden_harbour_logging.png",
+    "logging_stats": {
+      "water_pct": 20.6,
+      "logged_lt20_pct": 5.5,
+      "logged_20_40_pct": 5.1,
+      "logged_40_80_pct": 0.5,
+      "forest_80_150_pct": 0.4,
+      "alpine_pct": 0.3,
+      "oldgrowth_pct": 67.4
+    }
+  },
+  {
+    "slug": "tribune_channel",
+    "name": "Tribune Channel",
+    "desc": "Remote outer-coast fjord CWH",
+    "lat": 51.35,
+    "lon": -126.7,
+    "bbox": {
+      "south": 51.305084,
+      "north": 51.394916,
+      "west": -126.771915,
+      "east": -126.628085
+    },
+    "stats": {
+      "mean": 0.005864989012479782,
+      "median": 5.829563087900169e-05,
+      "max": 0.9982933402061462,
+      "p30_ha": 95.96,
+      "p50_ha": 69.2,
+      "p70_ha": 49.48,
+      "h": 1001,
+      "w": 1602
+    },
+    "png": "tribune_channel.png",
+    "logging_png": "tribune_channel_logging.png",
+    "logging_stats": {
+      "water_pct": 0.3,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 3.8,
+      "forest_80_150_pct": 5.4,
+      "alpine_pct": 18.3,
+      "oldgrowth_pct": 72.3
+    }
+  },
+  {
+    "slug": "tweedsmuir_south",
+    "name": "Tweedsmuir South",
+    "desc": "Atnarko CWH valley bottom",
+    "lat": 52.15,
+    "lon": -126.2,
+    "bbox": {
+      "south": 52.105084,
+      "north": 52.194916,
+      "west": -126.2732,
+      "east": -126.1268
+    },
+    "stats": {
+      "mean": 0.0002421253884676844,
+      "median": 0.0,
+      "max": 0.967176616191864,
+      "p30_ha": 2.82,
+      "p50_ha": 1.5,
+      "p70_ha": 0.77,
+      "h": 1001,
+      "w": 1630
+    },
+    "png": "tweedsmuir_south.png",
+    "logging_png": "tweedsmuir_south_logging.png",
+    "logging_stats": {
+      "water_pct": 1.0,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 0.6,
+      "forest_80_150_pct": 8.9,
+      "alpine_pct": 72.8,
+      "oldgrowth_pct": 16.8
+    }
+  },
+  {
+    "slug": "skeena_estuary",
+    "name": "Skeena Estuary",
+    "desc": "Outer coast Prince Rupert area CWHvh",
+    "lat": 54.1,
+    "lon": -130.1,
+    "bbox": {
+      "south": 54.055084,
+      "north": 54.144916,
+      "west": -130.176599,
+      "east": -130.023401
+    },
+    "stats": {
+      "mean": 0.04212760552763939,
+      "median": 0.0,
+      "max": 0.9950072765350342,
+      "p30_ha": 943.9,
+      "p50_ha": 567.4,
+      "p70_ha": 224.38,
+      "h": 1001,
+      "w": 1707
+    },
+    "png": "skeena_estuary.png",
+    "logging_png": "skeena_estuary_logging.png",
+    "logging_stats": {
+      "water_pct": 48.5,
+      "logged_lt20_pct": 0.3,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 0.4,
+      "forest_80_150_pct": 0.0,
+      "alpine_pct": 8.6,
+      "oldgrowth_pct": 41.6
+    }
+  },
+  {
+    "slug": "work_channel",
+    "name": "Work Channel",
+    "desc": "N of Prince Rupert outer coast CWHvh3",
+    "lat": 54.65,
+    "lon": -130.45,
+    "bbox": {
+      "south": 54.605084,
+      "north": 54.694916,
+      "west": -130.527632,
+      "east": -130.372368
+    },
+    "stats": {
+      "mean": 0.02410963736474514,
+      "median": 0.0,
+      "max": 0.9957364797592163,
+      "p30_ha": 522.6,
+      "p50_ha": 250.4,
+      "p70_ha": 54.31,
+      "h": 1001,
+      "w": 1729
+    },
+    "png": "work_channel.png",
+    "logging_png": "work_channel_logging.png",
+    "logging_stats": {
+      "water_pct": 77.4,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 0.0,
+      "logged_40_80_pct": 0.0,
+      "forest_80_150_pct": 0.0,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 21.9
     }
   }
 ]

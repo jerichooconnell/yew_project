@@ -1,20 +1,20 @@
 # Pacific Yew Habitat Mapping — Current Analysis Synopsis
 
 **Project:** Spatial prediction of Pacific yew (*Taxus brevifolia*) habitat probability across coastal British Columbia  
-**Last updated:** March 4, 2026  
+**Last updated:** March 5, 2026  
 **Interactive map:** [jerichooconnell.github.io/yew_project](https://jerichooconnell.github.io/yew_project/)
 
 ---
 
 ## Executive Summary
 
-This project maps Pacific yew habitat suitability across British Columbia's Coastal Western Hemlock (CWH) zone using machine learning applied to satellite spectral embeddings. The analysis covers **45 study areas** spanning ~450 km² at 10 m resolution, integrating yew presence data from iNaturalist with Google Earth Engine satellite embeddings, BC forestry records, historical fire perimeters, and protected area boundaries.
+This project maps Pacific yew habitat suitability across British Columbia's Coastal Western Hemlock (CWH) zone using machine learning applied to satellite spectral embeddings. The analysis covers **85 study areas** spanning ~850 km² at 10 m resolution, integrating yew presence data from iNaturalist with Google Earth Engine satellite embeddings, BC forestry records, historical fire perimeters, and protected area boundaries.
 
 **Key findings:**
-- **~39,000 hectares** of high-probability yew habitat (P≥0.5) identified across 45 study tiles
+- **~49,248 hectares** of high-probability yew habitat (P≥0.5) identified across 85 study tiles
 - **~38,000 hectares** of yew habitat estimated destroyed by logging since 1920s in CWH zone
-- **Only 3.5% of modelled yew habitat (898 ha) falls inside protected areas** — 96.5% is unprotected and potentially at risk
-- Highest habitat concentrations in south-central Vancouver Island, Sunshine Coast, and mid-coast mainland fjords
+- **Only 4.6% of modelled yew habitat (2,244 ha) falls inside protected areas** — 95.4% is unprotected and potentially at risk
+- Highest habitat concentrations in south-central Vancouver Island, outer mid-coast (Blunden Harbour, Seaforth Channel), and north coast mainland fjords
 - XGBoost classifier achieves **AUC 0.9957** on validation data
 
 The interactive web map displays yew probability overlays with forestry/logging status, historical fire boundaries, and protected areas, allowing users to report field observations via GitHub.
@@ -23,10 +23,10 @@ The interactive web map displays yew probability overlays with forestry/logging 
 
 ## 1. Study Areas
 
-**Coverage:** 45 study tiles (previously 15, expanded March 2026)  
+**Coverage:** 85 study tiles (expanded March 2026 from 45)  
 **Geographic extent:** Coastal British Columbia, 48.3°N–55.3°N  
 **Tile dimensions:** ~10 km × 10 km each (~100 km² per tile)  
-**Total analyzed area:** ~450 km² at 10 m pixel resolution  
+**Total analyzed area:** ~850 km² at 10 m pixel resolution  
 **Biogeoclimatic zones:** Primarily CWH (Coastal Western Hemlock), with representation of CDF, MH, ESSF, and CMA zones
 
 ### Study tile coverage (by region)
@@ -153,7 +153,7 @@ Protected areas highlight where yew habitat may be conserved from future logging
 
 ### Map features
 
-**Yew probability overlay (45 tiles):**
+**Yew probability overlay (85 tiles):**
 - Transparent PNG tiles draped over satellite imagery
 - Color scale: green (0.02–0.33) → yellow (0.33–0.50) → orange (0.50–0.83) → magenta (0.83–1.0)
 - Pixels with P<0.02 are fully transparent (noise floor)
@@ -181,7 +181,7 @@ Protected areas highlight where yew habitat may be conserved from future logging
 
 **Logging impact statistics tab:**
 - By-zone and by-subzone estimates of yew habitat destroyed by logging
-- Covers 42 of 45 tiles (~4,200 km²) across CWH zone
+- Covers 78 of 85 tiles (~7,800 km²) across CWH zone
 - Methodology: yew prevalence in old-growth ×  (old-growth + logged area) − current remaining
 
 ---
@@ -190,49 +190,49 @@ Protected areas highlight where yew habitat may be conserved from future logging
 
 ### 5.1 Habitat extent by tile (top 10)
 
-| Tile | Region | Area P≥0.5 (ha) | Mean prob | Notes |
-|---|---|---|---|---|
-| Stave Lake | Lower Fraser | 4,357 | 0.362 | CWHvm1/dm, logged valleys + intact slopes |
-| Alberni Valley | Central VI | 4,408 | 0.363 | CWHmm1/vm2, Somass River drainage |
-| Howe Sound East | South mainland | 3,962 | 0.261 | Montane CWH, Squamish River |
-| Rivers Inlet | Mid-coast | 3,114 | 0.188 | Outer coast CWH, hypermaritime |
-| Port Renfrew | SW VI | 2,181 | 0.164 | Pacific Rim old-growth |
-| Campbell River Uplands | Central VI | 2,184 | 0.172 | North-central VI CWH |
-| Port Hardy Forest | North VI | 2,097 | 0.152 | Valley-bottom CWH |
-| Clayoquot Sound | West VI | 1,773 | 0.171 | UNESCO biosphere reserve |
-| Sooke Hills | South VI | 1,673 | 0.159 | Montane CWH, Victoria watershed |
-| Cowichan Uplands | South VI | 1,652 | 0.173 | Lower-elevation CWH, mixed age |
+| Tile | Region | Area P≥0.5 (ha) | Notes |
+|---|---|---|---|
+| Blunden Harbour | North VI / inner coast | 4,609 | Outer coast CWH, hypermaritime |
+| Alberni Valley | Central VI | 4,287 | CWHmm1/vm2, Somass River drainage |
+| Seaforth Channel | Central coast | 3,188 | Mid-coast fjord, intact old-growth |
+| Rivers Inlet | Mid-coast | 3,114 | Outer coast CWH, hypermaritime |
+| Bella Bella Forest | Central coast | 2,266 | Outer coast CWH, Heiltsuk territory |
+| Calvert Island | Central coast | 2,214 | Outer coast CWH, isolated island |
+| Port Hardy Forest | North VI | 2,081 | Valley-bottom CWH |
+| Port Renfrew | SW VI | 1,481 | Pacific Rim old-growth |
+| Sooke Hills | South VI | 1,227 | Montane CWH, Victoria watershed |
+| Milbanke Sound | Central coast | 1,085 | Outer coast CWH |
 
-**Total across 45 tiles:** ~39,000 ha with P≥0.5 (390 km²)
+**Total across 85 tiles:** ~49,248 ha with P≥0.5 (492 km²)
 
 ### 5.2 Protected areas coverage of yew habitat
 
 Analysis script: `scripts/analysis/yew_in_protected_areas.py`  
 Protected areas data: BC WFS (930 provincial features) + OSM national parks  
-Threshold: P≥0.5 after logging suppression (25,747 ha total)
+Threshold: P≥0.5 after logging suppression (49,248 ha total, 85 tiles)
 
 | Protection status | ha | % of yew habitat |
 |---|---|---|
-| **Inside protected areas** | **898** | **3.5%** |
-| Outside protected areas | 24,849 | 96.5% |
+| **Inside protected areas** | **2,244** | **4.6%** |
+| Outside protected areas | 47,003 | 95.4% |
 
 **By designation:**
 | Designation | ha | % |
 |---|---|---|
-| Provincial Park (Class A) | 881.6 | 3.4% |
-| Ecological Reserve | 16.4 | 0.1% |
-| Protected Area / Conservancy | 0.2 | <0.1% |
+| Provincial Park (Class A) | 2,219.5 | 4.5% |
+| Ecological Reserve | 16.4 | 0.0% |
+| Protected Area / Conservancy | 6.0 | 0.0% |
 
 **Tiles with most yew inside parks:**
 | Tile | Yew ha | Protected ha | % |
 |---|---|---|---|
+| Whistler Callaghan | 1,007 | 761 | 75.6% |
+| Theodosia Inlet | 639 | 410 | 64.1% |
+| Harrison Lowlands | 85 | 62 | 73.3% |
 | Port Renfrew | 1,481 | 335 | 22.6% |
 | Gold River Forest | 799 | 254 | 31.8% |
-| Carmanah-Walbran | 294 | 89 | 30.4% |
-| Stave Lake | 902 | 86 | 9.5% |
-| Clayoquot Sound | 535 | 48 | 8.9% |
 
-Notably, the tiles with the largest total yew habitat — Alberni Valley (4,287 ha), Rivers Inlet (3,114 ha), Port Hardy (2,081 ha) — have **0% inside protected areas**.
+Notably, the tiles with the largest total yew habitat — Blunden Harbour (4,609 ha), Alberni Valley (4,287 ha), Seaforth Channel (3,188 ha), Rivers Inlet (3,114 ha) — have **0% inside protected areas**.
 
 ---
 

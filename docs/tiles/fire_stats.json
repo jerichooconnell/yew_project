@@ -3,66 +3,66 @@
     {
       "decade_start": 1910,
       "decade_label": "1910s",
-      "fire_years_in_study": 2,
-      "burned_ha": 2057.5,
-      "yew_suppressed_ha": 76.23,
+      "fire_years_in_study": 3,
+      "burned_ha": 2250.5,
+      "yew_suppressed_ha": 77.22,
       "mean_modifier": 0.847
     },
     {
       "decade_start": 1920,
       "decade_label": "1920s",
-      "fire_years_in_study": 17,
-      "burned_ha": 8364.0,
-      "yew_suppressed_ha": 210.09,
-      "mean_modifier": 0.797
+      "fire_years_in_study": 27,
+      "burned_ha": 18566.8,
+      "yew_suppressed_ha": 238.7,
+      "mean_modifier": 0.801
     },
     {
       "decade_start": 1930,
       "decade_label": "1930s",
-      "fire_years_in_study": 16,
-      "burned_ha": 7328.6,
-      "yew_suppressed_ha": 182.26,
+      "fire_years_in_study": 22,
+      "burned_ha": 9841.3,
+      "yew_suppressed_ha": 217.14,
       "mean_modifier": 0.717
     },
     {
       "decade_start": 1940,
       "decade_label": "1940s",
-      "fire_years_in_study": 10,
-      "burned_ha": 1800.8,
-      "yew_suppressed_ha": 44.44,
-      "mean_modifier": 0.641
+      "fire_years_in_study": 15,
+      "burned_ha": 2350.9,
+      "yew_suppressed_ha": 52.03,
+      "mean_modifier": 0.646
     },
     {
       "decade_start": 1950,
       "decade_label": "1950s",
-      "fire_years_in_study": 12,
-      "burned_ha": 13657.1,
-      "yew_suppressed_ha": 222.67,
-      "mean_modifier": 0.563
+      "fire_years_in_study": 17,
+      "burned_ha": 16665.9,
+      "yew_suppressed_ha": 288.54,
+      "mean_modifier": 0.565
     },
     {
       "decade_start": 1960,
       "decade_label": "1960s",
-      "fire_years_in_study": 7,
-      "burned_ha": 6956.5,
-      "yew_suppressed_ha": 253.13,
-      "mean_modifier": 0.474
+      "fire_years_in_study": 9,
+      "burned_ha": 7112.7,
+      "yew_suppressed_ha": 259.08,
+      "mean_modifier": 0.476
     },
     {
       "decade_start": 1970,
       "decade_label": "1970s",
-      "fire_years_in_study": 3,
-      "burned_ha": 1454.3,
-      "yew_suppressed_ha": 58.7,
-      "mean_modifier": 0.382
+      "fire_years_in_study": 5,
+      "burned_ha": 1534.1,
+      "yew_suppressed_ha": 60.53,
+      "mean_modifier": 0.381
     },
     {
       "decade_start": 1980,
       "decade_label": "1980s",
-      "fire_years_in_study": 1,
-      "burned_ha": 191.5,
-      "yew_suppressed_ha": 2.85,
-      "mean_modifier": 0.29
+      "fire_years_in_study": 3,
+      "burned_ha": 565.4,
+      "yew_suppressed_ha": 12.79,
+      "mean_modifier": 0.312
     },
     {
       "decade_start": 2000,
@@ -75,26 +75,26 @@
     {
       "decade_start": 2010,
       "decade_label": "2010s",
-      "fire_years_in_study": 1,
-      "burned_ha": 2512.2,
-      "yew_suppressed_ha": 21.91,
-      "mean_modifier": 0.113
+      "fire_years_in_study": 3,
+      "burned_ha": 3828.1,
+      "yew_suppressed_ha": 23.04,
+      "mean_modifier": 0.083
     },
     {
       "decade_start": 2020,
       "decade_label": "2020s",
-      "fire_years_in_study": 2,
-      "burned_ha": 816.0,
-      "yew_suppressed_ha": 7.61,
+      "fire_years_in_study": 5,
+      "burned_ha": 2280.0,
+      "yew_suppressed_ha": 32.23,
       "mean_modifier": 0.008
     }
   ],
-  "total_yew_suppressed_ha": 1102.08,
-  "total_burned_ha": 46443.9,
+  "total_yew_suppressed_ha": 1283.49,
+  "total_burned_ha": 66301.1,
   "modifier_formula": "(2024 - fire_year) / 124, clamped [0, 1]",
   "lower_mainland_tiles": [
-    "stave_lake",
-    "chilliwack_uplands"
+    "chilliwack_uplands",
+    "stave_lake"
   ],
   "lower_mainland_note": "Additional -0.2 suppression applied outside protected areas"
 }
