@@ -30,9 +30,8 @@ from shapely.geometry import (
     MultiPolygon,
     Polygon,
     mapping,
-    shape,
 )
-from shapely.ops import unary_union
+from shapely.validation import make_valid
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT_PATH = ROOT / "docs" / "tiles" / "park_contours.geojson"
@@ -52,13 +51,18 @@ BC_WFS = (
 
 # ── Federal parks to fetch from OSM Overpass ──────────────────────────────────
 # Each entry: (name, designation, bbox as (south, west, north, east))
+# For parks that are container relations (with subarea members), list explicit
+# OSM relation IDs for the unit sub-relations under "unit_ids" instead of a bbox.
 FEDERAL_PARKS = [
     ("Gwaii Haanas National Park Reserve and Haida Heritage Site",
      "National Park Reserve",
      (51.5, -132.5, 53.3, -130.5)),
+    # Pacific Rim is a container relation — use unit sub-relation IDs directly
+    # IDs: 2017388 (Broken Group), 2017389 (Long Beach), 2100172 (West Coast Trail)
     ("Pacific Rim National Park Reserve of Canada",
      "National Park Reserve",
-     (48.6, -126.2, 49.55, -125.0)),
+     None,  # bbox=None signals use of unit_ids below
+     [2017388, 2017389, 2100172]),
     ("Gulf Islands National Park Reserve of Canada",
      "National Park Reserve",
      (48.55, -123.7, 48.95, -123.0)),
@@ -90,106 +94,110 @@ def fetch_bc_parks():
     return gdf
 
 
-def osm_relation_to_polygon(element):
+def build_polys_from_relation(element):
     """
-    Convert an OSM relation element (from Overpass `out geom`) to a Shapely
-    geometry by assembling member ways into polygon rings.
-    Returns a Polygon or MultiPolygon, or None on failure.
+    Assemble Shapely Polygons from a single OSM relation element.
+    Uses make_valid to handle self-intersections; returns list of Polygons.
     """
-    if element.get("type") != "relation":
-        return None
-
-    outer_rings = []
-    inner_rings = []
-
+    outer_coords, inner_coords = [], []
     for member in element.get("members", []):
+        pts = member.get("geometry", [])
+        if len(pts) < 3:
+            continue
+        coords = [(p["lon"], p["lat"]) for p in pts]
         role = member.get("role", "outer")
-        geom_pts = member.get("geometry", [])
-        if len(geom_pts) < 2:
-            continue
-        coords = [(p["lon"], p["lat"]) for p in geom_pts]
-        if len(coords) < 3:
-            continue
-        if role == "inner":
-            inner_rings.append(coords)
-        else:
-            outer_rings.append(coords)
-
-    if not outer_rings:
-        return None
+        (inner_coords if role == "inner" else outer_coords).append(coords)
 
     polys = []
-    for outer in outer_rings:
-        holes = []
-        # Simple heuristic: assign all inner rings (will improve if needed)
+    for outer in outer_coords:
         try:
             shell = Polygon(outer)
-            for inner in inner_rings:
-                hole = Polygon(inner)
-                if shell.contains(hole):
-                    holes.append(inner)
-            polys.append(Polygon(outer, holes))
+            holes = [h for h in inner_coords if shell.contains(Polygon(h))]
+            p = make_valid(Polygon(outer, holes))
+            if p.is_empty:
+                continue
+            if p.geom_type == "Polygon":
+                polys.append(p)
+            elif p.geom_type == "MultiPolygon":
+                polys.extend(p.geoms)
         except Exception:
             continue
+    return polys
 
-    if not polys:
+
+def elems_to_geojson_feature(elems, name, designation):
+    """
+    Convert a list of OSM relation elements to a single GeoJSON Feature.
+    Each element is assembled into polygons; all polygons are combined as
+    a MultiPolygon (no union, so topology issues are avoided).
+    Returns the Feature dict or None.
+    """
+    all_polys = []
+    for elem in elems:
+        for p in build_polys_from_relation(elem):
+            s = p.simplify(SIMPLIFY_TOL, preserve_topology=True)
+            if not s.is_empty and s.geom_type == "Polygon":
+                all_polys.append(s)
+
+    if not all_polys:
         return None
-    if len(polys) == 1:
-        return polys[0]
-    return MultiPolygon(polys)
+
+    geom = MultiPolygon(all_polys) if len(all_polys) > 1 else all_polys[0]
+    print(f"    ✓ {name}  ({geom.geom_type}, {len(all_polys)} parts)")
+    return {
+        "type": "Feature",
+        "geometry": mapping(geom),
+        "properties": {
+            "PROTECTED_LANDS_NAME": name,
+            "PROTECTED_LANDS_DESIGNATION": "NATIONAL PARK",
+            "PARK_CLASS": designation,
+            "SOURCE": "OpenStreetMap",
+        },
+    }
 
 
-def fetch_federal_park(name, designation, bbox):
+def fetch_federal_park(name, designation, bbox, unit_ids=None):
     """
-    Query Overpass for relations with boundary=national_park in a small bbox.
-    Returns a (geojson_feature, name, designation) tuple or None.
+    Fetch an OSM national park and return a GeoJSON Feature.
+
+    If unit_ids is given (list of OSM relation IDs), those sub-relations are
+    fetched directly — this handles parks like Pacific Rim that are container
+    relations whose sub-area members carry the actual way geometry.
+
+    Otherwise, a bbox query is used.
     """
-    s, w, n, e = bbox
-    q = (
-        f"[out:json][timeout:30];"
-        f"(relation[\"boundary\"=\"national_park\"]({s},{w},{n},{e});"
-        f"relation[\"protection_title\"~\"National Park\"]({s},{w},{n},{e}););"
-        f"out geom;"
-    )
+    if unit_ids:
+        ids_str = ",".join(str(i) for i in unit_ids)
+        q = f"[out:json][timeout:60];relation(id:{ids_str});out geom;"
+        timeout = 65
+    else:
+        s, w, n, e = bbox
+        q = (
+            f"[out:json][timeout:40];"
+            f"(relation[\"boundary\"=\"national_park\"]({s},{w},{n},{e});"
+            f"relation[\"protection_title\"~\"National Park\"]({s},{w},{n},{e}););"
+            f"out geom;"
+        )
+        timeout = 45
+
     try:
-        r = requests.post(OVERPASS_URL, data={"data": q}, timeout=35)
+        r = requests.post(OVERPASS_URL, data={"data": q}, timeout=timeout)
         if r.status_code != 200:
             print(f"    ✗ {name}: HTTP {r.status_code}")
             return None
         elems = r.json().get("elements", [])
         if not elems:
-            print(f"    ✗ {name}: no OSM relations found in bbox")
+            print(f"    ✗ {name}: no OSM relations found")
             return None
-
-        # Pick the best matching element (prefer exact name match)
-        best = None
-        for el in elems:
-            el_name = el.get("tags", {}).get("name", "")
-            if name.lower().split()[0] in el_name.lower():
-                best = el
-                break
-        if best is None:
-            best = elems[0]  # fallback to first
-
-        geom = osm_relation_to_polygon(best)
-        if geom is None or geom.is_empty:
-            print(f"    ✗ {name}: geometry assembly failed")
-            return None
-
-        tags = best.get("tags", {})
-        feat = {
-            "type": "Feature",
-            "geometry": mapping(geom),
-            "properties": {
-                "PROTECTED_LANDS_NAME": name,
-                "PROTECTED_LANDS_DESIGNATION": "NATIONAL PARK",
-                "PARK_CLASS": designation,
-                "OFFICIAL_AREA_HA": tags.get("Wikipedia", ""),
-                "SOURCE": "OpenStreetMap",
-            },
-        }
-        print(f"    ✓ {name}  ({geom.geom_type}, {geom.area*1e4:.0f} km² approx)")
-        return feat
+        if not unit_ids:
+            # Pick best-matching element from bbox result
+            best = next(
+                (el for el in elems
+                 if name.lower().split()[0] in el.get("tags", {}).get("name", "").lower()),
+                elems[0]
+            )
+            elems = [best]
+        return elems_to_geojson_feature(elems, name, designation)
     except Exception as exc:
         print(f"    ✗ {name}: {exc}")
         return None
@@ -227,11 +235,14 @@ def main():
     # ── 2. Federal parks (OSM) ──────────────────────────────────────────────
     print("\n  Fetching federal parks from OpenStreetMap Overpass API…")
     federal_features = []
-    for name, designation, bbox in FEDERAL_PARKS:
-        feat = fetch_federal_park(name, designation, bbox)
+    for entry in FEDERAL_PARKS:
+        name, designation = entry[0], entry[1]
+        bbox = entry[2]
+        unit_ids = entry[3] if len(entry) > 3 else None
+        feat = fetch_federal_park(name, designation, bbox, unit_ids)
         if feat:
             federal_features.append(feat)
-        time.sleep(1)  # be polite to Overpass
+        time.sleep(2)
 
     print(f"\n  Federal parks fetched: {len(federal_features)}/{len(FEDERAL_PARKS)}")
 
