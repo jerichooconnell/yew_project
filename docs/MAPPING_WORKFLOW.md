@@ -113,7 +113,7 @@ Embeddings are pre-computed by Google using a deep neural network trained on glo
 |---|---|---|---|
 | Water/non-forest | BCLCS water/urban/agriculture | ×0.00 | Yew absent |
 | Logged <40 yr | Stand age <40 yr | ×0.00 | Young second-growth, yew absent |
-| Logged 40–80 yr | Stand age 40–80 yr | ×0.50 | Maturing second-growth, partial recovery |
+| Logged 40–80 yr | Stand age 40–80 yr | ×0.20 | Second-growth, yew recovery very slow |
 | Forest 80–150 yr | Stand age 80–150 yr | ×0.35 | Established but regenerating; yew present but sparse |
 | Old-growth >150 yr | Stand age >150 yr | ×1.00 | No suppression |
 | Alpine/barren | Designated alpine, rock/ice | ×0.00 | Above treeline, yew absent |

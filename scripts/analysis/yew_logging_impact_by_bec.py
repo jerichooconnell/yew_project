@@ -211,9 +211,9 @@ LOG_LABELS = {
 LOG_SUPPRESS = {
     1: 0.00,
     2: 0.00,
-    3: 0.00,   # changed from 0.08 — <40yr forests now ×0
-    4: 0.50,
-    5: 0.35,   # changed from 1.00 — 80-150yr maturing forest
+    3: 0.00,   # <40yr forests → ×0
+    4: 0.20,   # changed from 0.50 — 40-80yr now more suppressed
+    5: 0.35,   # 80-150yr maturing forest
     6: 0.00,
     7: 1.00,   # new: old-growth >150yr — unchanged
 }

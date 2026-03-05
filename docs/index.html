@@ -335,7 +335,7 @@
         1. Yew prevalence rate = fraction of old-growth (&gt;80 yr) pixels with P&ge;0.5<br>
         2. Est. original yew = prevalence &times; (old-growth + logged area)<br>
         3. Destroyed (logging) = original &minus; current after logging suppression<br>
-        4. Logging suppression: &lt;40yr &rarr; &times;0, <b>40-80yr &rarr; &times;0.50</b>, <b>80-150yr &rarr; &times;0.35</b>, &gt;150yr &rarr; &times;1<br>
+        4. Logging suppression: &lt;40yr &rarr; &times;0, <b>40-80yr &rarr; &times;0.20</b>, <b>80-150yr &rarr; &times;0.35</b>, &gt;150yr &rarr; &times;1<br>
         5. Fire suppression = yew pixels driven below P=0.5 threshold by fire-date modifier [(2024&minus;fire_year)/124]<br>
         6. Data: XGBoost model on 2024 GEE embeddings, BC VRI 2024, BC BEC zones, BC Historical Fire Perimeters
       </div>
@@ -402,8 +402,8 @@
     <div class="legend-row"><span class="legend-swatch" style="background:rgba(180,20,20,0.82)"></span> 0–10 yr (bare / logged)</div>
     <div class="legend-row"><span class="legend-swatch" style="background:rgba(230,80,10,0.82)"></span> 10–30 yr</div>
     <div class="legend-row"><span class="legend-swatch" style="background:rgba(240,180,20,0.82)"></span> 40–80 yr</div>
-    <div class="legend-row"><span class="legend-swatch" style="background:rgba(40,155,50,0.82)"></span> 80–150 yr</div>
-    <div class="legend-row"><span class="legend-swatch" style="background:rgba(10,70,20,0.82)"></span> 150+ yr (old-growth)</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(180,220,70,0.82)"></span> 80–150 yr</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(20,100,40,0.82)"></span> 150+ yr (old-growth)</div>
     <div class="legend-row"><span class="legend-swatch" style="background:rgba(0,0,0,0);border:1px solid #ccc"></span> Water / alpine</div>
     <hr style="margin:6px 0">
   </div>
@@ -413,7 +413,7 @@
     <div class="legend-row"><span class="legend-swatch" style="background:rgba(220,50,50,0.67)"></span> Logged &lt; 20 yr</div>
     <div class="legend-row"><span class="legend-swatch" style="background:rgba(230,120,30,0.59)"></span> Logged 20–40 yr</div>
     <div class="legend-row"><span class="legend-swatch" style="background:rgba(220,200,50,0.43)"></span> Logged 40–80 yr</div>
-    <div class="legend-row"><span class="legend-swatch" style="background:rgba(100,200,100,0.27)"></span> Forest 80–150 yr</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:rgba(180,220,70,0.27)"></span> Forest 80–150 yr</div>
     <div class="legend-row"><span class="legend-swatch" style="background:rgba(20,100,40,0.27)"></span> Old-growth &gt; 150 yr</div>
     <div class="legend-row"><span class="legend-swatch" style="background:rgba(175,155,125,0.63)"></span> Alpine / barren</div>
     <hr style="margin:6px 0">
@@ -556,8 +556,9 @@ function initTiles() {
       forestryOverlays[t.slug] = logOverlay;
     }
     // Forest-age overlay (not added to map by default)
-    if (t.age_png) {
-      const ageOverlay = L.imageOverlay('tiles/' + t.age_png, bounds, {
+    const agePng = t.age_png || t.logging_png;
+    if (agePng) {
+      const ageOverlay = L.imageOverlay('tiles/' + agePng, bounds, {
         opacity: 0.85,
         interactive: false,
       });
@@ -989,8 +990,8 @@ function renderCWHFireChart(data) {
 }
 
 // ── Logging Impact Statistics ─────────────────────────────────────────────────
-// Suppression factors: <40yr→×0, 40-80yr→×0.50, 80-150yr→×0.35, >150yr→×1
-// orig = yr × (og+l2+l3+l4); cur from analysis (yr×(og7×1 + og5×0.35 + l4×0.50)); dest = orig-cur
+// Suppression factors: <40yr→×0, 40-80yr→×0.20, 80-150yr→×0.35, >150yr→×1
+// orig = yr × (og+l2+l3+l4); cur from analysis (yr×(og7×1 + og5×0.35 + l4×0.20)); dest = orig-cur
 // og = og5+og7 (all ≥80yr); og5 = 80-150yr (×0.35); og7 = >150yr (×1.00)
 // fire = yew ha suppressed below P=0.5 threshold by fire-date modifier
 const BEC_STATS = [

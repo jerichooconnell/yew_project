@@ -61,9 +61,9 @@ LOG_RGBA = {
     2: (220, 50,  50,  170),   # logged  <20 yr
     3: (230, 120, 30,  150),   # logged 20–40 yr
     4: (220, 200, 50,  110),   # logged 40–80 yr
-    5: (100, 200, 100,  70),   # forest 80–150 yr
+    5: (180, 220,  70,  70),   # forest 80–150 yr  (lime/chartreuse)
     6: (175, 155, 125, 160),   # alpine / barren (rock, rubble, non-treed veg)
-    7: (20,  100,  40,  70),   # old-growth >150 yr
+    7: (20,  100,  40,  70),   # old-growth >150 yr (deep forest green)
 }
 LOG_LABELS = {
     1: 'Water / non-forest',
@@ -80,7 +80,7 @@ LOG_HEX = {
     2: '#dc3232',
     3: '#e6781e',
     4: '#dcc832',
-    5: '#64c864',
+    5: '#b4dc46',
     6: '#af9b7d',
     7: '#146428',
 }
@@ -613,7 +613,7 @@ LOG_SUPPRESS = {
     1: 0.00,   # water / non-forest → zero out completely
     2: 0.00,   # logged  <20 yr     → zero out (bare ground, no yew)
     3: 0.00,   # logged 20–40 yr    → zero out (young second-growth, yew absent)
-    4: 0.50,   # logged 40–80 yr    → moderately suppressed
+    4: 0.20,   # logged 40–80 yr    → heavily suppressed (yew slow to recover)
     5: 0.35,   # forest 80–150 yr   → partial suppression (maturing second-growth)
     6: 0.00,   # alpine / barren    → zero out (trees don't grow here)
     7: 1.00,   # old-growth >150 yr → unchanged
