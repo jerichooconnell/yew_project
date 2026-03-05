@@ -319,7 +319,7 @@
       <p>
         Estimated yew habitat destroyed by logging in each BEC subzone,
         based on yew prevalence in surviving old-growth forest (P&ge;0.5).
-        Covers 42 of 45 tiles (~4,200 km²) across the CWH zone.
+        Covers 78 of 85 tiles (~7,800 km²) across the CWH zone.
       </p>
 
       <div class="stats-toggle">
@@ -1004,29 +1004,39 @@ function renderCWHFireChart(data) {
 // og = og5+og7 (all ≥80yr); og5 = 80-150yr (×0.35); og7 = >150yr (×1.00)
 // fire = yew ha suppressed below P=0.5 threshold by fire-date modifier
 const BEC_STATS = [
-  {s:"CDFmm",z:"CDF",og:4184,og5:4116,og7:69,log:1109,l2:241,l3:382,l4:486,yr:0.6589,orig:3487,cur:48,dest:3440,fire:0},
-  {s:"CMAunp",z:"CMA",og:14555,og5:4654,og7:9901,log:1266,l2:0,l3:2,l4:1264,yr:0.0103,orig:162,cur:130,dest:32,fire:0},
-  {s:"CWHdm",z:"CWH",og:23394,og5:14616,og7:8778,log:11410,l2:1430,l3:2535,l4:7445,yr:0.3205,orig:11155,cur:1313,dest:9841,fire:106},
-  {s:"CWHds1",z:"CWH",og:2441,og5:1242,og7:1198,log:3115,l2:801,l3:692,l4:1622,yr:0.0374,orig:208,cur:36,dest:172,fire:1},
-  {s:"CWHds2",z:"CWH",og:1628,og5:684,og7:944,log:1716,l2:968,l3:24,l4:724,yr:0.0249,orig:83,cur:40,dest:43,fire:12},
-  {s:"CWHmm1",z:"CWH",og:1779,og5:494,og7:1285,log:8407,l2:838,l3:2053,l4:5516,yr:0.2682,orig:2732,cur:327,dest:2405,fire:58},
-  {s:"CWHmm2",z:"CWH",og:3224,og5:1065,og7:2159,log:18766,l2:1709,l3:6998,l4:10059,yr:0.2855,orig:6278,cur:669,dest:5609,fire:12},
-  {s:"CWHms1",z:"CWH",og:3101,og5:318,og7:2782,log:1427,l2:407,l3:118,l4:902,yr:0.0226,orig:102,cur:60,dest:42,fire:20},
-  {s:"CWHms2",z:"CWH",og:2086,og5:356,og7:1730,log:3260,l2:119,l3:819,l4:2322,yr:0.018,orig:96,cur:33,dest:63,fire:1},
-  {s:"CWHvh1",z:"CWH",og:2062,og5:826,og7:1236,log:1395,l2:11,l3:497,l4:887,yr:0.5575,orig:1927,cur:620,dest:1307,fire:0},
-  {s:"CWHvh2",z:"CWH",og:41046,og5:1368,og7:39678,log:683,l2:127,l3:467,l4:89,yr:0.1283,orig:5354,cur:5273,dest:81,fire:0},
-  {s:"CWHvm1",z:"CWH",og:59784,og5:8983,og7:50801,log:35613,l2:4125,l3:9920,l4:21568,yr:0.1383,orig:13193,cur:6261,dest:6932,fire:72},
-  {s:"CWHvm2",z:"CWH",og:33205,og5:4322,og7:28883,log:8067,l2:445,l3:1716,l4:5906,yr:0.1332,orig:5499,cur:3982,dest:1517,fire:45},
-  {s:"CWHws2",z:"CWH",og:6032,og5:1379,og7:4653,log:2244,l2:1227,l3:34,l4:983,yr:0.0316,orig:262,cur:148,dest:113,fire:2},
-  {s:"CWHxm1",z:"CWH",og:13137,og5:7917,og7:5220,log:17826,l2:3078,l3:5130,l4:9618,yr:0.4163,orig:12890,cur:1525,dest:11366,fire:102},
-  {s:"CWHxm2",z:"CWH",og:14437,og5:6850,og7:7587,log:46325,l2:11447,l3:8176,l4:26702,yr:0.2797,orig:16994,cur:1870,dest:15124,fire:67},
-  {s:"ESSFmc",z:"ESSF",og:81,og5:0,og7:81,log:52,l2:29,l3:0,l4:23,yr:0.0,orig:0,cur:0,dest:0,fire:0},
-  {s:"ESSFmw",z:"ESSF",og:1576,og5:459,og7:1117,log:343,l2:261,l3:0,l4:82,yr:0.0053,orig:10,cur:6,dest:4,fire:0},
-  {s:"MHmm1",z:"MH",og:20575,og5:2867,og7:17708,log:3100,l2:134,l3:514,l4:2452,yr:0.149,orig:3527,cur:2961,dest:566,fire:0},
-  {s:"MHmm2",z:"MH",og:13696,og5:3811,og7:9884,log:1954,l2:240,l3:0,l4:1714,yr:0.0073,orig:114,cur:94,dest:20,fire:2},
-  {s:"MHmmp",z:"MH",og:83,og5:0,og7:83,log:0,l2:0,l3:0,l4:0,yr:0.0,orig:0,cur:0,dest:0,fire:0},
-  {s:"MHwh1",z:"MH",og:968,og5:123,og7:845,log:1,l2:0,l3:0,l4:1,yr:0.0006,orig:1,cur:1,dest:0,fire:0},
-  {s:"MHwhp",z:"MH",og:60,og5:0,og7:60,log:1,l2:0,l3:0,l4:1,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"BAFAun",z:"BAF",og:0,og5:0,og7:0,log:0,l2:0,l3:0,l4:0,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"CDFmm",z:"CDF",og:6048,og5:5834,og7:214,log:4152,l2:476,l3:1131,l4:2545,yr:0.5667,orig:5780,cur:85,dest:5695,fire:0},
+  {s:"CMAun",z:"CMA",og:103,og5:46,og7:57,log:135,l2:0,l3:0,l4:135,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"CMAunp",z:"CMA",og:27004,og5:8170,og7:18834,log:2124,l2:12,l3:10,l4:2102,yr:0.0085,orig:249,cur:209,dest:40,fire:2},
+  {s:"CWHdm",z:"CWH",og:35979,og5:22913,og7:13066,log:16368,l2:2714,l3:3652,l4:10002,yr:0.2712,orig:14198,cur:1842,dest:12356,fire:122},
+  {s:"CWHds1",z:"CWH",og:3446,og5:1356,og7:2090,log:4863,l2:1435,l3:978,l4:2451,yr:0.0499,orig:414,cur:89,dest:325,fire:4},
+  {s:"CWHds2",z:"CWH",og:3079,og5:684,og7:2395,log:1807,l2:1058,l3:25,l4:724,yr:0.0634,orig:310,cur:194,dest:115,fire:13},
+  {s:"CWHmm1",z:"CWH",og:1779,og5:494,og7:1285,log:8406,l2:838,l3:2053,l4:5516,yr:0.2682,orig:2732,cur:327,dest:2405,fire:58},
+  {s:"CWHmm2",z:"CWH",og:3224,og5:1065,og7:2159,log:18791,l2:1709,l3:7003,l4:10079,yr:0.2855,orig:6286,cur:669,dest:5617,fire:12},
+  {s:"CWHms1",z:"CWH",og:7601,og5:638,og7:6964,log:3209,l2:1046,l3:583,l4:1581,yr:0.1305,orig:1410,cur:966,dest:444,fire:37},
+  {s:"CWHms2",z:"CWH",og:2793,og5:433,og7:2360,log:3477,l2:119,l3:998,l4:2360,yr:0.0267,orig:167,cur:70,dest:97,fire:1},
+  {s:"CWHvh1",z:"CWH",og:18122,og5:1122,og7:17000,log:6616,l2:1945,l3:2208,l4:2462,yr:0.4312,orig:10667,cur:7250,dest:3418,fire:0},
+  {s:"CWHvh2",z:"CWH",og:128520,og5:6873,og7:121647,log:3682,l2:1508,l3:1644,l4:530,yr:0.1268,orig:16768,cur:15863,dest:905,fire:1},
+  {s:"CWHvm1",z:"CWH",og:99890,og5:14844,og7:85045,log:82746,l2:16730,l3:26270,l4:39746,yr:0.1052,orig:19209,cur:8391,dest:10818,fire:74},
+  {s:"CWHvm2",z:"CWH",og:57379,og5:8108,og7:49271,log:14434,l2:2612,l3:3236,l4:8586,yr:0.0902,orig:6475,cur:4554,dest:1921,fire:50},
+  {s:"CWHws2",z:"CWH",og:14080,og5:2694,og7:11385,log:2654,l2:1337,l3:37,l4:1280,yr:0.0276,orig:462,cur:345,dest:117,fire:5},
+  {s:"CWHxm1",z:"CWH",og:18236,og5:9702,og7:8533,log:20737,l2:3467,l3:5668,l4:11602,yr:0.3218,orig:12541,cur:1583,dest:10958,fire:103},
+  {s:"CWHxm2",z:"CWH",og:14528,og5:6924,og7:7604,log:46485,l2:11485,l3:8180,l4:26821,yr:0.2782,orig:16973,cur:1873,dest:15100,fire:68},
+  {s:"ESSFmc",z:"ESS",og:81,og5:0,og7:81,log:52,l2:29,l3:0,l4:23,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"ESSFmw",z:"ESS",og:2058,og5:466,og7:1592,log:419,l2:337,l3:0,l4:82,yr:0.005,orig:12,cur:8,dest:4,fire:0},
+  {s:"ESSFmw2",z:"ESS",og:3659,og5:231,og7:3428,log:1173,l2:972,l3:116,l4:85,yr:0.0926,orig:447,cur:329,dest:119,fire:3},
+  {s:"ESSFmwp",z:"ESS",og:0,og5:0,og7:0,log:0,l2:0,l3:0,l4:0,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"ESSFxv1",z:"ESS",og:1081,og5:522,og7:559,log:276,l2:265,l3:11,l4:0,yr:0.0036,orig:5,cur:1,dest:4,fire:0},
+  {s:"ESSFxvp",z:"ESS",og:32,og5:21,og7:11,log:0,l2:0,l3:0,l4:0,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"IDFdw",z:"IDF",og:409,og5:186,og7:224,log:321,l2:273,l3:22,l4:26,yr:0.0622,orig:45,cur:6,dest:40,fire:0},
+  {s:"IDFww",z:"IDF",og:116,og5:40,og7:76,log:74,l2:38,l3:21,l4:14,yr:0.0121,orig:2,cur:2,dest:1,fire:0},
+  {s:"IMAunp",z:"IMA",og:855,og5:327,og7:528,log:57,l2:55,l3:0,l4:2,yr:0.0125,orig:11,cur:8,dest:3,fire:0},
+  {s:"MHmm1",z:"MHm",og:36300,og5:5272,og7:31028,log:4661,l2:390,l3:598,l4:3674,yr:0.093,orig:3808,cur:3284,dest:523,fire:3},
+  {s:"MHmm2",z:"MHm",og:27976,og5:7195,og7:20780,log:2719,l2:240,l3:4,l4:2475,yr:0.0313,orig:960,cur:854,dest:106,fire:2},
+  {s:"MHmmp",z:"MHm",og:2278,og5:1255,og7:1023,log:481,l2:0,l3:0,l4:481,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"MHwh1",z:"MHw",og:1184,og5:123,og7:1061,log:1,l2:0,l3:0,l4:1,yr:0.0005,orig:1,cur:1,dest:0,fire:0},
+  {s:"MHwhp",z:"MHw",og:60,og5:0,og7:60,log:1,l2:0,l3:0,l4:1,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"MSdc2",z:"MSd",og:501,og5:8,og7:493,log:42,l2:42,l3:0,l4:0,yr:0.0019,orig:1,cur:1,dest:0,fire:0},
 ];
 
 function fmt(n) { return n.toLocaleString('en-CA', {maximumFractionDigits:0}); }
