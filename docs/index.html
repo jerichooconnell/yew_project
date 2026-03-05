@@ -877,15 +877,16 @@ function switchTab(tab) {
 
 // ── Fire Impact Tab ───────────────────────────────────────────────────────────
 function loadFireTab() {
-  // Load both JSON files in parallel
+  // Load all JSON files in parallel
   Promise.all([
     loadJSON('tiles/fire_stats.json').catch(e => null),
     loadJSON('tiles/cwh_fire_by_decade.json').catch(e => null),
-  ]).then(([statsData, cwhData]) => {
+    loadJSON('tiles/water_stats.json').catch(e => null),
+  ]).then(([statsData, cwhData, waterData]) => {
     if (statsData) { fireStats = statsData; renderFireChart(statsData); }
     else document.getElementById('fire-decade-chart').textContent =
       'fire_stats.json not found. Re-run export_tiles_for_web.py.';
-    if (cwhData) renderCWHFireChart(cwhData);
+    if (cwhData) renderCWHFireChart(cwhData, waterData);
     else document.getElementById('cwh-decade-chart').textContent =
       'cwh_fire_by_decade.json not found. Run scripts/analysis/cwh_fire_decades.py.';
   });
@@ -949,7 +950,7 @@ function renderFireChart(data) {
   `;
 }
 
-function renderCWHFireChart(data) {
+function renderCWHFireChart(data, waterData) {
   const decades = data.decades;
   const cwhHa   = data.cwh_area_ha;
   const totalBurned = data.total_burned_ha;
@@ -991,36 +992,51 @@ function renderCWHFireChart(data) {
   chart.innerHTML = html;
 
   // Compute total yew decline from all sources using BEC_STATS (global)
-  const totalOrig = BEC_STATS.reduce((s,r) => s + r.orig, 0);
-  const totalDest = BEC_STATS.reduce((s,r) => s + r.dest, 0);
-  const totalFire = BEC_STATS.reduce((s,r) => s + r.fire, 0);
-  const totalLost = totalDest + totalFire;
-  const pctLost   = totalOrig > 0 ? (totalLost / totalOrig * 100).toFixed(0) : '?';
-  const pctLog    = totalOrig > 0 ? (totalDest  / totalOrig * 100).toFixed(0) : '?';
-  const pctFire   = totalOrig > 0 ? (totalFire  / totalOrig * 100).toFixed(0) : '?';
+  const totalOrig  = BEC_STATS.reduce((s,r) => s + r.orig, 0);
+  const totalDest  = BEC_STATS.reduce((s,r) => s + r.dest, 0);
+  const totalFire  = BEC_STATS.reduce((s,r) => s + r.fire, 0);
+  const totalWater = waterData ? waterData.sensitivity_10m_ha : null;
+  const totalLost  = totalDest + totalFire + (totalWater || 0);
+  const pctLost    = totalOrig > 0 ? (totalLost  / totalOrig * 100).toFixed(0) : '?';
+  const pctLog     = totalOrig > 0 ? (totalDest   / totalOrig * 100).toFixed(0) : '?';
+  const pctFire    = totalOrig > 0 ? (totalFire   / totalOrig * 100).toFixed(0) : '?';
+  const pctWater   = (totalWater && totalOrig > 0) ? (totalWater / totalOrig * 100).toFixed(1) : '?';
 
-  const peakDecade = [...decades].sort((a,b) => b.burned_ha - a.burned_ha)[0];
+  const waterLine  = totalWater
+    ? `Water erosion risk (≤10 m of water): ${fmt(Math.round(totalWater))} ha (${pctWater}%)`
+    : '';
+
+  const peakDecade   = [...decades].sort((a,b) => b.burned_ha - a.burned_ha)[0];
   const latestDecade = [...decades].sort((a,b) => b.decade_start - a.decade_start)[0];
-  const fireDrop = peakDecade ? ((1 - latestDecade.burned_ha / peakDecade.burned_ha) * 100).toFixed(0) : '?';
+  const fireDrop     = peakDecade ? ((1 - latestDecade.burned_ha / peakDecade.burned_ha) * 100).toFixed(0) : '?';
 
   document.getElementById('cwh-notes').innerHTML = `
     <b>Total yew habitat decline (all sources, study tiles):</b><br>
     <span style="font-size:13px;">
-      <b style="color:#c0392b;">${pctLost}%</b> of estimated original yew habitat lost
-      — <b>${fmt(totalLost)} ha</b> of <b>${fmt(totalOrig)} ha</b> original
+      <b style="color:#c0392b;">${pctLost}%</b> of estimated original yew habitat lost or at risk
+      — <b>${fmt(Math.round(totalLost))} ha</b> of <b>${fmt(totalOrig)} ha</b> original
     </span><br>
-    <span style="color:#555;font-size:10px;">
-      Logging: ${fmt(totalDest)} ha (${pctLog}%) &nbsp;|&nbsp;
-      Fire suppression: ${fmt(totalFire)} ha (${pctFire}%) &nbsp;|&nbsp;
-      Current remaining: ${fmt(totalOrig - totalDest)} ha
-    </span><br><br>
+    <table style="border-collapse:collapse;font-size:10px;margin:4px 0 6px 0;color:#555;">
+      <tr><td style="padding:1px 12px 1px 0;">🪓 Logging (destroyed):</td>
+          <td style="text-align:right;"><b>${fmt(totalDest)} ha</b></td>
+          <td style="padding-left:8px;color:#888;">${pctLog}% of original</td></tr>
+      <tr><td style="padding:1px 12px 1px 0;">🔥 Fire suppression:</td>
+          <td style="text-align:right;"><b>${fmt(totalFire)} ha</b></td>
+          <td style="padding-left:8px;color:#888;">${pctFire}% of original</td></tr>
+      ${totalWater ? `<tr><td style="padding:1px 12px 1px 0;">💧 Water erosion risk (≤10 m):</td>
+          <td style="text-align:right;"><b>${fmt(Math.round(totalWater))} ha</b></td>
+          <td style="padding-left:8px;color:#888;">${pctWater}% of original</td></tr>` : ''}
+      <tr style="border-top:1px solid #ccc;"><td style="padding:2px 12px 1px 0;">Remaining habitat:</td>
+          <td style="text-align:right;"><b>${fmt(Math.round(totalOrig - totalDest))} ha</b></td>
+          <td></td></tr>
+    </table>
     <b>CWH-zone fire trend:</b> Peak in ${peakDecade ? peakDecade.decade_label : '—'}
     (${peakDecade ? Math.round(peakDecade.burned_ha).toLocaleString() : '?'} ha),
     falling <b>${fireDrop}%</b> to ${Math.round(latestDecade.burned_ha).toLocaleString()} ha
-    in the ${latestDecade.decade_label} — driven by fire suppression policy after 1940.<br>
+    in the ${latestDecade.decade_label}.<br>
     <span style="color:#888;font-size:9px;">
-      Source: BC Historical Fire Perimeters GDB × XGBoost yew tile model.
-      Fire suppression in study tiles = yew pixels driven below P=0.5 threshold by fire-date modifier.
+      Logging/fire: BC VRI 2024 × XGBoost model × BC Historical Fire Perimeters.
+      Water erosion: yew ha within 10 m of an ocean/river/lake boundary (riparian risk).
     </span>
   `;
 }

@@ -1,0 +1,9 @@
+{
+  "baseline_yew_ha": 49247.7,
+  "at_risk_10m_ha": 528.7,
+  "at_risk_20m_ha": 1080.4,
+  "sensitivity_10m_ha": 1099.3,
+  "sensitivity_15m_ha": 1519.6,
+  "tiles_processed": 85,
+  "note": "at_risk = yew ha within Xm of ocean/river/lake (water_buffer_by_type.py); sensitivity = yew ha excluded if Xm riparian buffer enforced (water_buffer_sensitivity.py)"
+}
