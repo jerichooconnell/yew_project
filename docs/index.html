@@ -990,11 +990,39 @@ function renderCWHFireChart(data) {
   });
   chart.innerHTML = html;
 
+  // Build decade-by-decade decline table (post-peak)
+  const peakDecade   = [...decades].sort((a,b) => b.burned_ha - a.burned_ha)[0];
+  const peakHa       = peakDecade.burned_ha;
+  const postPeak     = decades.filter(d => d.decade_start > peakDecade.decade_start);
+  const declineRows  = postPeak.map(d => {
+    const drop = ((1 - d.burned_ha / peakHa) * 100).toFixed(0);
+    const bar  = Math.round(d.burned_ha / peakHa * 60);  // max ~60 chars wide
+    return `<tr>
+      <td style="padding:1px 6px;color:#555;">${d.decade_label}</td>
+      <td style="padding:1px 6px;text-align:right;">${Math.round(d.burned_ha).toLocaleString()} ha</td>
+      <td style="padding:1px 6px;text-align:right;color:#c0392b;">−${drop}%</td>
+      <td style="padding:1px 4px;">${d.fire_count} fires</td>
+    </tr>`;
+  }).join('');
+
   document.getElementById('cwh-notes').innerHTML = `
     <b>Source:</b> BC Historical Fire Perimeters GDB, all fires, clipped to CWH zone boundary.<br>
-    <b>Note:</b> The same area may burn in multiple decades; total burned exceeds unique burned footprint.<br>
-    <b>Peak:</b> 1920s (98k ha) and 1930s (66k ha) dominated by early industrial logging slash fires.
-    The dramatic decline after 1940 reflects modern fire suppression and reduced slash burning.
+    <b>Note:</b> The same area may burn in multiple decades; total burned exceeds unique burned footprint.<br><br>
+    <b>Peak decade:</b> ${peakDecade.decade_label} — <b>${Math.round(peakHa).toLocaleString()} ha</b>
+    (${peakDecade.fire_count} fires, ${peakDecade.cwh_pct.toFixed(2)}% of CWH zone),
+    dominated by early industrial logging slash fires.<br>
+    <b>Decline from peak (${peakDecade.decade_label}):</b>
+    <table style="border-collapse:collapse;font-size:10px;margin-top:4px;">
+      <thead><tr style="color:#888;">
+        <th style="padding:1px 6px;text-align:left;">Decade</th>
+        <th style="padding:1px 6px;text-align:right;">Area burned</th>
+        <th style="padding:1px 6px;text-align:right;">vs. peak</th>
+        <th style="padding:1px 4px;">Fires</th>
+      </tr></thead>
+      <tbody>${declineRows}</tbody>
+    </table>
+    <span style="color:#888;font-size:9px;">Note: 2010s uptick (+${Math.round(postPeak.find(d=>d.decade_start===2010)?.burned_ha||0).toLocaleString()} ha)
+    driven by climate-related fire increase; 2020s partial decade.</span>
   `;
 }
 
