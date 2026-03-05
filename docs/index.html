@@ -427,7 +427,6 @@
     <h4 style="margin-top:4px;">🏞️ Protected Areas</h4>
     <div class="legend-row"><span class="legend-swatch" style="background:rgba(0,180,0,0.25);border:2px solid #00aa00;"></span> Provincial Park</div>
     <div class="legend-row"><span class="legend-swatch" style="background:rgba(0,136,170,0.25);border:2px dashed #0088aa;"></span> Ecological Reserve</div>
-    <div class="legend-row"><span class="legend-swatch" style="background:rgba(200,100,0,0.25);border:2px solid #cc6600;"></span> National Park / Reserve</div>
     <hr style="margin:6px 0">
   </div>
   <div style="font-size:10px;color:#666;">
@@ -689,15 +688,13 @@ function toggleParksLayer(show) {
             if (desig.includes('ECOLOGICAL')) {
               color = '#0088aa';      // Ecological Reserve — teal
               dash = '5,5';
-            } else if (desig.includes('NATIONAL') || desig.includes('FEDERAL')) {
-              color = '#cc6600';      // National Park — orange-brown
             } else if (desig.includes('RECREATION')) {
               color = '#888800';      // Recreation Area — olive
               dash = '3,6';
             }
             return {
               color: color,
-              weight: desig.includes('NATIONAL') ? 2.5 : 1.5,
+              weight: 1.5,
               fillColor: color,
               fillOpacity: 0.12,
               opacity: 0.8,

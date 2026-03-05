@@ -134,15 +134,12 @@ Fire history provides context for stand age and disturbance patterns, complement
 ### 3.4 Protected Areas
 
 **Provincial parks source:** BC Data Catalogue WFS — `WHSE_TANTALIS.TA_PARK_ECORES_PA_SVW` (live service, fetched province-wide at runtime)  
-**National/federal parks source:** OpenStreetMap Overpass API — targeted queries per park boundary  
-**Coverage:** 936 features — 930 provincial parks / ecological reserves / protected areas + 6 federal national parks  
-**Federal parks included:** Gwaii Haanas National Park Reserve & Haida Heritage Site, Pacific Rim National Park Reserve, Gulf Islands National Park Reserve, Glacier NP, Kootenay NP, Yoho NP  
+**Coverage:** 930 provincial parks / ecological reserves / protected areas (province-wide, down to 48.3°N)  
+**Note:** Federal national parks (Gwaii Haanas, Pacific Rim, Gulf Islands, etc.) are **not shown** on the map — their OSM boundary geometries are too fragmented for clean web rendering.  
 **Geometry:** Full-resolution polygons simplified at 100 m tolerance (0.001°) for web delivery  
-**Web display:** Green = Provincial Park, teal dashed = Ecological Reserve, orange = National Park  
-**GeoJSON export:** `docs/tiles/park_contours.geojson` (1.7 MB)  
+**Web display:** Green = Provincial Park, teal dashed = Ecological Reserve  
+**GeoJSON export:** `docs/tiles/park_contours.geojson` (1.5 MB)  
 **Protected areas script:** `scripts/analysis/yew_in_protected_areas.py`
-
-The local `TA_PARK_ECORES_PA_SVW.gdb` is retained for reference but is a **northern BC subset only** (southern boundary ≈50.2°N). All analysis uses the WFS endpoint which covers the full province to 48.3°N.
 
 Protected areas highlight where yew habitat may be conserved from future logging. Analysis shows **only 3.5% of modelled yew habitat falls inside protected areas** — see §5.2.
 
@@ -173,10 +170,9 @@ Protected areas highlight where yew habitat may be conserved from future logging
 - Color gradient by age (bright red = 2020s, orange = pre-1950)
 
 **Protected areas (🏞️):**
-- 936 parks and protected areas — provincial (BC Parks WFS) + federal national parks (OSM)
-- Clickable popups: name, designation, official area, source
-- Green fill = Provincial Park; teal dashed = Ecological Reserve; orange = National Park / Reserve
-- National parks include Gwaii Haanas, Pacific Rim NP Reserve, Gulf Islands NP Reserve
+- 930 provincial parks and protected areas (BC Parks WFS, province-wide)
+- Clickable popups: name, designation, official area
+- Green fill = Provincial Park; teal dashed = Ecological Reserve
 
 **Observation reporting:**
 - Users can click "✔ Yew Present" or "✘ No Yew" then click the map to add field observations
