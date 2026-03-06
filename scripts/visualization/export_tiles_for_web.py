@@ -340,6 +340,16 @@ def main():
             log_grid = None
             zeroed = 0
 
+        # Step 1b: Apply low-elevation suppression (linear 0→1 for 0–30 m)
+        elev_path = CACHE_DIR / f'{slug}_elev.npy'
+        if elev_path.exists():
+            elev = np.load(str(elev_path))
+            elev_factor = np.clip(elev / 30.0, 0.0, 1.0).astype(np.float32)
+            elev_zeroed = int((grid > 0.02).sum()) - int((grid * elev_factor > 0.02).sum())
+            grid = (grid * elev_factor)
+        else:
+            elev_zeroed = 0
+
         # Step 2: Apply fire-date modifier — (2024 - fire_year) / 124
         fire_modifier, fire_year_raster = make_fire_modifier(H, W, west, south, east, north, fires_gdf)
         pre_fire_grid = grid.copy()
@@ -422,7 +432,8 @@ def main():
             }
             print(f'  ✓ {name}: {H}×{W} → '
                   f'yew {size/1024:.0f} KB + logging {log_size/1024:.0f} KB '
-                  f'(P≥0.5: {stats["p50_ha"]:.0f} ha, {zeroed:,} masked, '
+                  f'(P≥0.5: {stats["p50_ha"]:.0f} ha, {zeroed:,} log-masked, '
+                  f'{elev_zeroed:,} elev-masked, '
                   f'fire {fire_pct:.1f}%){lm_info}')
         else:
             print(f'  ✓ {name}: {H}×{W} → {size/1024:.0f} KB '

@@ -318,6 +318,16 @@ def main():
         for cat, factor in LOG_SUPPRESS.items():
             suppressed[log_grid == cat] *= factor
 
+        # Apply low-elevation suppression: linear 0→1 between 0–30 m
+        elev_path = TILE_CACHE / f"{slug}_elev.npy"
+        if elev_path.exists():
+            elev = np.load(str(elev_path))
+            elev_factor = np.clip(elev / 30.0, 0.0, 1.0).astype(np.float32)
+        else:
+            elev_factor = np.ones((grid_h, grid_w), dtype=np.float32)
+        suppressed_logging_only = suppressed.copy()  # save pre-elevation for stat tracking
+        suppressed = (suppressed * elev_factor).astype(np.float32)
+
         # Compute fire modifier and apply on top of logging suppression
         south_t, north_t, west_t, east_t = bbox
         fire_modifier = make_fire_modifier(grid_h, grid_w, west_t, south_t, east_t, north_t, fires_gdf)
@@ -360,6 +370,9 @@ def main():
             s["fire_suppressed_yew_px"] += int(
                 (bec_mask & (suppressed >= THRESHOLD) & (suppressed_with_fire < THRESHOLD)).sum()
             )
+            s["elev_suppressed_yew_px"] += int(
+                (bec_mask & (suppressed_logging_only >= THRESHOLD) & (suppressed < THRESHOLD)).sum()
+            )
             s["raw_yew_px"]             += int((bec_mask & (grid >= THRESHOLD)).sum())
 
         bec_str = ", ".join(sorted(bec_labels_in_tile))
@@ -388,6 +401,7 @@ def main():
         current_yew          = s["current_yew_px"]
         current_yew_fire     = s["current_yew_fire_px"]
         fire_suppressed_yew  = s["fire_suppressed_yew_px"]
+        elev_suppressed_yew  = s["elev_suppressed_yew_px"]
         raw_yew              = s["raw_yew_px"]
 
         # Yew prevalence in old-growth for this BEC subzone
@@ -421,6 +435,7 @@ def main():
             "current_yew_ha":        round(current_yew * HA_PER_PX, 1),
             "current_yew_with_fire_ha": round(current_yew_fire * HA_PER_PX, 1),
             "fire_suppressed_ha":    round(fire_suppressed_yew * HA_PER_PX, 1),
+            "elev_suppressed_ha":    round(elev_suppressed_yew * HA_PER_PX, 1),
             "destroyed_yew_ha":      round(max(0, est_destroyed_yew_px * HA_PER_PX), 1),
             "raw_model_yew_ha":      round(raw_yew * HA_PER_PX, 1),
         })
@@ -516,6 +531,7 @@ def main():
     lines.append(f"5. Estimated original yew = yew_rate × (old-growth + logged area)")
     lines.append(f"6. Destroyed yew = estimated original − current remaining (after suppression)")
     lines.append(f"7. Logging suppression: <150yr (cats 2-5) → ×0, >150yr (cat 7) → ×1 (all forests <150yr treated as logged)")
+    lines.append(f"8. Elevation suppression: linear ×0 at 0m → ×1 at 30m (Copernicus GLO-30 DEM; tiles without DEM use no suppression)")
     lines.append(f"8. Sample covers {tiles_processed} tiles × 10×10 km = ~{tiles_processed * 100:,} km²")
     lines.append("")
 
