@@ -332,10 +332,10 @@
 
       <div style="margin-top:12px; padding:10px; background:#f5f5f5; border-radius:6px; font-size:10px; color:#555; line-height:1.5;">
         <b>Methodology:</b><br>
-        1. Yew prevalence rate = fraction of old-growth (&gt;80 yr) pixels with P&ge;0.5<br>
-        2. Est. original yew = prevalence &times; (old-growth + logged area)<br>
-        3. Destroyed (logging) = original &minus; current after logging suppression<br>
-        4. Logging suppression: &lt;40yr &rarr; &times;0, <b>40-80yr &rarr; &times;0.20</b>, <b>80-150yr &rarr; &times;0.35</b>, &gt;150yr &rarr; &times;1<br>
+        1. Yew prevalence rate = fraction of old-growth (&gt;150 yr) pixels with P&ge;0.5<br>
+        2. Est. original yew = prevalence &times; (old-growth + all logged area, including 80&ndash;150 yr second-growth)<br>
+        3. Destroyed (logging) = original &minus; current (forests &lt;150 yr assumed logged, yew habitat = 0)<br>
+        4. Logging suppression: all forests &lt;150 yr &rarr; &times;0 (assumed logged); &gt;150 yr &rarr; &times;1<br>
         5. Fire suppression = yew pixels driven below P=0.5 threshold by fire-date modifier [(2024&minus;fire_year)/124]<br>
         6. Data: XGBoost model on 2024 GEE embeddings, BC VRI 2024, BC BEC zones, BC Historical Fire Perimeters
       </div>
@@ -1042,44 +1042,45 @@ function renderCWHFireChart(data, waterData) {
 }
 
 // ── Logging Impact Statistics ─────────────────────────────────────────────────
-// Suppression factors: <40yr→×0, 40-80yr→×0.20, 80-150yr→×0.35, >150yr→×1
-// orig = yr × (og+l2+l3+l4); cur from analysis (yr×(og7×1 + og5×0.35 + l4×0.20)); dest = orig-cur
-// og = og5+og7 (all ≥80yr); og5 = 80-150yr (×0.35); og7 = >150yr (×1.00)
+// Assumption: all forests <150yr are logged (VRI age determines category)
+// Suppression: all cat 2-5 (<150yr) → ×0; cat 7 (>150yr) → ×1
+// og = og7 only (>150yr true old-growth); og5 = 80-150yr (treated as logged); log = cat2+3+4+5
+// orig = yr × (og7 + log_all); cur = yr × og7; dest = orig-cur
 // fire = yew ha suppressed below P=0.5 threshold by fire-date modifier
 const BEC_STATS = [
   {s:"BAFAun",z:"BAF",og:0,og5:0,og7:0,log:0,l2:0,l3:0,l4:0,yr:0.0,orig:0,cur:0,dest:0,fire:0},
-  {s:"CDFmm",z:"CDF",og:6048,og5:5834,og7:214,log:4152,l2:476,l3:1131,l4:2545,yr:0.5667,orig:5780,cur:85,dest:5695,fire:0},
-  {s:"CMAun",z:"CMA",og:103,og5:46,og7:57,log:135,l2:0,l3:0,l4:135,yr:0.0,orig:0,cur:0,dest:0,fire:0},
-  {s:"CMAunp",z:"CMA",og:27004,og5:8170,og7:18834,log:2124,l2:12,l3:10,l4:2102,yr:0.0085,orig:249,cur:209,dest:40,fire:2},
-  {s:"CWHdm",z:"CWH",og:35979,og5:22913,og7:13066,log:16368,l2:2714,l3:3652,l4:10002,yr:0.2712,orig:14198,cur:1842,dest:12356,fire:122},
-  {s:"CWHds1",z:"CWH",og:3446,og5:1356,og7:2090,log:4863,l2:1435,l3:978,l4:2451,yr:0.0499,orig:414,cur:89,dest:325,fire:4},
-  {s:"CWHds2",z:"CWH",og:3079,og5:684,og7:2395,log:1807,l2:1058,l3:25,l4:724,yr:0.0634,orig:310,cur:194,dest:115,fire:13},
-  {s:"CWHmm1",z:"CWH",og:1779,og5:494,og7:1285,log:8406,l2:838,l3:2053,l4:5516,yr:0.2682,orig:2732,cur:327,dest:2405,fire:58},
-  {s:"CWHmm2",z:"CWH",og:3224,og5:1065,og7:2159,log:18791,l2:1709,l3:7003,l4:10079,yr:0.2855,orig:6286,cur:669,dest:5617,fire:12},
-  {s:"CWHms1",z:"CWH",og:7601,og5:638,og7:6964,log:3209,l2:1046,l3:583,l4:1581,yr:0.1305,orig:1410,cur:966,dest:444,fire:37},
-  {s:"CWHms2",z:"CWH",og:2793,og5:433,og7:2360,log:3477,l2:119,l3:998,l4:2360,yr:0.0267,orig:167,cur:70,dest:97,fire:1},
-  {s:"CWHvh1",z:"CWH",og:18122,og5:1122,og7:17000,log:6616,l2:1945,l3:2208,l4:2462,yr:0.4312,orig:10667,cur:7250,dest:3418,fire:0},
-  {s:"CWHvh2",z:"CWH",og:128520,og5:6873,og7:121647,log:3682,l2:1508,l3:1644,l4:530,yr:0.1268,orig:16768,cur:15863,dest:905,fire:1},
-  {s:"CWHvm1",z:"CWH",og:99890,og5:14844,og7:85045,log:82746,l2:16730,l3:26270,l4:39746,yr:0.1052,orig:19209,cur:8391,dest:10818,fire:74},
-  {s:"CWHvm2",z:"CWH",og:57379,og5:8108,og7:49271,log:14434,l2:2612,l3:3236,l4:8586,yr:0.0902,orig:6475,cur:4554,dest:1921,fire:50},
-  {s:"CWHws2",z:"CWH",og:14080,og5:2694,og7:11385,log:2654,l2:1337,l3:37,l4:1280,yr:0.0276,orig:462,cur:345,dest:117,fire:5},
-  {s:"CWHxm1",z:"CWH",og:18236,og5:9702,og7:8533,log:20737,l2:3467,l3:5668,l4:11602,yr:0.3218,orig:12541,cur:1583,dest:10958,fire:103},
-  {s:"CWHxm2",z:"CWH",og:14528,og5:6924,og7:7604,log:46485,l2:11485,l3:8180,l4:26821,yr:0.2782,orig:16973,cur:1873,dest:15100,fire:68},
+  {s:"CDFmm",z:"CDF",og:214,og5:5834,og7:214,log:9986,l2:476,l3:1131,l4:2545,yr:0.3955,orig:4034,cur:85,dest:3949,fire:0.4},
+  {s:"CMAun",z:"CMA",og:57,og5:46,og7:57,log:181,l2:0,l3:0,l4:135,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"CMAunp",z:"CMA",og:18834,og5:8170,og7:18834,log:10293,l2:12,l3:10,l4:2102,yr:0.0111,orig:322,cur:209,dest:112,fire:1.6},
+  {s:"CWHdm",z:"CWH",og:13066,og5:22913,og7:13066,log:39280,l2:2714,l3:3652,l4:10002,yr:0.1303,orig:6819,cur:1842,dest:4977,fire:122.1},
+  {s:"CWHds1",z:"CWH",og:2090,og5:1356,og7:2090,log:6219,l2:1435,l3:978,l4:2451,yr:0.0292,orig:242,cur:89,dest:153,fire:3.8},
+  {s:"CWHds2",z:"CWH",og:2395,og5:684,og7:2395,log:2491,l2:1058,l3:25,l4:724,yr:0.0812,orig:396,cur:194,dest:202,fire:12.9},
+  {s:"CWHmm1",z:"CWH",og:1285,og5:494,og7:1285,log:8900,l2:838,l3:2053,l4:5516,yr:0.2487,orig:2534,cur:327,dest:2207,fire:58.3},
+  {s:"CWHmm2",z:"CWH",og:2159,og5:1065,og7:2159,log:19856,l2:1709,l3:7003,l4:10079,yr:0.3013,orig:6634,cur:669,dest:5964,fire:11.5},
+  {s:"CWHms1",z:"CWH",og:6964,og5:638,og7:6964,log:3847,l2:1046,l3:583,l4:1581,yr:0.1344,orig:1453,cur:966,dest:486,fire:36.8},
+  {s:"CWHms2",z:"CWH",og:2360,og5:433,og7:2360,log:3911,l2:119,l3:998,l4:2360,yr:0.0296,orig:186,cur:70,dest:116,fire:0.9},
+  {s:"CWHvh1",z:"CWH",og:17000,og5:1122,og7:17000,log:7738,l2:1945,l3:2208,l4:2462,yr:0.4259,orig:10537,cur:7250,dest:3288,fire:0},
+  {s:"CWHvh2",z:"CWH",og:121647,og5:6873,og7:121647,log:10556,l2:1508,l3:1644,l4:530,yr:0.1299,orig:17172,cur:15863,dest:1309,fire:0.8},
+  {s:"CWHvm1",z:"CWH",og:85045,og5:14844,og7:85045,log:97591,l2:16730,l3:26270,l4:39746,yr:0.0977,orig:17850,cur:8391,dest:9459,fire:73.5},
+  {s:"CWHvm2",z:"CWH",og:49271,og5:8108,og7:49271,log:22543,l2:2612,l3:3236,l4:8586,yr:0.0914,orig:6564,cur:4554,dest:2011,fire:50},
+  {s:"CWHws2",z:"CWH",og:11385,og5:2694,og7:11385,log:5349,l2:1337,l3:37,l4:1280,yr:0.0303,orig:507,cur:345,dest:162,fire:5.2},
+  {s:"CWHxm1",z:"CWH",og:8533,og5:9702,og7:8533,log:30439,l2:3467,l3:5668,l4:11602,yr:0.1826,orig:7115,cur:1583,dest:5532,fire:102.9},
+  {s:"CWHxm2",z:"CWH",og:7604,og5:6924,og7:7604,log:53409,l2:11485,l3:8180,l4:26821,yr:0.2439,orig:14883,cur:1873,dest:13010,fire:67.5},
   {s:"ESSFmc",z:"ESS",og:81,og5:0,og7:81,log:52,l2:29,l3:0,l4:23,yr:0.0,orig:0,cur:0,dest:0,fire:0},
-  {s:"ESSFmw",z:"ESS",og:2058,og5:466,og7:1592,log:419,l2:337,l3:0,l4:82,yr:0.005,orig:12,cur:8,dest:4,fire:0},
-  {s:"ESSFmw2",z:"ESS",og:3659,og5:231,og7:3428,log:1173,l2:972,l3:116,l4:85,yr:0.0926,orig:447,cur:329,dest:119,fire:3},
+  {s:"ESSFmw",z:"ESS",og:1592,og5:466,og7:1592,log:886,l2:337,l3:0,l4:82,yr:0.005,orig:12,cur:8,dest:4,fire:0},
+  {s:"ESSFmw2",z:"ESS",og:3428,og5:231,og7:3428,log:1404,l2:972,l3:116,l4:85,yr:0.0958,orig:463,cur:329,dest:134,fire:3.3},
   {s:"ESSFmwp",z:"ESS",og:0,og5:0,og7:0,log:0,l2:0,l3:0,l4:0,yr:0.0,orig:0,cur:0,dest:0,fire:0},
-  {s:"ESSFxv1",z:"ESS",og:1081,og5:522,og7:559,log:276,l2:265,l3:11,l4:0,yr:0.0036,orig:5,cur:1,dest:4,fire:0},
-  {s:"ESSFxvp",z:"ESS",og:32,og5:21,og7:11,log:0,l2:0,l3:0,l4:0,yr:0.0,orig:0,cur:0,dest:0,fire:0},
-  {s:"IDFdw",z:"IDF",og:409,og5:186,og7:224,log:321,l2:273,l3:22,l4:26,yr:0.0622,orig:45,cur:6,dest:40,fire:0},
-  {s:"IDFww",z:"IDF",og:116,og5:40,og7:76,log:74,l2:38,l3:21,l4:14,yr:0.0121,orig:2,cur:2,dest:1,fire:0},
-  {s:"IMAunp",z:"IMA",og:855,og5:327,og7:528,log:57,l2:55,l3:0,l4:2,yr:0.0125,orig:11,cur:8,dest:3,fire:0},
-  {s:"MHmm1",z:"MHm",og:36300,og5:5272,og7:31028,log:4661,l2:390,l3:598,l4:3674,yr:0.093,orig:3808,cur:3284,dest:523,fire:3},
-  {s:"MHmm2",z:"MHm",og:27976,og5:7195,og7:20780,log:2719,l2:240,l3:4,l4:2475,yr:0.0313,orig:960,cur:854,dest:106,fire:2},
-  {s:"MHmmp",z:"MHm",og:2278,og5:1255,og7:1023,log:481,l2:0,l3:0,l4:481,yr:0.0,orig:0,cur:0,dest:0,fire:0},
-  {s:"MHwh1",z:"MHw",og:1184,og5:123,og7:1061,log:1,l2:0,l3:0,l4:1,yr:0.0005,orig:1,cur:1,dest:0,fire:0},
-  {s:"MHwhp",z:"MHw",og:60,og5:0,og7:60,log:1,l2:0,l3:0,l4:1,yr:0.0,orig:0,cur:0,dest:0,fire:0},
-  {s:"MSdc2",z:"MSd",og:501,og5:8,og7:493,log:42,l2:42,l3:0,l4:0,yr:0.0019,orig:1,cur:1,dest:0,fire:0},
+  {s:"ESSFxv1",z:"ESS",og:559,og5:522,og7:559,log:798,l2:265,l3:11,l4:0,yr:0.0014,orig:2,cur:1,dest:1,fire:0},
+  {s:"ESSFxvp",z:"ESS",og:11,og5:21,og7:11,log:21,l2:0,l3:0,l4:0,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"IDFdw",z:"IDF",og:224,og5:186,og7:224,log:507,l2:273,l3:22,l4:26,yr:0.026,orig:19,cur:6,dest:13,fire:0},
+  {s:"IDFww",z:"IDF",og:76,og5:40,og7:76,log:114,l2:38,l3:21,l4:14,yr:0.0031,orig:1,cur:2,dest:0,fire:0},
+  {s:"IMAunp",z:"IMA",og:528,og5:327,og7:528,log:384,l2:55,l3:0,l4:2,yr:0.0158,orig:14,cur:8,dest:6,fire:0},
+  {s:"MHmm1",z:"MHm",og:31028,og5:5272,og7:31028,log:9933,l2:390,l3:598,l4:3674,yr:0.1044,orig:4276,cur:3284,dest:992,fire:2.7},
+  {s:"MHmm2",z:"MHm",og:20780,og5:7195,og7:20780,log:9915,l2:240,l3:4,l4:2475,yr:0.0406,orig:1247,cur:854,dest:393,fire:1.8},
+  {s:"MHmmp",z:"MHm",og:1023,og5:1255,og7:1023,log:1736,l2:0,l3:0,l4:481,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"MHwh1",z:"MHw",og:1061,og5:123,og7:1061,log:124,l2:0,l3:0,l4:1,yr:0.0006,orig:1,cur:1,dest:0,fire:0},
+  {s:"MHwhp",z:"MHw",og:60,og5:0,og7:60,log:2,l2:0,l3:0,l4:1,yr:0.0,orig:0,cur:0,dest:0,fire:0},
+  {s:"MSdc2",z:"MSd",og:493,og5:8,og7:493,log:50,l2:42,l3:0,l4:0,yr:0.0019,orig:1,cur:1,dest:0,fire:0},
 ];
 
 function fmt(n) { return n.toLocaleString('en-CA', {maximumFractionDigits:0}); }
@@ -1117,7 +1118,7 @@ function renderLoggingStats() {
 
   let zh = `<table class="stats-table">
     <thead><tr>
-      <th>Zone</th><th class="num">Old-Growth<br>(ha)</th><th class="num">Logged<br>(ha)</th>
+      <th>Zone</th><th class="num">Old-Growth<br>&gt;150yr (ha)</th><th class="num">Logged<br>&lt;150yr (ha)</th>
       <th class="num">Yew Rate<br>(OG)</th><th class="num">Est. Orig<br>Yew (ha)</th>
       <th class="num">Current<br>Yew (ha)</th><th class="num">Logging<br>Loss (ha)</th>
       <th class="num">Fire<br>Loss (ha)</th>
@@ -1157,7 +1158,7 @@ function renderLoggingStats() {
   const maxSubDest = Math.max(...sorted.map(r => r.dest));
   let sh = `<table class="stats-table">
     <thead><tr>
-      <th>Subzone</th><th class="num">Old-<br>Growth</th><th class="num">Logged<br>(ha)</th>
+      <th>Subzone</th><th class="num">OG<br>&gt;150yr</th><th class="num">Logged<br>&lt;150yr (ha)</th>
       <th class="num">Logged<br>%</th><th class="num">Yew %<br>in OG</th>
       <th class="num">Orig<br>Yew</th><th class="num">Current</th>
       <th class="num">Logging<br>Loss</th><th class="num">Fire<br>Loss</th>

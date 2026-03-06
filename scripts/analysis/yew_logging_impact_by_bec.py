@@ -253,10 +253,10 @@ LOG_SUPPRESS = {
     1: 0.00,
     2: 0.00,
     3: 0.00,   # <40yr forests → ×0
-    4: 0.20,   # changed from 0.50 — 40-80yr now more suppressed
-    5: 0.35,   # 80-150yr maturing forest
+    4: 0.00,   # 40-80yr logged — treated as logged (<150yr assumption)
+    5: 0.00,   # 80-150yr — treated as logged (<150yr assumption)
     6: 0.00,
-    7: 1.00,   # new: old-growth >150yr — unchanged
+    7: 1.00,   # old-growth >150yr — only unlogged reference
 }
 
 
@@ -278,11 +278,11 @@ def main():
     # Accumulators per BEC subzone
     # For each MAP_LABEL we track:
     #   total_px              – total pixels in that BEC zone across all tiles
-    #   oldgrowth_px          – cat 5+7 pixels (all forests ≥80yr = unlogged reference)
-    #   oldgrowth_yew_px      – cat 5+7 pixels with P ≥ threshold
-    #   mature_forest_px      – cat 5 pixels (80–150yr maturing forest)
+    #   oldgrowth_px          – cat 7 pixels only (>150yr = unlogged reference)
+    #   oldgrowth_yew_px      – cat 7 pixels with P ≥ threshold
+    #   mature_forest_px      – cat 5 pixels (80–150yr, treated as logged)
     #   old_growth_true_px    – cat 7 pixels (>150yr old-growth)
-    #   logged_px             – cat 2+3+4 pixels (all logged categories)
+    #   logged_px             – cat 2+3+4+5 pixels (all forests <150yr = logged)
     #   logged_cat2_px        – cat 2 pixels specifically
     #   logged_cat3_px        – cat 3 pixels specifically
     #   logged_cat4_px        – cat 4 pixels specifically
@@ -344,14 +344,14 @@ def main():
             s = stats[lbl]
 
             s["total_px"]         += int(bec_mask.sum())
-            s["oldgrowth_px"]     += int((((log_grid == 5) | (log_grid == 7)) & bec_mask).sum())
-            s["oldgrowth_yew_px"] += int((((log_grid == 5) | (log_grid == 7)) & bec_mask & (grid >= THRESHOLD)).sum())
+            s["oldgrowth_px"]     += int(((log_grid == 7) & bec_mask).sum())  # only >150yr
+            s["oldgrowth_yew_px"] += int(((log_grid == 7) & bec_mask & (grid >= THRESHOLD)).sum())  # only >150yr
             s["mature_forest_px"] += int(((log_grid == 5) & bec_mask).sum())
             s["old_growth_true_px"] += int(((log_grid == 7) & bec_mask).sum())
             s["logged_cat2_px"]   += int(((log_grid == 2) & bec_mask).sum())
             s["logged_cat3_px"]   += int(((log_grid == 3) & bec_mask).sum())
             s["logged_cat4_px"]   += int(((log_grid == 4) & bec_mask).sum())
-            s["logged_px"]        += int((((log_grid == 2) | (log_grid == 3) | (log_grid == 4)) & bec_mask).sum())
+            s["logged_px"]        += int((((log_grid == 2) | (log_grid == 3) | (log_grid == 4) | (log_grid == 5)) & bec_mask).sum())  # all <150yr
             s["water_px"]         += int(((log_grid == 1) & bec_mask).sum())
             s["alpine_px"]        += int(((log_grid == 6) & bec_mask).sum())
             s["nodata_px"]        += int(((log_grid == 0) & bec_mask).sum())
@@ -374,7 +374,7 @@ def main():
     for lbl in sorted(stats.keys()):
         s = stats[lbl]
         total        = s["total_px"]
-        og           = s["oldgrowth_px"]          # all forests ≥80yr (cat5+cat7)
+        og           = s["oldgrowth_px"]          # old-growth >150yr only (cat7)
         og_yew       = s["oldgrowth_yew_px"]
         mature       = s["mature_forest_px"]       # cat5: 80–150yr
         og_true      = s["old_growth_true_px"]     # cat7: >150yr
@@ -515,7 +515,7 @@ def main():
     lines.append(f"4. Yew prevalence rate = fraction of old-growth (cat 5) pixels with P ≥ {THRESHOLD}")
     lines.append(f"5. Estimated original yew = yew_rate × (old-growth + logged area)")
     lines.append(f"6. Destroyed yew = estimated original − current remaining (after suppression)")
-    lines.append(f"7. Logging suppression: <20yr → ×0, 20-40yr → ×0.08, 40-80yr → ×0.50, >80yr → ×1")
+    lines.append(f"7. Logging suppression: <150yr (cats 2-5) → ×0, >150yr (cat 7) → ×1 (all forests <150yr treated as logged)")
     lines.append(f"8. Sample covers {tiles_processed} tiles × 10×10 km = ~{tiles_processed * 100:,} km²")
     lines.append("")
 
