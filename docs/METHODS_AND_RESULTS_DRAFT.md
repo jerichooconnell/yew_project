@@ -30,11 +30,11 @@ No comprehensive spatial assessment of Pacific yew habitat extent or decline has
 
 ### 2.1 Study Area
 
-We analysed 99 study tiles (each ~10 × 10 km, ~100 km²) distributed across British Columbia (Figure 18), covering a total of approximately 9,900 km². Of these, 85 tiles were located in coastal British Columbia within the CWH zone and adjacent zones, and 14 tiles were placed within the Interior Cedar–Hemlock (ICH) zone in the BC interior (one additional ICH tile, ICH_pt10 at Valemount, failed to download due to Google Earth Engine timeout).
+We analysed 99 study tiles (each ~10 × 10 km, ~100 km²) distributed across British Columbia (Figure 18), covering a total of approximately 9,900 km². Of these, 85 tiles were located in coastal British Columbia within the CWH zone and adjacent zones, and 14 tiles were placed within the Interior Cedar–Hemlock (ICH) zone in the BC interior.
 
 #### 2.1.1 Coastal Tile Selection
 
-The 85 coastal tiles span 48.3°N–55.3°N and were selected to:
+The 85 coastal tiles center pixels were selected by random stratified sampling within the CWH and CDF biogeoclimatic zone to:
 1. Cover the full latitudinal and precipitation gradient of the CWH zone, from south Vancouver Island lowlands to north coast hypermaritime rainforest
 2. Represent diverse stand ages and disturbance histories
 3. Include clusters of iNaturalist yew observations for training data proximity
@@ -191,7 +191,7 @@ In addition to the quantitative logging and fire analysis, we reviewed the scien
 
 #### 2.6.1 Stream Erosion and Riparian Habitat Loss
 
-Pacific yew preferentially occupies moist riparian zones — stream banks, canyon bottoms, and shaded ravines (Busing et al. 1995). Logging-driven hydrological changes increase peak flows by 20–50% (Hartman & Scrivener 1990, Carnation Creek study), causing channel widening proportional to $W \propto Q^{0.5}$ (Leopold & Maddock 1953). Combined with climate-driven precipitation increases of 5–20% by 2050 (Schnorbus et al. 2012, PCIC), channels may widen by ~14% in logged watersheds. A sensitivity analysis applying a 30 m riparian buffer to all water features estimates an additional 2–3% habitat loss beyond static VRI classifications.
+Pacific yew preferentially occupies moist riparian zones — stream banks, canyon bottoms, and shaded ravines (Busing et al. 1995). Logging-driven hydrological changes increase peak flows by 20–50% (Hartman & Scrivener 1990, Carnation Creek study), causing channel widening proportional to $W \propto Q^{0.5}$ (Leopold & Maddock 1953). Combined with climate-driven precipitation increases of 5–20% by 2050 (Schnorbus et al. 2012, PCIC), channels may widen by ~14% in logged watersheds. A water buffer sensitivity analysis was run across all 42 tiles with available grid data using continuous probability mass: applying binary morphological dilation (3 pixels = 30 m) to all water category pixels (VRI category 1), then summing yew probability mass in the newly-buffered old-growth pixels. This yielded **1,717 ha** of yew probability mass at risk from riparian erosion, equivalent to **5.9%** of the remaining yew probability mass in sampled tiles (29,028 ha) and 3.6% of the full 47,534 ha study total.
 
 #### 2.6.2 Sea-Level Rise and Saltwater Intrusion
 
@@ -410,14 +410,14 @@ While logging dominates the estimated decline, secondary threats compound the po
 |--------|------------------|------------|------|
 | Clear-cut logging | 106,949 ha destroyed | High (modelled) | Direct habitat destruction |
 | Wildfire (historical) | 692 ha suppressed | High (modelled) | Direct mortality |
-| Stream erosion buffer (30 m) | ~1,190 ha (2.5% of remaining) | Moderate (sensitivity analysis) | Riparian habitat loss |
+| Stream erosion buffer (30 m) | ~1,717 ha (5.9% of remaining in sampled tiles) | Moderate (sensitivity analysis) | Riparian habitat loss |
 | Sea-level rise (future) | ~240 ha (<0.5% of remaining) | Low (estimated) | Coastal inundation + salt intrusion |
 | Yew big bud mite | 20–25% bud mortality | Moderate (literature) | Growth/fecundity reduction |
 | Ungulate browsing | 60–80% seedling mortality | Moderate (literature) | Regeneration failure |
 | Historical Taxol harvest | Unknown (hundreds of thousands of trees) | Low (no spatial data) | Historical direct mortality |
 | Climate-driven fire increase | Potentially catastrophic | Low (projected) | Future 100% mortality in fire polygons |
 
-The stream erosion estimate is derived from a sensitivity analysis applying a 30 m water buffer to all stream features: at 10 m resolution, this translates to 3 pixels of dilation, adding ~1,190 ha of effective habitat loss based on the riparian concentration of yew populations. The scientific basis for this buffer includes the Carnation Creek study (Hartman & Scrivener 1990) showing 20–50% peak flow increases post-logging, hydraulic geometry relationships predicting ~14% channel widening for a 30% flow increase, and PCIC climate projections indicating 5–15% additional winter discharge increases by 2050.
+The stream erosion estimate uses continuous probability mass rather than a binary threshold. A morphological dilation of 3 pixels (30 m) was applied to all VRI category 1 (water) pixels across 42 tiles with available data; the yew probability mass summed across old-growth pixels in the newly-buffered zone totalled 1,717 ha — 5.9% of the 29,028 ha remaining yew mass in those tiles, or 3.6% of the full 47,534 ha study total. The scientific basis for this buffer includes the Carnation Creek study (Hartman & Scrivener 1990) showing 20–50% peak flow increases post-logging, hydraulic geometry relationships predicting ~14% channel widening for a 30% flow increase ($W \propto Q^{0.5}$), and PCIC climate projections indicating 5–15% additional winter discharge increases by 2050 (Schnorbus et al. 2012).
 
 ---
 
