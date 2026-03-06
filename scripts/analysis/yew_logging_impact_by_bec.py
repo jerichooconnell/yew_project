@@ -289,8 +289,8 @@ def main():
     #   water_px              – cat 1 pixels
     #   alpine_px             – cat 6 pixels
     #   nodata_px             – cat 0 pixels
-    #   current_yew_px        – pixels with suppressed P ≥ threshold
-    #   raw_yew_px            – pixels with raw P ≥ threshold (regardless of logging)
+    #   current_yew_px        – probability mass of suppressed+fire grid (continuous sum)
+    #   raw_yew_px            – probability mass of raw grid (continuous sum)
     from collections import defaultdict
     stats = defaultdict(lambda: defaultdict(float))
 
@@ -355,7 +355,7 @@ def main():
 
             s["total_px"]         += int(bec_mask.sum())
             s["oldgrowth_px"]     += int(((log_grid == 7) & bec_mask).sum())  # only >150yr
-            s["oldgrowth_yew_px"] += int(((log_grid == 7) & bec_mask & (grid >= THRESHOLD)).sum())  # only >150yr
+            s["oldgrowth_yew_px"] += float(grid[(log_grid == 7) & bec_mask].sum())  # prob mass in og
             s["mature_forest_px"] += int(((log_grid == 5) & bec_mask).sum())
             s["old_growth_true_px"] += int(((log_grid == 7) & bec_mask).sum())
             s["logged_cat2_px"]   += int(((log_grid == 2) & bec_mask).sum())
@@ -365,15 +365,11 @@ def main():
             s["water_px"]         += int(((log_grid == 1) & bec_mask).sum())
             s["alpine_px"]        += int(((log_grid == 6) & bec_mask).sum())
             s["nodata_px"]        += int(((log_grid == 0) & bec_mask).sum())
-            s["current_yew_px"]         += int((bec_mask & (suppressed >= THRESHOLD)).sum())
-            s["current_yew_fire_px"]    += int((bec_mask & (suppressed_with_fire >= THRESHOLD)).sum())
-            s["fire_suppressed_yew_px"] += int(
-                (bec_mask & (suppressed >= THRESHOLD) & (suppressed_with_fire < THRESHOLD)).sum()
-            )
-            s["elev_suppressed_yew_px"] += int(
-                (bec_mask & (suppressed_logging_only >= THRESHOLD) & (suppressed < THRESHOLD)).sum()
-            )
-            s["raw_yew_px"]             += int((bec_mask & (grid >= THRESHOLD)).sum())
+            s["current_yew_px"]         += float(suppressed_with_fire[bec_mask].sum())
+            s["current_yew_fire_px"]    += float(suppressed_with_fire[bec_mask].sum())
+            s["fire_suppressed_yew_px"] += float((suppressed[bec_mask] - suppressed_with_fire[bec_mask]).sum())
+            s["elev_suppressed_yew_px"] += float((suppressed_logging_only[bec_mask] - suppressed[bec_mask]).sum())
+            s["raw_yew_px"]             += float(grid[bec_mask].sum())
 
         bec_str = ", ".join(sorted(bec_labels_in_tile))
         print(f"{len(bec_labels_in_tile)} zones: {bec_str}")
@@ -527,9 +523,9 @@ def main():
     lines.append(f"1. Raw yew probability grid (_grid.npy) from XGBoost model on 2024 embeddings")
     lines.append(f"2. VRI logging categories (_logging.npy) from VEG_COMP_LYR_R1_POLY_2024.gdb")
     lines.append(f"3. BEC zones rasterized from BEC_BIOGEOCLIMATIC_POLY.gdb per tile")
-    lines.append(f"4. Yew prevalence rate = fraction of old-growth (cat 5) pixels with P ≥ {THRESHOLD}")
-    lines.append(f"5. Estimated original yew = yew_rate × (old-growth + logged area)")
-    lines.append(f"6. Destroyed yew = estimated original − current remaining (after suppression)")
+    lines.append(f"4. Yew prevalence rate = mean probability in old-growth (cat 7) pixels (continuous, not P≥{THRESHOLD})")
+    lines.append(f"5. Estimated original yew = mean_og_prob × (old-growth + logged pixel count) × ha/px")
+    lines.append(f"6. Destroyed yew = estimated original − current remaining (probability mass after suppression)")
     lines.append(f"7. Logging suppression: <150yr (cats 2-5) → ×0, >150yr (cat 7) → ×1 (all forests <150yr treated as logged)")
     lines.append(f"8. Elevation suppression: linear ×0 at 0m → ×1 at 30m (Copernicus GLO-30 DEM; tiles without DEM use no suppression)")
     lines.append(f"8. Sample covers {tiles_processed} tiles × 10×10 km = ~{tiles_processed * 100:,} km²")
