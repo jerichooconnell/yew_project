@@ -15,8 +15,8 @@ import geopandas as gpd
 from shapely.geometry import box
 
 # ── Config ────────────────────────────────────────────────────────────────────
-# Bounding box covering all 45 study tiles (with margin)
-STUDY_BBOX = box(-134, 47.5, -121, 56)   # west, south, east, north
+# Bounding box covering all of BC
+STUDY_BBOX = box(-139.5, 48.2, -114.0, 60.0)   # west, south, east, north
 
 FIRE_GDB  = 'data/PROT_HISTORICAL_FIRE_POLYS_SP.gdb'
 PARKS_GDB = 'data/TA_PARK_ECORES_PA_SVW.gdb'
@@ -41,10 +41,10 @@ def export_fire():
     fire = fire[fire.intersects(STUDY_BBOX)].copy()
     print(f"  {len(fire)} records after spatial clip")
 
-    # Keep only larger fires (>= 50 ha) for web display
+    # Keep only larger fires (>= 100 ha) for web display — all-BC coverage
     if 'FIRE_SIZE_HECTARES' in fire.columns:
-        fire = fire[fire['FIRE_SIZE_HECTARES'] >= 50].copy()
-        print(f"  {len(fire)} records after filtering >= 50 ha")
+        fire = fire[fire['FIRE_SIZE_HECTARES'] >= 100].copy()
+        print(f'  {len(fire)} records after filtering >= 100 ha')
 
     # Simplify geometries
     fire['geometry'] = fire.geometry.simplify(SIMPLIFY_TOL, preserve_topology=True)

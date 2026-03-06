@@ -135,6 +135,22 @@ STUDY_AREAS = [
     (52.150, -126.200, "Tweedsmuir South",       "Atnarko CWH valley bottom"),
     (54.100, -130.100, "Skeena Estuary",         "Outer coast Prince Rupert area CWHvh"),
     (54.650, -130.450, "Work Channel",           "N of Prince Rupert outer coast CWHvh3"),
+    # 15 random ICH points (seed=42, generated March 2026)
+    (53.61047, -120.93874, "ICH_pt01", "ICH random point 1"),
+    (49.20165, -118.69015, "ICH_pt02", "ICH random point 2"),
+    (50.75906, -119.50551, "ICH_pt03", "ICH random point 3"),
+    (51.59952, -118.35079, "ICH_pt04", "ICH random point 4"),
+    (50.34007, -117.80908, "ICH_pt05", "ICH random point 5"),
+    (50.75079, -118.59314, "ICH_pt06", "ICH random point 6"),
+    (50.25313, -118.65064, "ICH_pt07", "ICH random point 7"),
+    (49.93111, -118.65477, "ICH_pt08", "ICH random point 8"),
+    (51.72015, -119.51683, "ICH_pt09", "ICH random point 9"),
+    (51.89958, -117.32075, "ICH_pt10", "ICH random point 10"),
+    (53.35259, -120.35505, "ICH_pt11", "ICH random point 11"),
+    (49.04066, -117.80612, "ICH_pt12", "ICH random point 12"),
+    (49.19825, -116.36615, "ICH_pt13", "ICH random point 13"),
+    (51.22977, -118.20172, "ICH_pt14", "ICH random point 14"),
+    (51.44183, -119.36046, "ICH_pt15", "ICH random point 15"),
 ]
 
 

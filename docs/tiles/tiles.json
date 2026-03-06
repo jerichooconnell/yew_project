@@ -182,12 +182,12 @@
       "east": -123.080556
     },
     "stats": {
-      "mean": 0.06243552267551422,
+      "mean": 0.062476515769958496,
       "median": 0.0,
       "max": 0.99812251329422,
-      "p30_ha": 1214.83,
-      "p50_ha": 718.36,
-      "p70_ha": 373.53,
+      "p30_ha": 1215.3,
+      "p50_ha": 718.64,
+      "p70_ha": 373.66,
       "h": 1001,
       "w": 1547
     },
@@ -420,7 +420,7 @@
       "east": -124.848889
     },
     "stats": {
-      "mean": 0.011899922043085098,
+      "mean": 0.01193336769938469,
       "median": 0.0,
       "max": 0.9845651388168335,
       "p30_ha": 136.68,
@@ -522,10 +522,10 @@
       "east": -124.352148
     },
     "stats": {
-      "mean": 0.09632248431444168,
+      "mean": 0.09632570296525955,
       "median": 0.0,
       "max": 0.999160647392273,
-      "p30_ha": 2011.14,
+      "p30_ha": 2011.24,
       "p50_ha": 1356.77,
       "p70_ha": 788.84,
       "h": 1001,
@@ -590,12 +590,12 @@
       "east": -125.03067
     },
     "stats": {
-      "mean": 0.02302691899240017,
+      "mean": 0.02305012196302414,
       "median": 0.0,
       "max": 0.9917562007904053,
-      "p30_ha": 434.5,
-      "p50_ha": 212.46,
-      "p70_ha": 87.09,
+      "p30_ha": 435.01,
+      "p50_ha": 212.56,
+      "p70_ha": 87.1,
       "h": 1001,
       "w": 1544
     },
@@ -726,7 +726,7 @@
       "east": -123.350812
     },
     "stats": {
-      "mean": 0.034629300236701965,
+      "mean": 0.03462933003902435,
       "median": 0.0,
       "max": 0.9988470077514648,
       "p30_ha": 749.58,
@@ -1202,12 +1202,12 @@
       "east": -125.679758
     },
     "stats": {
-      "mean": 0.022095246240496635,
+      "mean": 0.022121284157037735,
       "median": 0.0,
       "max": 0.99284428358078,
-      "p30_ha": 368.53,
-      "p50_ha": 168.11,
-      "p70_ha": 60.95,
+      "p30_ha": 369.26,
+      "p50_ha": 168.23,
+      "p70_ha": 61.15,
       "h": 1001,
       "w": 1565
     },
@@ -1236,12 +1236,12 @@
       "east": -122.181191
     },
     "stats": {
-      "mean": 0.0393548458814621,
+      "mean": 0.038166992366313934,
       "median": 0.0,
-      "max": 0.9971991777420044,
-      "p30_ha": 897.04,
-      "p50_ha": 568.94,
-      "p70_ha": 233.83,
+      "max": 0.79885333776474,
+      "p30_ha": 890.74,
+      "p50_ha": 552.32,
+      "p70_ha": 194.35,
       "h": 1001,
       "w": 1533
     },
@@ -1576,7 +1576,7 @@
       "east": -127.929237
     },
     "stats": {
-      "mean": 0.0034928424283862114,
+      "mean": 0.0034928652457892895,
       "median": 0.0,
       "max": 0.9610758423805237,
       "p30_ha": 56.23,
@@ -1882,7 +1882,7 @@
       "east": -122.529506
     },
     "stats": {
-      "mean": 0.01447574608027935,
+      "mean": 0.014475747011601925,
       "median": 0.0,
       "max": 0.9950315952301025,
       "p30_ha": 265.08,
@@ -1950,12 +1950,12 @@
       "east": -124.430153
     },
     "stats": {
-      "mean": 0.026774296537041664,
+      "mean": 0.026816481724381447,
       "median": 0.0,
       "max": 0.9996857643127441,
-      "p30_ha": 487.82,
-      "p50_ha": 407.66,
-      "p70_ha": 336.45,
+      "p30_ha": 488.51,
+      "p50_ha": 408.73,
+      "p70_ha": 337.15,
       "h": 1001,
       "w": 1556
     },
@@ -2887,6 +2887,482 @@
       "forest_80_150_pct": 0.0,
       "alpine_pct": 0.0,
       "oldgrowth_pct": 21.9
+    }
+  },
+  {
+    "slug": "ich_pt01",
+    "name": "ICH_pt01",
+    "desc": "ICH random point 1",
+    "lat": 53.61047,
+    "lon": -120.93874,
+    "bbox": {
+      "south": 53.565554,
+      "north": 53.655386,
+      "west": -121.014448,
+      "east": -120.863032
+    },
+    "stats": {
+      "mean": 0.011600502766668797,
+      "median": 0.0012575460132211447,
+      "max": 0.987079381942749,
+      "p30_ha": 100.82,
+      "p50_ha": 41.42,
+      "p70_ha": 16.37,
+      "h": 1001,
+      "w": 1686
+    },
+    "png": "ich_pt01.png",
+    "logging_png": "ich_pt01_logging.png",
+    "logging_stats": {
+      "water_pct": 0.3,
+      "logged_lt20_pct": 0.0,
+      "logged_20_40_pct": 8.3,
+      "logged_40_80_pct": 6.3,
+      "forest_80_150_pct": 11.1,
+      "alpine_pct": 7.1,
+      "oldgrowth_pct": 64.3
+    }
+  },
+  {
+    "slug": "ich_pt02",
+    "name": "ICH_pt02",
+    "desc": "ICH random point 2",
+    "lat": 49.20165,
+    "lon": -118.69015,
+    "bbox": {
+      "south": 49.156734,
+      "north": 49.246566,
+      "west": -118.758891,
+      "east": -118.621409
+    },
+    "stats": {
+      "mean": 0.042318735271692276,
+      "median": 0.0,
+      "max": 0.9989564418792725,
+      "p30_ha": 757.3,
+      "p50_ha": 443.03,
+      "p70_ha": 230.48,
+      "h": 1001,
+      "w": 1531
+    },
+    "png": "ich_pt02.png",
+    "logging_png": "ich_pt02_logging.png",
+    "logging_stats": {
+      "water_pct": 0.1,
+      "logged_lt20_pct": 21.0,
+      "logged_20_40_pct": 17.2,
+      "logged_40_80_pct": 5.8,
+      "forest_80_150_pct": 22.4,
+      "alpine_pct": 2.0,
+      "oldgrowth_pct": 26.5
+    }
+  },
+  {
+    "slug": "ich_pt03",
+    "name": "ICH_pt03",
+    "desc": "ICH random point 3",
+    "lat": 50.75906,
+    "lon": -119.50551,
+    "bbox": {
+      "south": 50.714144,
+      "north": 50.803976,
+      "west": -119.576513,
+      "east": -119.434507
+    },
+    "stats": {
+      "mean": 0.01875373348593712,
+      "median": 0.0,
+      "max": 0.9983795881271362,
+      "p30_ha": 331.38,
+      "p50_ha": 215.22,
+      "p70_ha": 129.4,
+      "h": 1001,
+      "w": 1582
+    },
+    "png": "ich_pt03.png",
+    "logging_png": "ich_pt03_logging.png",
+    "logging_stats": {
+      "water_pct": 0.6,
+      "logged_lt20_pct": 36.5,
+      "logged_20_40_pct": 18.4,
+      "logged_40_80_pct": 3.1,
+      "forest_80_150_pct": 26.3,
+      "alpine_pct": 1.5,
+      "oldgrowth_pct": 9.5
+    }
+  },
+  {
+    "slug": "ich_pt04",
+    "name": "ICH_pt04",
+    "desc": "ICH random point 4",
+    "lat": 51.59952,
+    "lon": -118.35079,
+    "bbox": {
+      "south": 51.554604,
+      "north": 51.644436,
+      "west": -118.4231,
+      "east": -118.27848
+    },
+    "stats": {
+      "mean": 0.04436440393328667,
+      "median": 0.0,
+      "max": 0.9974479675292969,
+      "p30_ha": 694.07,
+      "p50_ha": 356.05,
+      "p70_ha": 177.32,
+      "h": 1001,
+      "w": 1610
+    },
+    "png": "ich_pt04.png",
+    "logging_png": "ich_pt04_logging.png",
+    "logging_stats": {
+      "water_pct": 0.8,
+      "logged_lt20_pct": 5.9,
+      "logged_20_40_pct": 6.4,
+      "logged_40_80_pct": 8.3,
+      "forest_80_150_pct": 10.1,
+      "alpine_pct": 19.3,
+      "oldgrowth_pct": 43.9
+    }
+  },
+  {
+    "slug": "ich_pt05",
+    "name": "ICH_pt05",
+    "desc": "ICH random point 5",
+    "lat": 50.34007,
+    "lon": -117.80908,
+    "bbox": {
+      "south": 50.295154,
+      "north": 50.384986,
+      "west": -117.879455,
+      "east": -117.738705
+    },
+    "stats": {
+      "mean": 0.06141200289130211,
+      "median": 0.0,
+      "max": 0.9965205192565918,
+      "p30_ha": 979.73,
+      "p50_ha": 495.84,
+      "p70_ha": 231.84,
+      "h": 1001,
+      "w": 1568
+    },
+    "png": "ich_pt05.png",
+    "logging_png": "ich_pt05_logging.png",
+    "logging_stats": {
+      "water_pct": 4.6,
+      "logged_lt20_pct": 3.4,
+      "logged_20_40_pct": 8.7,
+      "logged_40_80_pct": 3.3,
+      "forest_80_150_pct": 31.0,
+      "alpine_pct": 0.1,
+      "oldgrowth_pct": 43.6
+    }
+  },
+  {
+    "slug": "ich_pt06",
+    "name": "ICH_pt06",
+    "desc": "ICH random point 6",
+    "lat": 50.75079,
+    "lon": -118.59314,
+    "bbox": {
+      "south": 50.705874,
+      "north": 50.795706,
+      "west": -118.664131,
+      "east": -118.522149
+    },
+    "stats": {
+      "mean": 0.0725092887878418,
+      "median": 0.0,
+      "max": 0.9991024732589722,
+      "p30_ha": 1338.66,
+      "p50_ha": 911.47,
+      "p70_ha": 594.32,
+      "h": 1001,
+      "w": 1582
+    },
+    "png": "ich_pt06.png",
+    "logging_png": "ich_pt06_logging.png",
+    "logging_stats": {
+      "water_pct": 3.9,
+      "logged_lt20_pct": 10.2,
+      "logged_20_40_pct": 10.5,
+      "logged_40_80_pct": 19.3,
+      "forest_80_150_pct": 24.6,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 28.5
+    }
+  },
+  {
+    "slug": "ich_pt07",
+    "name": "ICH_pt07",
+    "desc": "ICH random point 7",
+    "lat": 50.25313,
+    "lon": -118.65064,
+    "bbox": {
+      "south": 50.208214,
+      "north": 50.298046,
+      "west": -118.720887,
+      "east": -118.580393
+    },
+    "stats": {
+      "mean": 0.08670494705438614,
+      "median": 0.0,
+      "max": 0.9996196031570435,
+      "p30_ha": 1734.65,
+      "p50_ha": 1130.61,
+      "p70_ha": 680.14,
+      "h": 1001,
+      "w": 1565
+    },
+    "png": "ich_pt07.png",
+    "logging_png": "ich_pt07_logging.png",
+    "logging_stats": {
+      "water_pct": 1.5,
+      "logged_lt20_pct": 13.5,
+      "logged_20_40_pct": 10.3,
+      "logged_40_80_pct": 2.6,
+      "forest_80_150_pct": 41.0,
+      "alpine_pct": 0.4,
+      "oldgrowth_pct": 27.0
+    }
+  },
+  {
+    "slug": "ich_pt08",
+    "name": "ICH_pt08",
+    "desc": "ICH random point 8",
+    "lat": 49.93111,
+    "lon": -118.65477,
+    "bbox": {
+      "south": 49.886194,
+      "north": 49.976026,
+      "west": -118.724546,
+      "east": -118.584994
+    },
+    "stats": {
+      "mean": 0.02055777795612812,
+      "median": 0.0,
+      "max": 0.9985249638557434,
+      "p30_ha": 368.28,
+      "p50_ha": 224.85,
+      "p70_ha": 126.32,
+      "h": 1001,
+      "w": 1554
+    },
+    "png": "ich_pt08.png",
+    "logging_png": "ich_pt08_logging.png",
+    "logging_stats": {
+      "water_pct": 0.5,
+      "logged_lt20_pct": 42.1,
+      "logged_20_40_pct": 18.8,
+      "logged_40_80_pct": 13.3,
+      "forest_80_150_pct": 9.6,
+      "alpine_pct": 0.2,
+      "oldgrowth_pct": 10.3
+    }
+  },
+  {
+    "slug": "ich_pt09",
+    "name": "ICH_pt09",
+    "desc": "ICH random point 9",
+    "lat": 51.72015,
+    "lon": -119.51683,
+    "bbox": {
+      "south": 51.675234,
+      "north": 51.765066,
+      "west": -119.589333,
+      "east": -119.444327
+    },
+    "stats": {
+      "mean": 0.002703219885006547,
+      "median": 0.0,
+      "max": 0.9612285494804382,
+      "p30_ha": 27.29,
+      "p50_ha": 9.24,
+      "p70_ha": 2.77,
+      "h": 1001,
+      "w": 1615
+    },
+    "png": "ich_pt09.png",
+    "logging_png": "ich_pt09_logging.png",
+    "logging_stats": {
+      "water_pct": 0.3,
+      "logged_lt20_pct": 17.1,
+      "logged_20_40_pct": 23.9,
+      "logged_40_80_pct": 9.9,
+      "forest_80_150_pct": 28.2,
+      "alpine_pct": 0.0,
+      "oldgrowth_pct": 17.0
+    }
+  },
+  {
+    "slug": "ich_pt11",
+    "name": "ICH_pt11",
+    "desc": "ICH random point 11",
+    "lat": 53.35259,
+    "lon": -120.35505,
+    "bbox": {
+      "south": 53.307674,
+      "north": 53.397506,
+      "west": -120.430299,
+      "east": -120.279801
+    },
+    "stats": {
+      "mean": 0.007748437114059925,
+      "median": 0.0,
+      "max": 0.9895275235176086,
+      "p30_ha": 76.09,
+      "p50_ha": 39.08,
+      "p70_ha": 17.76,
+      "h": 1001,
+      "w": 1676
+    },
+    "png": "ich_pt11.png",
+    "logging_png": "ich_pt11_logging.png",
+    "logging_stats": {
+      "water_pct": 1.2,
+      "logged_lt20_pct": 16.1,
+      "logged_20_40_pct": 5.3,
+      "logged_40_80_pct": 5.0,
+      "forest_80_150_pct": 16.7,
+      "alpine_pct": 9.8,
+      "oldgrowth_pct": 43.6
+    }
+  },
+  {
+    "slug": "ich_pt12",
+    "name": "ICH_pt12",
+    "desc": "ICH random point 12",
+    "lat": 49.04066,
+    "lon": -117.80612,
+    "bbox": {
+      "south": 48.995744,
+      "north": 49.085576,
+      "west": -117.874639,
+      "east": -117.737601
+    },
+    "stats": {
+      "mean": 0.09501244127750397,
+      "median": 0.0,
+      "max": 0.9996044039726257,
+      "p30_ha": 1850.62,
+      "p50_ha": 1308.93,
+      "p70_ha": 856.33,
+      "h": 1001,
+      "w": 1527
+    },
+    "png": "ich_pt12.png",
+    "logging_png": "ich_pt12_logging.png",
+    "logging_stats": {
+      "water_pct": 0.0,
+      "logged_lt20_pct": 5.9,
+      "logged_20_40_pct": 6.4,
+      "logged_40_80_pct": 6.6,
+      "forest_80_150_pct": 56.0,
+      "alpine_pct": 0.2,
+      "oldgrowth_pct": 15.5
+    }
+  },
+  {
+    "slug": "ich_pt13",
+    "name": "ICH_pt13",
+    "desc": "ICH random point 13",
+    "lat": 49.19825,
+    "lon": -116.36615,
+    "bbox": {
+      "south": 49.153334,
+      "north": 49.243166,
+      "west": -116.434887,
+      "east": -116.297413
+    },
+    "stats": {
+      "mean": 0.028096187859773636,
+      "median": 0.0,
+      "max": 0.9976778626441956,
+      "p30_ha": 560.81,
+      "p50_ha": 377.46,
+      "p70_ha": 210.23,
+      "h": 1001,
+      "w": 1532
+    },
+    "png": "ich_pt13.png",
+    "logging_png": "ich_pt13_logging.png",
+    "logging_stats": {
+      "water_pct": 0.6,
+      "logged_lt20_pct": 20.6,
+      "logged_20_40_pct": 12.1,
+      "logged_40_80_pct": 13.8,
+      "forest_80_150_pct": 42.1,
+      "alpine_pct": 0.4,
+      "oldgrowth_pct": 4.4
+    }
+  },
+  {
+    "slug": "ich_pt14",
+    "name": "ICH_pt14",
+    "desc": "ICH random point 14",
+    "lat": 51.22977,
+    "lon": -118.20172,
+    "bbox": {
+      "south": 51.184854,
+      "north": 51.274686,
+      "west": -118.273447,
+      "east": -118.129993
+    },
+    "stats": {
+      "mean": 0.05615900084376335,
+      "median": 0.0015978653682395816,
+      "max": 0.9988957643508911,
+      "p30_ha": 908.6,
+      "p50_ha": 518.03,
+      "p70_ha": 276.77,
+      "h": 1001,
+      "w": 1597
+    },
+    "png": "ich_pt14.png",
+    "logging_png": "ich_pt14_logging.png",
+    "logging_stats": {
+      "water_pct": 11.6,
+      "logged_lt20_pct": 4.3,
+      "logged_20_40_pct": 8.7,
+      "logged_40_80_pct": 6.3,
+      "forest_80_150_pct": 17.5,
+      "alpine_pct": 0.2,
+      "oldgrowth_pct": 46.8
+    }
+  },
+  {
+    "slug": "ich_pt15",
+    "name": "ICH_pt15",
+    "desc": "ICH random point 15",
+    "lat": 51.44183,
+    "lon": -119.36046,
+    "bbox": {
+      "south": 51.396914,
+      "north": 51.486746,
+      "west": -119.43252,
+      "east": -119.2884
+    },
+    "stats": {
+      "mean": 0.006676441058516502,
+      "median": 0.0,
+      "max": 0.9812296628952026,
+      "p30_ha": 95.24,
+      "p50_ha": 42.52,
+      "p70_ha": 15.45,
+      "h": 1001,
+      "w": 1605
+    },
+    "png": "ich_pt15.png",
+    "logging_png": "ich_pt15_logging.png",
+    "logging_stats": {
+      "water_pct": 2.0,
+      "logged_lt20_pct": 36.2,
+      "logged_20_40_pct": 17.0,
+      "logged_40_80_pct": 13.9,
+      "forest_80_150_pct": 12.1,
+      "alpine_pct": 0.2,
+      "oldgrowth_pct": 14.5
     }
   }
 ]
