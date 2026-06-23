@@ -22,6 +22,7 @@ from pathlib import Path
 
 import geopandas as gpd
 import numpy as np
+import pandas as pd
 import requests
 import rasterio.features
 from rasterio.transform import from_bounds as rio_bounds
@@ -29,16 +30,45 @@ from rasterio.transform import from_bounds as rio_bounds
 ROOT       = Path(__file__).resolve().parents[2]
 TILE_CACHE = ROOT / "results" / "analysis" / "cwh_spot_comparisons" / "tile_cache"
 
-# Province-wide parks data via BC Data Catalogue WFS (the local GDB is a
-# northern-BC subset only; the WFS covers all of BC down to ~48°N).
-PARKS_WFS = (
+# Province-wide protected-area data via BC Data Catalogue WFS. Three authoritative
+# layers are combined so the protected-area fraction reflects ALL protected-area
+# designations, not just provincial parks (matches docs/tiles/park_contours.geojson;
+# see scripts/analysis/build_park_contours.py).
+WFS_BASE = (
     "https://openmaps.gov.bc.ca/geo/pub/wfs"
     "?service=WFS&version=2.0.0&request=GetFeature"
-    "&typeName=WHSE_TANTALIS.TA_PARK_ECORES_PA_SVW"
-    "&outputFormat=application/json"
-    "&srsName=EPSG:4326"
-    "&count=5000"
+    "&outputFormat=application/json&srsName=EPSG:4326&count=10000"
 )
+
+# (typeName, name_field, fixed_designation, area_field, area_is_sqm)
+PARK_SOURCES = [
+    ("WHSE_TANTALIS.TA_PARK_ECORES_PA_SVW",
+     "PROTECTED_LANDS_NAME", None, "OFFICIAL_AREA_HA", False),
+    ("WHSE_TANTALIS.TA_CONSERVANCY_AREAS_SVW",
+     "CONSERVANCY_AREA_NAME", "CONSERVANCY", "OFFICIAL_AREA_HA", False),
+    ("WHSE_ADMIN_BOUNDARIES.CLAB_NATIONAL_PARKS",
+     "ENGLISH_NAME", "NATIONAL PARK", "FEATURE_AREA_SQM", True),
+]
+
+
+def fetch_protected_areas():
+    """Fetch and concatenate the three protected-area WFS layers."""
+    frames = []
+    for type_name, name_field, fixed_desig, area_field, area_is_sqm in PARK_SOURCES:
+        r = requests.get(f"{WFS_BASE}&typeName={type_name}", timeout=180)
+        r.raise_for_status()
+        feats = r.json().get('features', [])
+        gdf = gpd.GeoDataFrame.from_features(feats, crs='EPSG:4326')
+        if not len(gdf):
+            continue
+        out = gpd.GeoDataFrame(index=gdf.index, geometry=gdf.geometry, crs=gdf.crs)
+        out['PROTECTED_LANDS_NAME'] = gdf.get(name_field)
+        out['PROTECTED_LANDS_DESIGNATION'] = (
+            fixed_desig if fixed_desig else gdf.get('PROTECTED_LANDS_DESIGNATION'))
+        out['PARK_CLASS'] = gdf['PARK_CLASS'] if 'PARK_CLASS' in gdf else None
+        frames.append(out)
+        print(f"    + {type_name.split('.')[-1]}: {len(out):,}")
+    return gpd.GeoDataFrame(pd.concat(frames, ignore_index=True), crs='EPSG:4326')
 
 SCALE_M   = 10
 HA_PER_PX = (SCALE_M ** 2) / 10_000
@@ -159,21 +189,20 @@ def apply_suppression(grid, log_grid):
 def main():
     print("Loading parks / protected areas from BC Data Catalogue WFS...")
     try:
-        r = requests.get(PARKS_WFS, timeout=90)
-        r.raise_for_status()
-        feats = r.json().get('features', [])
-        parks = gpd.GeoDataFrame.from_features(feats, crs='EPSG:4326')
+        parks = fetch_protected_areas()
     except Exception as exc:
-        sys.exit(f"Failed to fetch parks via WFS: {exc}")
+        sys.exit(f"Failed to fetch protected areas via WFS: {exc}")
     print(f"  {len(parks):,} protected area polygons loaded (province-wide)")
     print(f"  Designations: {parks['PROTECTED_LANDS_DESIGNATION'].value_counts().to_dict()}")
     print()
 
     # Designation codes → short label mapping
     DESIG_LABELS = {
+        'NATIONAL PARK':      'National Park',
         'PROVINCIAL PARK':    'Prov. Park',
-        'ECOLOGICAL RESERVE': 'Ecol. Reserve',
+        'CONSERVANCY':        'Conservancy',
         'PROTECTED AREA':     'Protected Area',
+        'ECOLOGICAL RESERVE': 'Ecol. Reserve',
     }
 
     # Accumulators

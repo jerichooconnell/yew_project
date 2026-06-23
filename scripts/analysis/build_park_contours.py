@@ -2,284 +2,134 @@
 """
 build_park_contours.py
 ─────────────────────────────────────────────────────────────────────────────
-Regenerates docs/tiles/park_contours.geojson from two sources:
+Regenerates docs/tiles/park_contours.geojson at high resolution from three
+authoritative BC Data Catalogue WFS layers (all returned full-resolution,
+EPSG:4326):
 
-  1. BC provincial parks / ecological reserves / protected areas
-     → BC Data Catalogue WFS (WHSE_TANTALIS.TA_PARK_ECORES_PA_SVW)
-       Full province-wide coverage, 930 features.
+  1. Provincial parks / ecological reserves / protected areas / recreation areas
+     → WHSE_TANTALIS.TA_PARK_ECORES_PA_SVW          (~930 features)
+  2. Conservancies
+     → WHSE_TANTALIS.TA_CONSERVANCY_AREAS_SVW        (~169 features)
+  3. National parks (federal boundaries within BC)
+     → WHSE_ADMIN_BOUNDARIES.CLAB_NATIONAL_PARKS     (~102 polygons)
 
-  2. Federal / national parks not in BC Data Catalogue
-     → OpenStreetMap Overpass API (targeted queries per park)
-       Covers Gwaii Haanas NP Reserve, Pacific Rim NP Reserve,
-       Gulf Islands NP Reserve, Yoho NP, Glacier NP, etc. in BC.
-
-Geometry is simplified to ~10 m tolerance (0.0001°) so the resulting
-file stays small for the web map but contours remain crisp at zoom 13.
+The previous version of this layer was sourced from a generalised WFS response
+(and OSM Overpass for national parks) and simplified to ~11 m, leaving ~38
+vertices/feature — visibly blocky. These layers are now pulled at full
+resolution (~1,300 vertices/feature for parks) and simplified with a finer,
+topology-preserving tolerance so contours stay crisp while the file remains
+web-friendly.
 
 Usage:
     conda run -n yew_pytorch python scripts/analysis/build_park_contours.py
+    # optional: --tol 0.00005   (simplify tolerance in degrees, ~5.5 m)
 """
 
+import argparse
 import json
-import time
+from collections import Counter
 from pathlib import Path
 
 import geopandas as gpd
+import pandas as pd
 import requests
-from shapely.geometry import (
-    MultiPolygon,
-    Polygon,
-    mapping,
-)
-from shapely.validation import make_valid
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT_PATH = ROOT / "docs" / "tiles" / "park_contours.geojson"
 
-# Simplify tolerance in degrees (~10 m at BC latitudes)
-SIMPLIFY_TOL = 0.0001
+# Default simplify tolerance in degrees (~17 m at BC latitudes). ~1–2 px at the
+# map's working zoom — far crisper than the previous ~38-vertex/feature layer —
+# while keeping the file ~8 MB (≈2.4 MB gzipped, as served by GitHub Pages).
+DEFAULT_TOL = 0.00015
 
-# ── Province-wide BC parks via WFS ────────────────────────────────────────────
-BC_WFS = (
+WFS_BASE = (
     "https://openmaps.gov.bc.ca/geo/pub/wfs"
     "?service=WFS&version=2.0.0&request=GetFeature"
-    "&typeName=WHSE_TANTALIS.TA_PARK_ECORES_PA_SVW"
-    "&outputFormat=application/json"
-    "&srsName=EPSG:4326"
-    "&count=5000"
+    "&outputFormat=application/json&srsName=EPSG:4326&count=10000"
 )
 
-# ── Federal parks to fetch from OSM Overpass ──────────────────────────────────
-# Each entry: (name, designation, bbox as (south, west, north, east))
-# For parks that are container relations (with subarea members), list explicit
-# OSM relation IDs for the unit sub-relations under "unit_ids" instead of a bbox.
-FEDERAL_PARKS = [
-    ("Gwaii Haanas National Park Reserve and Haida Heritage Site",
-     "National Park Reserve",
-     (51.5, -132.5, 53.3, -130.5)),
-    # Pacific Rim is a container relation — use unit sub-relation IDs directly
-    # IDs: 2017388 (Broken Group), 2017389 (Long Beach), 2100172 (West Coast Trail)
-    ("Pacific Rim National Park Reserve of Canada",
-     "National Park Reserve",
-     None,  # bbox=None signals use of unit_ids below
-     [2017388, 2017389, 2100172]),
-    ("Gulf Islands National Park Reserve of Canada",
-     "National Park Reserve",
-     (48.55, -123.7, 48.95, -123.0)),
-    ("Mount Revelstoke National Park of Canada",
-     "National Park",
-     (51.0, -118.5, 51.4, -117.8)),
-    ("Glacier National Park of Canada",
-     "National Park",
-     (51.0, -118.5, 51.7, -117.0)),
-    ("Kootenay National Park of Canada",
-     "National Park",
-     (50.6, -116.6, 51.4, -115.8)),
-    ("Yoho National Park of Canada",
-     "National Park",
-     (51.1, -116.7, 51.7, -116.0)),
+# (typeName, name_field, designation, class_field, area_field, area_is_sqm)
+SOURCES = [
+    ("WHSE_TANTALIS.TA_PARK_ECORES_PA_SVW",
+     "PROTECTED_LANDS_NAME", None, "PARK_CLASS", "OFFICIAL_AREA_HA", False),
+    ("WHSE_TANTALIS.TA_CONSERVANCY_AREAS_SVW",
+     "CONSERVANCY_AREA_NAME", "CONSERVANCY", None, "OFFICIAL_AREA_HA", False),
+    ("WHSE_ADMIN_BOUNDARIES.CLAB_NATIONAL_PARKS",
+     "ENGLISH_NAME", "NATIONAL PARK", None, "FEATURE_AREA_SQM", True),
 ]
 
-OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 
-
-def fetch_bc_parks():
-    """Download all BC provincial parks from the BC Data Catalogue WFS."""
-    print("  Fetching BC parks from WFS…")
-    r = requests.get(BC_WFS, timeout=120)
+def fetch_layer(type_name):
+    print(f"  Fetching {type_name} …")
+    r = requests.get(f"{WFS_BASE}&typeName={type_name}", timeout=240)
     r.raise_for_status()
     feats = r.json().get("features", [])
+    if not feats:
+        print(f"    ⚠ no features returned for {type_name}")
+        return gpd.GeoDataFrame(geometry=[], crs="EPSG:4326")
     gdf = gpd.GeoDataFrame.from_features(feats, crs="EPSG:4326")
-    print(f"    → {len(gdf):,} BC features")
+    print(f"    → {len(gdf):,} features")
     return gdf
 
 
-def build_polys_from_relation(element):
-    """
-    Assemble Shapely Polygons from a single OSM relation element.
-    Uses make_valid to handle self-intersections; returns list of Polygons.
-    """
-    outer_coords, inner_coords = [], []
-    for member in element.get("members", []):
-        pts = member.get("geometry", [])
-        if len(pts) < 3:
-            continue
-        coords = [(p["lon"], p["lat"]) for p in pts]
-        role = member.get("role", "outer")
-        (inner_coords if role == "inner" else outer_coords).append(coords)
-
-    polys = []
-    for outer in outer_coords:
-        try:
-            shell = Polygon(outer)
-            holes = [h for h in inner_coords if shell.contains(Polygon(h))]
-            p = make_valid(Polygon(outer, holes))
-            if p.is_empty:
-                continue
-            if p.geom_type == "Polygon":
-                polys.append(p)
-            elif p.geom_type == "MultiPolygon":
-                polys.extend(p.geoms)
-        except Exception:
-            continue
-    return polys
-
-
-def elems_to_geojson_feature(elems, name, designation):
-    """
-    Convert a list of OSM relation elements to a single GeoJSON Feature.
-    Each element is assembled into polygons; all polygons are combined as
-    a MultiPolygon (no union, so topology issues are avoided).
-    Returns the Feature dict or None.
-    """
-    all_polys = []
-    for elem in elems:
-        for p in build_polys_from_relation(elem):
-            s = p.simplify(SIMPLIFY_TOL, preserve_topology=True)
-            if not s.is_empty and s.geom_type == "Polygon":
-                all_polys.append(s)
-
-    if not all_polys:
-        return None
-
-    geom = MultiPolygon(all_polys) if len(all_polys) > 1 else all_polys[0]
-    print(f"    ✓ {name}  ({geom.geom_type}, {len(all_polys)} parts)")
-    return {
-        "type": "Feature",
-        "geometry": mapping(geom),
-        "properties": {
-            "PROTECTED_LANDS_NAME": name,
-            "PROTECTED_LANDS_DESIGNATION": "NATIONAL PARK",
-            "PARK_CLASS": designation,
-            "SOURCE": "OpenStreetMap",
-        },
-    }
-
-
-def fetch_federal_park(name, designation, bbox, unit_ids=None):
-    """
-    Fetch an OSM national park and return a GeoJSON Feature.
-
-    If unit_ids is given (list of OSM relation IDs), those sub-relations are
-    fetched directly — this handles parks like Pacific Rim that are container
-    relations whose sub-area members carry the actual way geometry.
-
-    Otherwise, a bbox query is used.
-    """
-    if unit_ids:
-        ids_str = ",".join(str(i) for i in unit_ids)
-        q = f"[out:json][timeout:60];relation(id:{ids_str});out geom;"
-        timeout = 65
+def normalise(gdf, name_field, designation, class_field, area_field, area_is_sqm):
+    """Map a source layer onto the common park_contours property schema."""
+    out = gpd.GeoDataFrame(index=gdf.index, geometry=gdf.geometry, crs=gdf.crs)
+    out["PROTECTED_LANDS_NAME"] = gdf.get(name_field)
+    if designation is not None:
+        out["PROTECTED_LANDS_DESIGNATION"] = designation
     else:
-        s, w, n, e = bbox
-        q = (
-            f"[out:json][timeout:40];"
-            f"(relation[\"boundary\"=\"national_park\"]({s},{w},{n},{e});"
-            f"relation[\"protection_title\"~\"National Park\"]({s},{w},{n},{e}););"
-            f"out geom;"
-        )
-        timeout = 45
-
-    try:
-        r = requests.post(OVERPASS_URL, data={"data": q}, timeout=timeout)
-        if r.status_code != 200:
-            print(f"    ✗ {name}: HTTP {r.status_code}")
-            return None
-        elems = r.json().get("elements", [])
-        if not elems:
-            print(f"    ✗ {name}: no OSM relations found")
-            return None
-        if not unit_ids:
-            # Pick best-matching element from bbox result
-            best = next(
-                (el for el in elems
-                 if name.lower().split()[0] in el.get("tags", {}).get("name", "").lower()),
-                elems[0]
-            )
-            elems = [best]
-        return elems_to_geojson_feature(elems, name, designation)
-    except Exception as exc:
-        print(f"    ✗ {name}: {exc}")
-        return None
-
-
-def simplify_gdf(gdf, tol=SIMPLIFY_TOL):
-    """Simplify geometry while preserving validity."""
-    gdf = gdf.copy()
-    gdf["geometry"] = gdf.geometry.simplify(tol, preserve_topology=True)
-    gdf = gdf[~gdf.geometry.is_empty & gdf.geometry.notna()]
-    return gdf
+        out["PROTECTED_LANDS_DESIGNATION"] = gdf.get("PROTECTED_LANDS_DESIGNATION")
+    out["PARK_CLASS"] = gdf.get(class_field) if class_field else None
+    if area_field and area_field in gdf:
+        area = gdf[area_field].astype("float64")
+        out["OFFICIAL_AREA_HA"] = (area / 10_000.0) if area_is_sqm else area
+    else:
+        out["OFFICIAL_AREA_HA"] = None
+    out["SOURCE"] = "BC Data Catalogue"
+    return out
 
 
 def main():
-    print("Building park_contours.geojson")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--tol", type=float, default=DEFAULT_TOL,
+                    help="simplify tolerance in degrees (default %.5f)" % DEFAULT_TOL)
+    args = ap.parse_args()
+
+    print("Building park_contours.geojson (high resolution)")
     print("=" * 60)
 
-    # ── 1. BC Parks (WFS) ───────────────────────────────────────────────────
-    bc_parks = fetch_bc_parks()
+    parts = []
+    for type_name, *cfg in SOURCES:
+        gdf = fetch_layer(type_name)
+        if len(gdf):
+            parts.append(normalise(gdf, *cfg))
 
-    # Keep only the columns we need
-    keep_cols = [
-        "PROTECTED_LANDS_NAME",
-        "PROTECTED_LANDS_DESIGNATION",
-        "PARK_CLASS",
-        "OFFICIAL_AREA_HA",
-        "geometry",
-    ]
-    bc_parks = bc_parks[[c for c in keep_cols if c in bc_parks.columns]]
+    merged = gpd.GeoDataFrame(pd.concat(parts, ignore_index=True), crs="EPSG:4326")
 
-    # Simplify geometry
-    bc_parks = simplify_gdf(bc_parks)
-    print(f"  BC parks after simplification: {len(bc_parks):,}")
+    # Topology-preserving simplification
+    merged["geometry"] = merged.geometry.simplify(args.tol, preserve_topology=True)
+    merged = merged[~merged.geometry.is_empty & merged.geometry.notna()]
 
-    # ── 2. Federal parks (OSM) ──────────────────────────────────────────────
-    print("\n  Fetching federal parks from OpenStreetMap Overpass API…")
-    federal_features = []
-    for entry in FEDERAL_PARKS:
-        name, designation = entry[0], entry[1]
-        bbox = entry[2]
-        unit_ids = entry[3] if len(entry) > 3 else None
-        feat = fetch_federal_park(name, designation, bbox, unit_ids)
-        if feat:
-            federal_features.append(feat)
-        time.sleep(2)
-
-    print(f"\n  Federal parks fetched: {len(federal_features)}/{len(FEDERAL_PARKS)}")
-
-    # ── 3. Combine & write GeoJSON ──────────────────────────────────────────
-    print("\n  Building combined GeoJSON…")
-
-    # Convert BC GDF to features
-    bc_features = json.loads(bc_parks.to_json())["features"]
-
-    # Merge, putting federal parks first so they render below provinces
-    all_features = federal_features + bc_features
-
-    geojson = {
-        "type": "FeatureCollection",
-        "features": all_features,
-    }
-
+    geojson = json.loads(merged.to_json())
     with open(OUT_PATH, "w") as f:
         json.dump(geojson, f, separators=(",", ":"))
 
-    size_kb = OUT_PATH.stat().st_size / 1024
-    print(f"\n  Written: {OUT_PATH}")
-    print(f"  Total features: {len(all_features):,}")
-    print(f"  File size: {size_kb:.0f} KB")
+    # Report
+    desig = Counter(ft["properties"]["PROTECTED_LANDS_DESIGNATION"]
+                    for ft in geojson["features"])
 
-    # Vertex count check
-    total_verts = 0
-    for feat in all_features[:20]:
-        geom = feat["geometry"]
-        def count_verts(g):
-            if g["type"] in ("Polygon",):
-                return sum(len(r) for r in g["coordinates"])
-            elif g["type"] in ("MultiPolygon",):
-                return sum(len(r) for poly in g["coordinates"] for r in poly)
-            return 0
-        total_verts += count_verts(geom)
-    print(f"  Avg vertices (first 20 features): {total_verts // 20}")
+    def verts(g):
+        def walk(x):
+            return 1 if isinstance(x[0], (int, float)) else sum(walk(i) for i in x)
+        return walk(g["coordinates"])
+    tv = sum(verts(ft["geometry"]) for ft in geojson["features"])
+
+    print("\n  Written:", OUT_PATH)
+    print(f"  Features: {len(geojson['features']):,}  |  vertices: {tv:,}"
+          f"  ({tv // max(len(geojson['features']), 1)}/feature)")
+    print(f"  File size: {OUT_PATH.stat().st_size / 1024:.0f} KB  (tol={args.tol})")
+    print("  Designations:", dict(desig))
 
 
 if __name__ == "__main__":

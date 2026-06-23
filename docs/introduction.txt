@@ -1,0 +1,43 @@
+
+Notes for Predictive Population Model Paper;
+
+
+
+The Pacific yew (also known as Taxus brevifolia Nutt or Western Yew) is a gymnosperm tree that occurs in the understory of coniferous and deciduous forests. Its range extends throughout the Pacific Coast from the southern tip of Alaska south through British Columbia into Northern California. In B.C it extends into the Interior Cedar Hemlock zone. (Woods. 2012; Pojar J., & MacKinnon, A .1994)
+
+There is a perceived reduction in populations of Pacific yew (Hartzell. 1990; Council of the Haida Nation. 2016; Pojar J., & MacKinnon, A .1994;) which have raised concerns regarding the conservation of the species. Declines in the trees numbers also decrease their natural genetic diversity and subsequent resilience to disease and climate change.
+
+The Pacific yew plays a crucial role in coastal and riparian ecosystems, providing habitat and supporting biodiversity. ( Bolsinger & Jaramillo.1990;) It is also culturally significant to Indigenous communities, particularly in medicine, tool- making, and spiritual practices. (Turner. 1998, 2012, 2021;), Despite its ecological and cultural importance the species has faced multiple threats. 
+
+The Pacific yew is listed on the IUCN Red List of Threatened Species as Near Threatened this is due to the historical harvesting of the trees bark for Taxol, (a compound used in cancer treatment) and the continuing industrial logging of its habitat. This has resulted in a near 30% reduction in their population which is still considered to be declining. (Thomas, 2013)  .
+The yew struggles to regenerate after disturbance events like clear cutting (Busing Halpern et al, 1995) and is particularly sensitive to forest fragmentation, making it highly dependent on Old-Growth ecosystems. ( Arsenault & Bradfield, 1995; Reynolds, 2022;). Studies confirm that Pacific yews rarely re-establish in disturbed environments, and their scarcity of fruiting and low seedling survival rates further hinder recovery ( Council of the Haida Nation. 2016; Hartzell. 1990.) The species ‘exhibits slow recovery from major disturbances, potentially requiring centuries to return to pre-harvest abundance’. (Busing et al. 1995).
+The yews very thin bark (approx. 0.5 cms) makes the tree highly sensitive to the effects of fires. This has been demonstrated to hinder re-growth and re-establishment of Pacific yew. ( Reynolds, 2022; Busing, Halpern, et al., 1995a; Halpern & Spies, 1995; Hoffman, 2018; Scher & Jimerson, 1989; Hartzell, 1990;). The increasing occurrence of high-intensity forest fires associated with continuing climate change is another potential negative population factor.
+The remaining Old-Growth forests are increasingly at risk from logging and climate change. (Bergeron & Fenton, 2012; Lindenmayer et al., 2012; Woods 2012;) As the life process of the Pacific yew operate on a much longer time scale than modern forestry practices, which favour short harvest rotations and extensive clear cutting, the yew struggles to re-establish itself once the Old Growth forest is cleared. (Arsenault & Bradfield, 1995; Council of the Haida Nation. 2016;). 
+
+Within this trend of negative pressures on the trees population there is also a lack of inventory to understand the Pacific yews current population status. There are recognized ‘knowledge gaps’ and a lack of ‘hard data’ on the species current viability and distribution in B.C. (Reynolds,2022; COSWIC, 2024;) This is a barrier to understanding the perceived risks to the species and hindering any informed decision making within the Provincial Government and other stake holders. An understanding of the trees population levels would also in part recognize First Nations concerns on the over harvesting of Pacific yew.( Council of the Haida Nation. 2016; Nancy J. Turner and Richard J. Hebda. 2012;) 
+The objective of this study is to model the spatial distribution and abundance of the Pacific yew. The use of predictive habitat modelling quantifies the relative abundance of a species against other environmental factors and conditions on the landscape.This would be advantageous in addressing the lack of knowledge and data on the species. (Guisan and Zimmermann, 2000)
+
+
+
+Reference;
+Arsenault, A., & Bradfield, G. E. (1995). Structural – compositional variation in three age-classes of temperate rainforests in southern coastal British Columbia. Canadian Journal of Botany, 73(1), 54–64. https://doi.org/10.1139/b95-007 
+Bergeron, Y., & Fenton, N. J. (2012). Boreal forests of eastern Canada revisited: Old growth, nonfire disturbances, forest succession, and biodiversity. Botany, 90(6), 509–523. https://doi.org/10.1139/b2012-034 
+Busing, R. T., Halpern, C. B., & Spies, T. A. (1995a). Ecology of Pacific Yew (Taxus brevifolia) in Western Oregon and Washington. Conservation Biology, 9(5), 1199–1207. JSTOR. 
+Bolsinger, C. L., & Jaramillo, A. E. (1990). Taxus brevifolia Nutt. Pacific Yew. Silvics of North America.
+Guisan, A., Zimmermann, N.E., 2000. Predictive habitat distribution models in ecol- ogy. Ecol. Model. 135, 147–186. 
+Hartzell, H. (1990). The Yew Tree; A Thousand Whispers. 
+
+Pojar J., & MacKinnon, A .(1994). Plants of Coastal British Columbia.
+
+Reynolds, Genevieve E M. (2022) Ecological Understandings of Indigenous Management Shape the Study of Pacific Yew; Masters Thesis, UVic. 
+Council of the Haida Nation. (2016) hlgid-Western yew-Taxus brevifolia Effectiveness Monitoring Report
+Thomas, P. (2013). Taxus brevifolia. IUCN Red List of Threatened Species. https://www.iucnredlist.org/en 
+Nancy, J. Turner and Richard j. Hebda. (2012). Saanich Ethnobotany; Culturally Important Plants of the WSANEC People.
+‘In some places Western yew has been over harvested, and many carvers say that it is hard to find yew trees any more’ (pg 58)
+
+Nancy, J. Turner. (2021) Plants of Haida GwaII.
+
+Nancy, J. Turner. 2nd edition 1998. From; Plant Technology of First Peoples in British Columbia.
+
+Woods, Sarah. (2012). Western Yew Management in British Columbian Forests.
+

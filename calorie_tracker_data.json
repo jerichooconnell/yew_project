@@ -1,0 +1,268 @@
+{
+  "profile": {
+    "name": "Jericho",
+    "weight": 180.0,
+    "goal_weight": 172.0,
+    "goal_lbs": 8.0,
+    "deficit_target": 500,
+    "height_in": 74,
+    "age": 31,
+    "sex": "m",
+    "activity": "Extra active",
+    "act_mult": 1.9,
+    "bmr": 1841,
+    "tdee": 3498,
+    "daily_budget": 2998,
+    "created": "2026-04-20",
+    "start_weight": 180.0,
+    "milestones_shown": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "budget_history": [
+      {
+        "from": "2026-04-20",
+        "budget": 2998
+      }
+    ]
+  },
+  "log": {
+    "2026-04-20": [
+      {
+        "time": "20:55",
+        "name": "lunch",
+        "calories": 600
+      },
+      {
+        "time": "20:55",
+        "name": "dinner 1",
+        "calories": 250
+      },
+      {
+        "time": "20:56",
+        "name": "egg + bagel + mayo",
+        "calories": 650
+      },
+      {
+        "time": "20:56",
+        "name": "icecream",
+        "calories": 600
+      }
+    ],
+    "2026-04-21": [
+      {
+        "time": "19:02",
+        "name": "breakfast",
+        "calories": 200
+      },
+      {
+        "time": "19:02",
+        "name": "lunch",
+        "calories": 600
+      },
+      {
+        "time": "19:02",
+        "name": "latte",
+        "calories": 200
+      },
+      {
+        "time": "19:03",
+        "name": "dinner",
+        "calories": 1000
+      }
+    ],
+    "2026-04-22": [
+      {
+        "time": "22:14",
+        "name": "total",
+        "calories": 2300
+      }
+    ],
+    "2026-04-23": [
+      {
+        "time": "22:43",
+        "name": "total",
+        "calories": 2100
+      }
+    ],
+    "2026-04-24": [
+      {
+        "time": "21:05",
+        "name": "totla",
+        "calories": 2100
+      }
+    ],
+    "2026-04-26": [
+      {
+        "time": "15:49",
+        "name": "yesterday",
+        "calories": 2400
+      }
+    ],
+    "2026-04-27": [
+      {
+        "time": "22:09",
+        "name": "total",
+        "calories": 2150
+      }
+    ],
+    "2026-04-28": [
+      {
+        "time": "22:01",
+        "name": "total",
+        "calories": 2200
+      }
+    ],
+    "2026-04-29": [
+      {
+        "time": "22:47",
+        "name": "smoothie",
+        "calories": 250
+      },
+      {
+        "time": "22:47",
+        "name": "eggs",
+        "calories": 400
+      },
+      {
+        "time": "22:47",
+        "name": "pancake",
+        "calories": 500
+      },
+      {
+        "time": "22:48",
+        "name": "pancake",
+        "calories": 600
+      }
+    ],
+    "2026-04-30": [
+      {
+        "time": "22:35",
+        "name": "smoothie",
+        "calories": 200
+      },
+      {
+        "time": "22:36",
+        "name": "tofu",
+        "calories": 600
+      },
+      {
+        "time": "22:36",
+        "name": "curry",
+        "calories": 420
+      },
+      {
+        "time": "22:36",
+        "name": "pancake",
+        "calories": 600
+      },
+      {
+        "time": "22:37",
+        "name": "dins",
+        "calories": 400
+      }
+    ],
+    "2026-05-01": [
+      {
+        "time": "21:25",
+        "name": "total",
+        "calories": 2000
+      }
+    ],
+    "2026-05-02": [
+      {
+        "time": "23:39",
+        "name": "total",
+        "calories": 2500
+      }
+    ],
+    "2026-05-03": [
+      {
+        "time": "22:45",
+        "name": "total",
+        "calories": 2100
+      }
+    ],
+    "2026-05-05": [
+      {
+        "time": "22:08",
+        "name": "total",
+        "calories": 2000
+      }
+    ],
+    "2026-05-06": [
+      {
+        "time": "21:26",
+        "name": "total",
+        "calories": 1900
+      }
+    ],
+    "2026-05-07": [
+      {
+        "time": "21:46",
+        "name": "total",
+        "calories": 2000
+      }
+    ],
+    "2026-05-08": [
+      {
+        "time": "21:37",
+        "name": "total",
+        "calories": 2300
+      }
+    ],
+    "2026-05-09": [
+      {
+        "time": "22:53",
+        "name": "total",
+        "calories": 2000
+      }
+    ],
+    "2026-05-11": [
+      {
+        "time": "22:51",
+        "name": "total today and yesterday",
+        "calories": 1500
+      }
+    ],
+    "2026-05-12": [
+      {
+        "time": "23:02",
+        "name": "total",
+        "calories": 2700
+      }
+    ],
+    "2026-05-13": [
+      {
+        "time": "23:09",
+        "name": "2400",
+        "calories": 2400
+      }
+    ],
+    "2026-05-14": [
+      {
+        "time": "23:06",
+        "name": "total",
+        "calories": 2500
+      }
+    ],
+    "2026-05-18": [
+      {
+        "time": "22:28",
+        "name": "total",
+        "calories": 2000
+      }
+    ],
+    "2026-05-19": [
+      {
+        "time": "22:57",
+        "name": "total",
+        "calories": 2100
+      }
+    ]
+  },
+  "weight_log": {}
+}

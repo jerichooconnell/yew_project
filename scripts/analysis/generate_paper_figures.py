@@ -670,45 +670,48 @@ def fig13_logging_age_classes(rows):
 # FIGURE 14: Model performance summary
 # ══════════════════════════════════════════════════════════════════════
 def fig14_model_performance():
-    """Table-like figure summarizing model performance metrics."""
+    """Grouped bar chart comparing classifiers (AUC-ROC, Accuracy, F1)."""
     models = [
-        ('XGBoost (production)', 0.9957, 0.989, 0.947),
-        ('MLP + StandardScaler', 0.9961, 0.986, 0.977),
+        ('XGBoost\n(production)', 0.9957, 0.989, 0.947),
+        ('MLP +\nStandardScaler', 0.9961, 0.986, 0.977),
         ('MLP raw', 0.9962, 0.976, 0.960),
-        ('Random Forest', 0.9896, 0.984, 0.974),
+        ('Random\nForest', 0.9896, 0.984, 0.974),
         ('kNN (k=3)', 0.9909, 0.911, 0.833),
-        ('Logistic Regression', 0.9165, 0.813, 0.562),
+        ('Logistic\nRegression', 0.9165, 0.813, 0.562),
     ]
-    
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.axis('off')
-    
-    col_labels = ['Model', 'AUC-ROC', 'Accuracy', 'F1 Score']
-    table_data = [[m[0], f'{m[1]:.4f}', f'{m[2]:.3f}', f'{m[3]:.3f}'] for m in models]
-    
-    table = ax.table(cellText=table_data, colLabels=col_labels,
-                    loc='center', cellLoc='center')
-    table.auto_set_font_size(False)
-    table.set_fontsize(11)
-    table.scale(1.2, 1.5)
-    
-    # Style header
-    for j in range(len(col_labels)):
-        table[0, j].set_facecolor('#2E8B57')
-        table[0, j].set_text_props(color='white', fontweight='bold')
-    
-    # Highlight production model
-    for j in range(len(col_labels)):
-        table[1, j].set_facecolor('#E8F5E9')
-    
-    ax.set_title('Classifier Performance on Satellite Embedding Features\n(validation set, 64-band spectral embeddings)', 
-                fontsize=14, pad=20)
-    
+    names = [m[0] for m in models]
+    metrics = ['AUC-ROC', 'Accuracy', 'F1 Score']
+    colors = ['#2E8B57', '#5B9BD5', '#E8A33D']
+    vals = np.array([[m[1], m[2], m[3]] for m in models])
+
+    x = np.arange(len(models))
+    w = 0.26
+    fig, ax = plt.subplots(figsize=(11, 5.5))
+    for k, (metric, c) in enumerate(zip(metrics, colors)):
+        bars = ax.bar(x + (k - 1) * w, vals[:, k], w, label=metric, color=c,
+                      edgecolor='white', linewidth=0.5, zorder=3)
+        for b, v in zip(bars, vals[:, k]):
+            ax.text(b.get_x() + b.get_width() / 2, v + 0.004, f'{v:.3f}',
+                    ha='center', va='bottom', fontsize=7.5, rotation=90)
+
+    # Zoom y to 0.5–1.0 so the near-ceiling differences are visible
+    ax.set_ylim(0.5, 1.03)
+    ax.set_xticks(x)
+    ax.set_xticklabels(names, fontsize=10)
+    ax.set_ylabel('Score', fontsize=12)
+    ax.set_title('Classifier Performance on 64-band AlphaEarth Embeddings\n'
+                 '(held-out validation set; y-axis truncated at 0.5)', fontsize=13)
+    ax.axvline(0.5, color='#2E8B57', ls=':', lw=1.2, alpha=0.7, zorder=1)
+    ax.annotate('production model', xy=(0, 1.005), fontsize=8.5, color='#2E8B57',
+                ha='center', style='italic')
+    ax.legend(fontsize=10, loc='lower left', framealpha=0.95)
+    ax.grid(axis='y', alpha=0.3, zorder=0)
+
     fig.tight_layout()
     fig.savefig(OUT_DIR / 'fig14_model_performance.png', dpi=300, bbox_inches='tight')
     fig.savefig(OUT_DIR / 'fig14_model_performance.pdf', bbox_inches='tight')
     plt.close(fig)
-    print("  ✓ Figure 14: Model performance table")
+    print("  ✓ Figure 14: Model performance bar chart")
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -884,41 +887,52 @@ def fig18_study_area_map():
     with open(TILES_JSON) as f:
         tiles = json.load(f)
     
-    fig, ax = plt.subplots(figsize=(10, 12))
-    
+    fig, ax = plt.subplots(figsize=(10, 9))
+
+    # Land backdrop: simplified BC boundary for geographic context
+    bc_path = ROOT / "results" / "analysis" / "cwh_yew_population_100k" / "bc_boundary_simplified.geojson"
+    if bc_path.exists():
+        try:
+            import geopandas as gpd
+            bc = gpd.read_file(bc_path).to_crs(4326)
+            bc.plot(ax=ax, color='#eef2ee', edgecolor='#9bb09b', linewidth=0.6, zorder=1)
+        except Exception as exc:
+            print(f"    (BC boundary not drawn: {exc})")
+
+    n_coastal = n_ich = 0
     for t in tiles:
         lat = t.get('lat', 0)
-        lng = t.get('lng', 0)
+        lon = t.get('lon', t.get('lng', 0))          # tiles.json uses 'lon'
         slug = t.get('slug', '')
-        
-        if 'ich' in slug.lower():
-            color = ZONE_COLORS['ICH']
-            marker = '^'
-            s = 80
+
+        is_ich = slug.lower().startswith('ich')      # ICH tiles are 'ich_ptNN'
+        if is_ich:
+            color, marker, s = ZONE_COLORS['ICH'], '^', 70
+            n_ich += 1
         else:
-            color = ZONE_COLORS['CWH']
-            marker = 'o'
-            s = 50
-        
-        ax.scatter(lng, lat, c=color, marker=marker, s=s,
-                  edgecolors='black', linewidth=0.5, zorder=3)
-    
+            color, marker, s = ZONE_COLORS['CWH'], 'o', 45
+            n_coastal += 1
+
+        ax.scatter(lon, lat, c=color, marker=marker, s=s,
+                   edgecolors='black', linewidth=0.5, zorder=3)
+
     ax.set_xlabel('Longitude (°W)', fontsize=12)
     ax.set_ylabel('Latitude (°N)', fontsize=12)
-    ax.set_title('Study Area Locations\n99 tiles across British Columbia', fontsize=14)
-    ax.grid(alpha=0.3)
-    
-    # Legend
+    ax.set_title(f'Study Area Locations\n{len(tiles)} tiles across British Columbia', fontsize=14)
+    ax.grid(alpha=0.25, zorder=0)
+
     handles = [
-        plt.scatter([], [], c=ZONE_COLORS['CWH'], marker='o', s=50, edgecolors='black', label='Coastal tiles (85)'),
-        plt.scatter([], [], c=ZONE_COLORS['ICH'], marker='^', s=80, edgecolors='black', label='ICH tiles (14)'),
+        plt.scatter([], [], c=ZONE_COLORS['CWH'], marker='o', s=45, edgecolors='black',
+                    label=f'Coastal tiles ({n_coastal})'),
+        plt.scatter([], [], c=ZONE_COLORS['ICH'], marker='^', s=70, edgecolors='black',
+                    label=f'ICH tiles ({n_ich})'),
     ]
     ax.legend(handles=handles, fontsize=11, loc='lower left')
-    
-    # Rough BC coastline bounds for context
-    ax.set_xlim(-135, -114)
+
+    # Frame on the populated coastal+interior extent (with a small margin)
+    ax.set_xlim(-134, -114.5)
     ax.set_ylim(48, 56)
-    ax.set_aspect('equal')
+    ax.set_aspect(1.0 / np.cos(np.radians(52)))      # approx. equal-distance at BC latitudes
     
     fig.tight_layout()
     fig.savefig(OUT_DIR / 'fig18_study_area_map.png', dpi=300, bbox_inches='tight')
