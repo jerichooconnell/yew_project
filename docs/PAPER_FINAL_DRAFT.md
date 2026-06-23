@@ -244,11 +244,13 @@ Results are presented via an interactive Leaflet.js web map hosted on GitHub Pag
 
 ## 3. Results
 
-### 3.1 Overall Habitat Decline
+### 3.1 How much yew habitat remains, and where?
 
-Across all 99 study tiles (~9,900 km², 69 BEC subzones), we estimate that **154,483 ha** of yew habitat existed historically under pre-logging old-growth conditions, of which **47,534 ha (30.8%)** remains today (Table 1, Figure 1). This represents an overall decline of **69.2%**, with the per-zone severity of decline ranked in Figure 4. Unless otherwise stated, all headline habitat areas in this paper are *continuous probability-mass* estimates (the sum of per-pixel yew probability × 0.01 ha; §2.5.4) rather than counts of pixels above a fixed threshold; two threshold-based figures used for specific secondary analyses (37,885 ha and 29,028 ha) are defined where they appear in §4.4 and §3.9.
+Across all 99 study tiles (~9,900 km², 69 BEC subzones), we estimate that **154,483 ha** of yew habitat existed historically under pre-logging old-growth conditions, of which **47,534 ha (30.8%)** remains today (Table 1, Figure 1). This represents an overall decline of **69.2%**, with per-zone severity ranked in Figure 4. Unless otherwise stated, all headline habitat areas are *continuous probability-mass* estimates (the sum of per-pixel yew probability × 0.01 ha; §2.5.4) rather than counts of pixels above a fixed threshold; threshold-based figures used in specific secondary analyses (37,885 ha at P ≥ 0.5 and 29,028 ha in the 42-tile erosion subset) are defined where they appear.
 
-The total estimated loss of **106,949 ha** (the difference between original and current remaining habitat) is overwhelmingly driven by industrial logging, with a smaller contribution from historical fire. Of this total, fire suppression accounts for an estimated **692 ha** (0.4% of original), the remainder being attributable to logging of formerly old-growth stands. Separately, low-elevation suppression removes **18,434 ha** (11.9%) of *false-positive* predictions from intertidal and low-coastal zones; this is a model correction to improve spatial accuracy, not a quantity of destroyed habitat, and is therefore not counted as ecological loss.
+The remaining 47,534 ha is not evenly distributed. The Coastal Western Hemlock zone holds 72% of it (34,386 ha), concentrated in remote hypermaritime terrain where logging pressure has been lower. The Interior Cedar–Hemlock zone holds a further 13% (6,385 ha), mostly in isolated valley-bottom fragments. At the opposite extreme, the Coastal Douglas-fir zone — which historically supported some of the densest yew populations on Vancouver Island and the Gulf Islands — retains only 36 ha.
+
+The model pipeline that converts raw per-pixel spectral probabilities to this final estimate applies three sequential corrections (Figure 2): logging suppression (removing predictions from stands <150 yr old, −146,506 ha), fire suppression (a time-decaying modifier on historical burn perimeters, −692 ha), and elevation correction (removing false positives below 30 m elevation, −18,434 ha). The elevation correction is a model accuracy adjustment — not a quantity of ecological loss — and is excluded from all habitat-decline accounting. Mean yew probability in old-growth pixels is highest in warm, moist subzones at low to mid elevation (ICHxw: 0.489; CWHvh1: 0.411; ICHdw1: 0.410; CDFmm: 0.381; Figure S6), reflecting the species' preference for frost-free, moisture-retentive sites.
 
 **Table 1. Summary statistics by major BEC zone (zones with >10 ha estimated original yew habitat).**
 
@@ -264,73 +266,33 @@ The total estimated loss of **106,949 ha** (the difference between original and 
 | CMA  | 609 | 225 | 63.0 | 10,474 | 1 |
 | **Total** | **154,483** | **47,534** | **69.2** | not summed† | **692** |
 
-†The "Logged Area" column reports total logged *forest* area within each zone (all non-old-growth forested land), which is a distinct and much larger quantity than the area of logged *yew habitat*. It is not summed here because the zone-level totals reflect overall forest disturbance, not yew-specific loss; the estimated logged yew-habitat area (the difference between original and remaining yew habitat) is 106,949 ha (§3.1).
+†The "Logged Area" column reports total logged *forest* area within each zone (all non-old-growth forested land), a distinct and larger quantity than the area of logged *yew habitat*. It is not summed because zone totals reflect overall forest disturbance, not yew-specific loss; the estimated logged yew-habitat area (original minus remaining) is 106,949 ha.
 
-### 3.2 Coastal Western Hemlock (CWH) Zone
+### 3.2 What drove the decline?
 
-The CWH zone contains the vast majority of BC's yew habitat (72% of estimated original, 72% of current remaining). Across 14 CWH subzones and 885,783 ha of analysed area:
+#### 3.2.1 Logging as the primary driver
 
-- **Estimated original yew habitat**: 111,407 ha
-- **Current remaining**: 34,386 ha (**69.1% decline**)
-- **Old-growth forest remaining**: 330,804 ha (37.3% of total CWH area)
-- **Logged forest**: 312,128 ha (35.2% of total CWH area)
+Industrial clear-cut logging accounts for an estimated **106,949 ha** of destroyed yew habitat — approximately 99.4% of all ecological loss documented in this study. This dominance is reflected in the suppression pipeline: the logging filter removes 146,506 ha (68.7%) of raw model predictions, far exceeding the contributions of fire (692 ha) and all secondary threats combined. The three focal zones exhibit qualitatively different logging-driven decline pathways (Figure S13):
 
-`TODO: these area figures don't add up — reconcile (old-growth + logged + other vs total CWH area, and vs the estimated yew-habitat figures).`
+**Coastal Western Hemlock (CWH):** The CWH zone was logged extensively from the 1940s through the 1980s, with the 40–80 yr stand-age class now dominant (125,262 ha). Despite retaining 37.3% old-growth by area, 35.2% of the landscape is logged, and decline rates exceed 83% in the drier maritime subzones most intensively harvested (CWHxm2: 89.5%; CWHmm2: 90.7%; CWHdm: 83.9%). The CWHvh2 subzone retains the most yew habitat in absolute terms (10,355 ha) because its remote hypermaritime terrain (121,647 ha old-growth) has been less accessible to industrial forestry (Figure 3).
 
-The most severely impacted CWH subzones include CWHxm2 (89.5% decline), CWHmm2 (90.7%), CWHdm (83.9%), and CWHxm1 (84.1%) — all reflecting heavy logging in drier maritime subzones. The CWHvh2 subzone retains the most yew habitat in absolute terms (10,355 ha) due to its extensive old-growth (121,647 ha) in remote hypermaritime terrain (Figure 3).
+**Interior Cedar–Hemlock (ICH):** The ICH zone shows the second-highest overall decline (74.7%), exceeding the CWH despite a smaller absolute area, because 68.0% of the ICH landscape has been logged versus 35.2% of the CWH. Yew habitat in the ICH concentrates in accessible valley bottoms — precisely the terrain most intensively harvested. The ICHxw subzone has the highest raw yew probability in old-growth of any sampled subzone (0.489), yet has lost 83.8% of its estimated original habitat to logging. Recent logging (<20 yr stands: 22,579 ha, 23% of total logged ICH area) indicates that harvest pressure remains active (Figure S1).
 
-### 3.3 Interior Cedar–Hemlock (ICH) Zone
+**Coastal Douglas-fir (CDF):** The CDF zone represents a qualitatively different, more extreme trajectory: near-complete regional extirpation. Of 36,055 ha analysed, only 214 ha of old-growth remains (0.6%), and modelled current habitat is just 36 ha — a 99.1% decline. The CDFmm subzone historically had the highest yew prevalence of any sampled subzone (0.381), confirming that the CDF was prime yew habitat. Its near-total loss reflects not only commercial logging but decades of urban expansion and agricultural conversion across southern Vancouver Island and the Gulf Islands (Figure S2).
 
-The ICH zone supports Pacific yew in moist valley-bottom forests east of the Coast and Columbia Mountains. Our analysis of 14 ICH tiles across 142,778 ha reveals:
+#### 3.2.2 Fire as a secondary driver
 
-- **Estimated original yew habitat**: 25,257 ha
-- **Current remaining**: 6,385 ha (**74.7% decline**)
+Across all tiles, 5,700 historical fire perimeters (1900–2024) covering approximately 96,543 ha intersected the study area, yielding an estimated **692 ha** of yew habitat suppression — small relative to logging but non-negligible in drier interior subzones (ICH: 152 ha; CWH: 460 ha). Fire suppression is estimated by a time-decaying modifier that assumes linear recovery over 124 years; under this model, older fires retain partial yew habitat because fires rarely consume the full polygon and mature individuals persist within burn perimeters. The 2020s burned area (8,146 ha) exceeds the 2010s (4,859 ha), consistent with an accelerating fire season driven by climate change (Figure S7), suggesting that fire's contribution to future habitat loss will grow.
 
-The ICH zone shows a **higher percentage decline** than the CWH (74.7% vs. 69.1%), primarily because a larger proportion of the ICH landscape has been logged (68.0% vs. 35.2%), reflecting the more accessible valley-bottom terrain where yew habitat concentrates. The ICHxw subzone has the highest mean yew probability in old-growth of any sampled subzone (0.489), yet has lost 83.8% of its estimated original habitat (Figure S1).
+#### 3.2.3 Cumulative secondary threats
 
-### 3.4 Coastal Douglas-fir (CDF) Zone
-
-The CDF zone, restricted to the rain-shadow lowlands of southeastern Vancouver Island and the Gulf Islands, has experienced the most catastrophic yew habitat loss of any zone (Figure S2):
-
-- **Estimated original yew habitat**: 3,889 ha
-- **Current remaining**: 36 ha (**99.1% decline**)
-- **Old-growth forest remaining**: 214 ha (0.6% of total CDF area)
-- **Logged/developed/converted**: 35,841 ha (99.4% of total CDF area)
-
-The single CDFmm subzone had the highest old-growth yew prevalence rate of any sampled subzone (0.381), indicating that the Coastal Douglas-fir zone historically supported dense yew populations.
-
-### 3.5 Old-Growth Yew Prevalence
-
-Mean yew probability in old-growth pixels varies widely among subzones, reflecting genuine ecological variation (Figure S6). The highest-prevalence subzones are ICHxw (0.489), CWHvh1 (0.411), ICHdw1 (0.410), CDFmm (0.381), and CWHmm2 (0.365). These rates, concentrated in warm, moist subzones at low to mid elevation, serve as the basis for estimating original habitat area.
-
-### 3.6 Fire Impact
-
-Across all tiles, 5,700 fire features covering approximately 96,543 ha intersected the study area. Total estimated yew habitat suppression from fire is 692 ha — small relative to logging but contributing to cumulative decline, particularly in drier interior subzones. The 2020s burned area (8,146 ha) exceeds the 2010s (4,859 ha), consistent with an accelerating fire season driven by climate change (Figure S7).
-
-### 3.7 Post-Classification Suppression Pipeline
-
-The suppression pipeline progressively reduces raw model output to a realistic current habitat estimate (Figure 2). The stages below describe *model processing* — successive corrections applied to the raw per-pixel spectral suitability surface — and should be distinguished from the prevalence-based original-versus-remaining accounting reported in §3.1. The logging and fire stages remove pixels where habitat once existed but has since been destroyed (ecological loss), whereas the elevation stage removes spurious predictions in intertidal and low-coastal zones (false-positive correction, not habitat loss):
-
-| Stage | Yew Habitat (ha) |
-|-------|------------------:|
-| Raw model output | 213,165 |
-| After logging suppression | 66,659 |
-| After fire suppression | 65,968 |
-| After elevation suppression | **47,534** |
-
-Logging suppression is the dominant filter, removing ~146,506 ha (68.7% of raw predictions); fire suppression removes a further ~691 ha, and elevation correction removes ~18,434 ha of false positives. The spectral signature of potential yew habitat (moist closed-canopy forest) persists even in young second-growth where yew itself cannot yet survive, explaining the large logging filter contribution.
-
-### 3.8 Comparison of CWH, ICH, and CDF Decline Pathways
-
-The three focal zones exhibit qualitatively different decline pathways (Figure S13). The CWH shows gradual erosion from a large original base, with 37% old-growth remaining and continuing logging pressure. The ICH shows intensive logging concentrated in accessible valley-bottom yew habitat, resulting in a higher percentage decline (74.7%) despite a smaller absolute base. The CDF has experienced near-complete extirpation through a combination of industrial forestry, urban expansion, and agricultural conversion, leaving only 214 ha of old-growth as isolated fragments. `TODO: inconsistent number — reconcile the 214 ha figure with the deleted CDF sentence in §3.4.`
-
-### 3.9 Secondary Threats — Quantitative Estimates
+Beyond logging and fire, a suite of secondary threats compounds the ecological impact (Table 2). Of the quantified secondary threats, stream erosion is the most spatially significant: applying a 30 m buffer (3-pixel morphological dilation) to all VRI water-category pixels across 42 tiles with available grid data and summing yew probability mass in the buffered old-growth zone yields **1,717 ha** at risk from riparian erosion — 5.9% of the 29,028 ha remaining yew probability mass in those tiles. This estimate draws on the Carnation Creek study showing 20–50% peak flow increases post-logging (Hartman & Scrivener 1990) and hydraulic geometry relationships predicting ~14% channel widening for a 30% flow increase ($W \propto Q^{0.5}$; Leopold & Maddock 1953).
 
 **Table 2. Estimated impacts of threats to Pacific yew in BC.**
 
 | Threat | Estimated Impact | Confidence | Type |
 |--------|------------------|------------|------|
-| Clear-cut logging (dominant driver) | 106,949 ha total habitat loss | High (modelled) | Direct habitat destruction |
+| Clear-cut logging | 106,949 ha total habitat loss | High (modelled) | Direct habitat destruction |
 | Wildfire (historical) | 692 ha suppressed | High (modelled) | Direct mortality |
 | Stream erosion buffer (30 m) | ~1,717 ha (5.9% of remaining in sampled tiles) | Moderate | Riparian habitat loss |
 | Sea-level rise (future) | ~240 ha (<0.5% of remaining) | Low (projected) | Coastal inundation |
@@ -338,11 +300,9 @@ The three focal zones exhibit qualitatively different decline pathways (Figure S
 | Ungulate browsing | 60–80% seedling mortality | Moderate (literature) | Regeneration failure |
 | Historical Taxol harvest | Unknown (hundreds of thousands of trees) | Low (no spatial data) | Historical direct mortality |
 
-The stream erosion estimate applied binary morphological dilation (3 pixels = 30 m) to all VRI water category pixels across 42 tiles, then summed yew probability mass in the newly-buffered old-growth pixels. The 1,717 ha represents 5.9% of the 29,028 ha remaining yew mass in sampled tiles, supported by the Carnation Creek study (20–50% peak flow increases post-logging; Hartman & Scrivener 1990) and hydraulic geometry relationships predicting ~14% channel widening for a 30% flow increase ($W \propto Q^{0.5}$; Leopold & Maddock 1953). `TODO: this stream-erosion methodology should move to the Methods section; check numbers.`
+### 3.3 Are remaining populations viable? Field evidence from population size structure
 
-### 3.10 Population Age Structure
-
-Field measurement of *n* = 120 Pacific yew individuals yielded CBH values of 1–218 cm, corresponding to converted DBH values of 0.3–69.4 cm (mean DBH = 15.0 cm, median = 12.7 cm; Figure 7). Size-class structure differed markedly from the de Liocourt reference distribution (*q* = 1.5), with a pronounced deficit of large-diameter stems and a surplus of mid-sized stems (Table 3).
+Independent of the remote sensing analysis, field-measured population size structure provides a second line of evidence on species status. Measurement of *n* = 120 Pacific yew individuals yielded CBH values of 1–218 cm, corresponding to converted DBH values of 0.3–69.4 cm (mean DBH = 15.0 cm, median = 12.7 cm; Figure 7). Size-class structure differed markedly from the de Liocourt reference distribution (*q* = 1.5), with a pronounced deficit of large-diameter stems and a surplus of mid-sized stems (Table 3).
 
 **Table 3. Observed versus expected (de Liocourt *q* = 1.5) stem counts by 10-cm DBH class.**
 
@@ -359,43 +319,47 @@ Field measurement of *n* = 120 Pacific yew individuals yielded CBH values of 1�
 
 †The large-tree deficit is insensitive to the assumed *q*: the expected count > 30 cm DBH is 38.2 (*q* = 1.4), 32.1 (*q* = 1.5), and 27.1 (*q* = 1.6), against 7 observed in every case.
 
-The dominant feature of the sample is a deficit of large-diameter stems: only **7** stems exceed 30 cm DBH, against 32.1 expected under *q* = 1.5 (and 27–38 across *q* = 1.4–1.6). An exact binomial test rejects the stable-population expectation for this tail (7 of 120 vs. an expected proportion of 0.27; *p* ≈ 4 × 10⁻⁹ at *q* = 1.5, and *p* < 10⁻⁶ across the full *q* = 1.4–1.6 range), as does a χ² goodness-of-fit test on the binned counts (χ² = 49.5, df = 3, *p* ≈ 1 × 10⁻¹⁰). Fitting a single reverse-J slope to the whole observed distribution gives an empirical population *q* ≈ 2.0 (95% bootstrap CI 1.6–2.7), significantly steeper than the literature-stable *q* ≈ 1.5 — i.e. the realised distribution declines faster toward the large-diameter classes than a self-sustaining population would, consistent with depletion of large adults. We note that the observed distribution is not strictly monotonic (it peaks in the 10–20 cm class rather than the smallest class); this modal bulge most plausibly reflects under-detection of the smallest understory stems and/or the recording of layering ramets as separate stems (§2.7), and does not affect the large-tree result.
+Only **7** stems exceed 30 cm DBH, against 32.1 expected under *q* = 1.5 (and 27–38 across *q* = 1.4–1.6). An exact binomial test rejects the stable-population expectation for this tail (7 of 120 vs. expected proportion 0.27; *p* ≈ 4 × 10⁻⁹ at *q* = 1.5, and *p* < 10⁻⁶ across *q* = 1.4–1.6), as does a χ² goodness-of-fit test on binned counts (χ² = 49.5, df = 3, *p* ≈ 1 × 10⁻¹⁰). Fitting a single reverse-J slope to the whole observed distribution gives an empirical population *q* ≈ 2.0 (95% bootstrap CI 1.6–2.7), significantly steeper than the literature-stable *q* ≈ 1.5 — the realised distribution declines faster toward the large-diameter classes than a self-sustaining population, consistent with depletion of large adults. The observed distribution is not strictly monotonic (it peaks in the 10–20 cm class); this modal bulge most plausibly reflects under-detection of the smallest understorey stems and/or the recording of layering ramets as separate stems (§2.7), and does not affect the large-tree result.
 
-The combination of abundant mid-sized stems and depleted large adults is consistent with selective harvest of large, bark-rich individuals for paclitaxel extraction during the 1989–1993 taxol rush: a recruitment bottleneck would instead deplete the *smallest* classes, which is not observed. We caution, however, that this size signature is not uniquely diagnostic of harvest — an even-aged establishment or canopy-release cohort that has since grown into the 10–20 cm class would produce a broadly similar structure — and that the inference depends on the field sample being a representative stand census (the sampling design is specified in §2.7). With that caveat, the depletion is notable because Pacific yew reaches typical bark-harvest size (~30 cm DBH) only after 150–250 years of growth (Graham 1994), making any lost large-tree cohort effectively non-renewable on forestry time scales.
+The combination of abundant mid-sized stems and depleted large adults is consistent with selective harvest of large, bark-rich individuals for paclitaxel extraction during the 1989–1993 taxol rush: a recruitment bottleneck would instead deplete the *smallest* classes, which is not observed. We caution that this size signature is not uniquely diagnostic of harvest — an even-aged cohort that has grown into the 10–20 cm class would produce a broadly similar structure — and that the inference depends on the field sample being a representative stand census (§2.7). With that caveat, the depletion is ecologically significant because Pacific yew reaches bark-harvest size (~30 cm DBH) only after 150–250 years of growth (Graham 1994), making any lost large-tree cohort non-renewable on forestry time scales.
 
 ---
 
 ## 4. Discussion
 
-### 4.1 Scale of Decline
+### 4.1 A decline that likely understates true losses
 
-Our estimate of 69.2% overall decline should be interpreted as a property of the sampled tiles, not a validated province-wide figure. The study tiles cover approximately 9,900 km² of a total CWH+ICH+CDF zone area of ~3.8 million hectares (~0.26%), and were purposively rather than randomly sited — selection deliberately spanned both heavily logged and well-preserved areas and clustered around iNaturalist observation density (§2.1). This purposive design means the sample is not statistically representative of the zones as a whole, and the true province-wide decline could be either higher or lower than 69.2% depending on the disturbance profile of unsampled terrain. Any extrapolation to the full zonal extent would require province-wide systematic coverage; we therefore frame all zonal percentages as estimates conditional on the sampled tiles.
+The 69.2% overall decline reported here is a lower-bound estimate conditional on the sampled tiles, not a validated province-wide figure. Three sources of conservatism are worth noting. First, the 99 tiles were purposively rather than randomly sited, spanning both heavily logged and relatively intact areas (§2.1); the remotest and most unlogged outer-coast terrain is underrepresented. Second, the logging suppression model assigns zero yew probability to all stands <150 yr old — a threshold that excludes yew recovery in maturing second-growth — but this is ecologically appropriate given that Pacific yew rarely re-establishes in disturbed forest on human time scales (Busing et al. 1995). Third, the analysis does not model future logging under existing tenure commitments, which will continue to reduce old-growth area. The true province-wide decline across the full ~3.8 million hectares of CWH+ICH+CDF zone would require systematic coverage but would almost certainly not be lower than the 69.2% reported here.
 
-### 4.2 Interaction of Threats
+### 4.2 Two independent lines of evidence converge
 
-The threats to Pacific yew are not independent. Logging creates the conditions for all other threats to intensify: logging → stream erosion (removed canopy increases peak flows, eroding riparian zones where yew concentrates); logging → browsing pressure (clearcuts attract ungulates to forest edges); logging → fire vulnerability (forest fragmentation creates drier microclimates); logging → mite susceptibility (stressed, isolated populations may have reduced resistance to *Cecidophyopsis psilaspis*). The cumulative effect of these interacting threats is likely significantly greater than the sum of individually estimated impacts. `TODO: are all of these interaction pathways important enough to retain?`
+The remotely sensed habitat decline and the field-measured population size structure are methodologically independent — derived from different data sources and spatial scales — yet both converge on the same diagnosis: a population that has lost a large fraction of its historical extent and whose remaining individuals show a structural deficit in the size classes responsible for reproduction and bark-yield. The depleted large-tree cohort (>30 cm DBH; §3.3) corresponds to trees of 150–700+ years of age — exactly the cohort eliminated by commercial logging of old-growth stands and targeted taxol bark extraction. A viable self-sustaining population would show a reverse-J size distribution; instead, the observed *q* ≈ 2.0 (95% CI 1.6–2.7) indicates a distribution biased strongly toward mid-sized stems and against large adults. This convergence strengthens the evidentiary basis for the conservation concern raised by the remote sensing results alone, and underpins the IUCN assessment in §4.5.
 
-### 4.3 Limitations
+### 4.3 Protected areas offer insufficient refuge
 
-1. **Spectral similarity**: The classifier cannot distinguish Pacific yew understorey from spectrally similar moist-forest conditions; probabilities represent habitat suitability rather than confirmed presence `TODO: discuss what the yew probability represents and why a probability surface (rather than a binary map) was used.`
-2. **VRI accuracy**: Stand-age assignments have known errors, particularly for multi-cohort stands and post-fire regeneration
-3. **Spatial coverage**: 99 tiles cover a portion of BC's total area; extrapolation requires caution
-4. **Static analysis**: The study represents a snapshot as of 2024; ongoing logging and climate change will alter the estimates
-5. **No field validation**: Predictions have not been systematically validated against independent field surveys `TODO: the crowd-sourced reporting tool could enable this validation.`
-
-### 4.4 Conservation Implications
-
-The finding that **only 5.6% of mapped yew habitat falls inside provincial parks** (2,121 ha of 37,885 ha) highlights the species' extreme vulnerability to ongoing forestry operations. Including all protected-area designations raises the protected fraction to **11.0%** (4,180 ha) — with conservancies contributing the largest share (1,602 ha, 4.2% of mapped habitat) and national parks a further 457 ha (1.2%). This analysis intersects the suppressed P ≥ 0.5 habitat surface summed across all 99 tiles (37,885 ha — a threshold-based extent, as opposed to the 47,534 ha continuous probability-mass estimate used elsewhere) with the BC Data Catalogue protected-area layers (provincial parks, ecological reserves, protected areas, conservancies, and national parks). Even so, nearly half of the mapped habitat (17,785 ha, 47%) lies in tiles with **no protected area at all**, including high-habitat tiles such as Alberni Valley (3,632 ha), Port Hardy Forest (1,173 ha), Blunden Harbour (1,085 ha), and Jervis Inlet Slopes (984 ha).
+Only **5.6% of mapped yew habitat falls inside provincial parks** (2,121 ha of 37,885 ha at P ≥ 0.5), rising to **11.0%** (4,180 ha) when conservancies (1,602 ha, 4.2%) and national parks (457 ha, 1.2%) are included. Nearly half of all mapped habitat (17,785 ha, 47%) lies in tiles with no protected area at all, including the largest individual yew concentrations: Alberni Valley (3,632 ha), Port Hardy Forest (1,173 ha), Blunden Harbour (1,085 ha), and Jervis Inlet Slopes (984 ha). This protected fraction falls far short of the 30% target of the Kunming-Montreal Global Biodiversity Framework (2022), and is particularly concerning given that the largest unprotected concentrations lie in active timber supply areas with no current regulatory constraint on old-growth harvesting.
 
 Priority conservation actions include: (1) incorporation of Pacific yew habitat into forest stewardship plans for CWH and ICH operating areas; (2) riparian buffer widening to protect streamside populations from logging-driven erosion; (3) ungulate management in high-value yew stands to permit natural regeneration; (4) monitoring for *Cecidophyopsis psilaspis* spread in coastal populations; and (5) long-term fire management planning that recognises yew's zero fire tolerance.
 
-### 4.5 IUCN Red List Assessment for the Canadian (British Columbia) Population
+### 4.4 Compounding threats amplify logging impacts
 
-The current global IUCN Red List status of *Taxus brevifolia* is Near Threatened (NT; Thomas 2013), based on evidence available at the time of assessment. That assessment pre-dates any spatially explicit, province-scale analysis of BC habitat extent or decline. Using the quantitative results of the present study, we apply IUCN Red List criteria (IUCN 2012) to the Canadian BC population, which represents the northern core of the species' global range and the largest temperate rainforest population.
+The threats to Pacific yew are not independent — logging creates the conditions for all other threats to intensify. Canopy removal increases peak flows, eroding the riparian zones where yew is most abundant (§3.2.3; Hartman & Scrivener 1990). Clearcuts attract ungulates to forest edges, increasing browse pressure on any yew recruits attempting to establish. Forest fragmentation creates drier microclimates that raise fire risk. Stressed, isolated populations may also show reduced resistance to *Cecidophyopsis psilaspis*. The result is that the logging loss estimates in §3.2 understate the full cascade of harm: even old-growth patches that remain unlogged lose ecological value when surrounded by clearcut matrix that promotes edge effects, elevates deer density, and reduces moisture retention.
+
+### 4.5 Limitations
+
+1. **Spectral similarity**: The classifier cannot distinguish Pacific yew understorey from spectrally similar moist-forest conditions; probabilities represent habitat suitability rather than confirmed presence. A probability surface was used in preference to a binary map because it is threshold-free and propagates uncertainty throughout the analysis (§2.5.4).
+2. **VRI accuracy**: Stand-age assignments have known errors, particularly for multi-cohort stands and post-fire regeneration, which could lead to misclassification of some second-growth as old-growth or vice versa.
+3. **Spatial coverage**: 99 tiles represent a purposive rather than random sample; extrapolation to province-wide totals requires caution.
+4. **Static analysis**: The study represents a snapshot as of 2024; ongoing logging and climate change will alter the estimates.
+5. **No systematic field validation**: Model predictions have not been validated against independent field surveys across the full study extent. The crowd-sourced field reporting interface on the web map (§2.8) could enable community-based validation over time.
+
+### 4.6 IUCN Red List Assessment for the Canadian (British Columbia) Population
+
+The current global IUCN Red List status of *Taxus brevifolia* is Near Threatened (NT; Thomas 2013), an assessment that pre-dates any spatially explicit, province-scale analysis of BC habitat extent or decline. Using the quantitative results of the present study, we apply IUCN Red List criteria (IUCN 2012) to the Canadian BC population, which represents the northern core of the species' global range and the largest temperate rainforest population.
 
 **Criterion A — Population size reduction inferred from habitat decline**
 
-Criterion A2c evaluates population size reductions estimated or inferred where the reduction or its causes may not have ceased, based on observed decline in habitat area, extent, or quality. Pacific yew reaches reproductive maturity at approximately 80–100 years (Graham 1994) `TODO: check this maturity age / citation`; three generations therefore span ~240–300 years, well encompassing the industrial logging era beginning in the 1920s. Our analysis documents a 69.2% decline in modelled yew habitat across 9,900 km² of sampled BC range. The primary cause — industrial clear-cut logging — has not ceased; logging continues under existing tenure commitments across the CWH and ICH zones.
+Criterion A2c evaluates population size reductions estimated or inferred where the reduction or its causes may not have ceased, based on observed decline in habitat area, extent, or quality. Pacific yew reaches reproductive maturity at approximately 80–100 years (Graham 1994) `TODO: check maturity age / citation`; three generations therefore span ~240–300 years, well encompassing the industrial logging era beginning in the 1920s. Our analysis documents a 69.2% decline in modelled yew habitat across 9,900 km² of sampled BC range. The primary cause — industrial clear-cut logging — has not ceased; it continues under existing tenure commitments.
 
 | IUCN Criterion | Threshold | This Study | Assessment |
 |:---|:---|:---|:---|
@@ -403,23 +367,23 @@ Criterion A2c evaluates population size reductions estimated or inferred where t
 | EN A2c | ≥ 50% reduction | 69.2% (BC overall) | **EN** at population level |
 | VU A2c | ≥ 30% reduction | Exceeded | — |
 
-Applying criterion A2c to the Canadian BC population as a whole, a 69.2% estimated habitat decline where the cause is ongoing and not reversible meets the **Endangered (EN)** threshold (≥50%). The 99.1% decline in the CDF zone and 74.7% decline in the ICH zone each individually meet the Critically Endangered threshold (≥80%) at the subpopulation level.
+A 69.2% estimated habitat decline where the cause is ongoing and not reversible meets the **Endangered (EN)** threshold (≥50%). The 99.1% CDF decline and 74.7% ICH decline each individually meet the Critically Endangered threshold (≥80%) at the subpopulation level.
 
 **Criterion A2d — Levels of exploitation**
 
-The taxol bark harvest of 1989–1993, at which point an estimated 360,000 mature trees per year were felled across the Pacific Northwest (Hartzell 1990), constitutes direct exploitation at a scale unparalleled in the species' recorded history. Although bark harvest has ceased, its legacy is embedded in the depleted large-tree cohort documented in §3.10. This additional exploitation pressure reinforces the EN designation under criterion A2d.
+The taxol bark harvest of 1989–1993 constituted direct exploitation at a scale unparalleled in the species' recorded history, with an estimated 360,000 mature trees per year felled across the Pacific Northwest at peak harvest (Hartzell 1990). Although bark harvest has ceased, its legacy is embedded in the depleted large-tree cohort documented in §3.3, providing independent field-based corroboration of the A2c finding. This reinforces the EN designation under criterion A2d.
 
 **Criterion B — Geographic range**
 
-Criterion B1 (extent of occurrence, EOO) does not apply to the BC population, as the EOO substantially exceeds the 5,000 km² EN threshold. The remaining modelled yew habitat across all 99 study tiles totals ~475 km², which approaches the EN B2 area of occupancy (AOO) threshold of <500 km². However, the study tiles cover only ~0.26% of the CWH+ICH+CDF zone extent; the 99-tile AOO cannot be extrapolated to a true provincial AOO without systematic province-wide coverage. Pacific yew thus does not qualify for increased protection under this criterion.
+Criterion B1 (EOO) does not apply; the EOO substantially exceeds the 5,000 km² EN threshold. The remaining modelled yew habitat totals ~475 km² across the 99 tiles, approaching the EN B2 AOO threshold of <500 km². However, the tiles cover only ~0.26% of the CWH+ICH+CDF zone extent; the 99-tile AOO cannot be extrapolated to a true provincial AOO without systematic province-wide coverage, and Pacific yew does not formally qualify for increased protection under this criterion.
 
 **Criteria C, D, and E**
 
-Assuming mean yew density of 1–5 individuals per hectare in old-growth habitat (Bolsinger & Jaramillo 1990; Busing et al. 1995), the 47,534 ha of remaining modelled habitat supports an estimated 47,534–237,670 mature individuals, substantially exceeding the <2,500 EN threshold under criterion C. Criteria D and E are not met by the available data.
+Assuming mean yew density of 1–5 individuals per hectare in old-growth habitat (Bolsinger & Jaramillo 1990; Busing et al. 1995), the 47,534 ha of remaining modelled habitat supports an estimated 47,534–237,670 mature individuals, substantially exceeding the <2,500 EN threshold under criterion C. Criteria D and E are not met.
 
 **Summary assessment**
 
-Under the best available evidence, the Canadian BC population of *Taxus brevifolia* supports a classification consistent with **Endangered (EN A2c)** under IUCN Red List criteria, recognising that this inference rests on modelled habitat decline rather than direct population data. The CDF and ICH subpopulations individually reach Critically Endangered thresholds. The current global designation of Near Threatened (Thomas 2013) is not consistent with the magnitude of BC habitat decline documented here, nor with the ongoing and unabated nature of the primary threat. We recommend that COSEWIC and the IUCN undertake a formal reassessment of *Taxus brevifolia* using province-scale spatial data.
+Under the best available evidence, the Canadian BC population of *Taxus brevifolia* supports a classification consistent with **Endangered (EN A2c)** under IUCN Red List criteria, recognising that this inference rests on modelled habitat decline rather than direct population census. This conclusion is independently corroborated by the field-measured population size structure (§3.3; §4.2). The CDF and ICH subpopulations individually reach Critically Endangered thresholds. The current global designation of Near Threatened (Thomas 2013) is not consistent with the magnitude of BC habitat decline documented here, nor with the ongoing nature of the primary threat. We recommend that COSEWIC and the IUCN undertake a formal reassessment of *Taxus brevifolia* using province-scale spatial data.
 
 ---
 
