@@ -149,9 +149,10 @@ def make_panel(slug, t, fires, parks):
                 transform=ax.transAxes)
     ax.set_title("(a) Sentinel/AlphaEarth RGB context", fontsize=10.5)
 
-    # (b) yew probability
+    # (b) yew probability (water pixels masked out — yew does not occur on water)
     ax = axes[0, 1]
-    im = ax.imshow(g, extent=extent, origin="upper", cmap=YEWCMAP,
+    g_land = np.ma.masked_where(lg == 1, g)
+    im = ax.imshow(g_land, extent=extent, origin="upper", cmap=YEWCMAP,
                    vmin=0, vmax=1, interpolation="nearest")
     ax.set_title(f"(b) Yew habitat probability (raw)\n"
                  f"old-growth mass = {raw_yew_ha:,.0f} ha", fontsize=10.5)
@@ -217,7 +218,7 @@ def make_panel(slug, t, fires, parks):
     ax.set_title(ttl, fontsize=10.5)
     ax.legend(handles=[Patch(facecolor=(0.20, 0.50, 0.95), alpha=0.4, label="Protected area"),
                        Patch(facecolor=(0.10, 0.45, 0.20), label="Habitat protected")],
-              fontsize=7, loc="lower left", framealpha=0.85)
+              fontsize=7, loc="upper right", framealpha=0.85)
 
     for ax in axes.flat:
         ax.set_xticks([]); ax.set_yticks([])
