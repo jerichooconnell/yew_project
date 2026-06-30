@@ -1,0 +1,9 @@
+similarity_ratio=0.4404
+md_lines=292
+docx_lines=471
+md_todo_count=9
+docx_todo_lines=5
+docx_contains_brown_2025=True
+docx_contains_1107_positives=True
+docx_contains_mite_citation=True
+docx_contains_iucn_maturity_citation=True

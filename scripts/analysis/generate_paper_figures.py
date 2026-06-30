@@ -19,6 +19,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.gridspec as gridspec
+from matplotlib.lines import Line2D
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib import ticker
 
@@ -106,49 +107,54 @@ def aggregate_by_zone(rows):
 # FIGURE 1: Bar chart — estimated original vs current yew by BEC zone
 # ══════════════════════════════════════════════════════════════════════
 def fig1_zone_comparison(rows):
-    """Side-by-side bar chart of original vs current yew habitat by major zone."""
+    """Dumbbell chart (log x) of original→current yew habitat by major zone.
+
+    A log x-axis keeps both the dominant CWH (~111k ha) and the smallest zones
+    (~hundreds of ha) legible in one view; the gap between the faded (original)
+    and solid (remaining) dot encodes the loss, annotated with % decline.
+    """
     zones_data = aggregate_by_zone(rows)
-    
-    # Filter to zones with meaningful yew
-    zone_list = sorted([z for z in zones_data if zones_data[z]['est_original_yew_ha'] > 10],
-                       key=lambda z: zones_data[z]['est_original_yew_ha'], reverse=True)
-    
-    fig, ax = plt.subplots(figsize=(12, 6))
-    x = np.arange(len(zone_list))
-    w = 0.35
-    
-    orig = [zones_data[z]['est_original_yew_ha'] for z in zone_list]
-    curr = [zones_data[z]['current_yew_ha'] for z in zone_list]
-    
-    bars1 = ax.bar(x - w/2, orig, w, label='Estimated original habitat',
-                   color=[ZONE_COLORS.get(z, '#888888') for z in zone_list], alpha=0.5,
-                   edgecolor='black', linewidth=0.5)
-    bars2 = ax.bar(x + w/2, curr, w, label='Current remaining habitat',
-                   color=[ZONE_COLORS.get(z, '#888888') for z in zone_list], alpha=1.0,
-                   edgecolor='black', linewidth=0.5)
-    
-    ax.set_xlabel('Biogeoclimatic Zone', fontsize=12)
-    ax.set_ylabel('Yew Habitat (ha, probability mass)', fontsize=12)
-    ax.set_title('Pacific Yew Habitat: Estimated Historical vs. Current Remaining\nby Major BEC Zone', fontsize=14)
-    ax.set_xticks(x)
-    ax.set_xticklabels(zone_list, fontsize=11)
-    ax.legend(fontsize=11)
-    ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f'{x:,.0f}'))
-    ax.grid(axis='y', alpha=0.3)
-    
-    # Add % decline annotations
+    # ascending so the largest zone sits at the top of a horizontal layout;
+    # >100 ha keeps the eight zones reported in Table 1 and drops marginal noise
+    zone_list = sorted([z for z in zones_data if zones_data[z]['est_original_yew_ha'] > 100],
+                       key=lambda z: zones_data[z]['est_original_yew_ha'])
+
+    fig, ax = plt.subplots(figsize=(11, 6.5))
+    y = np.arange(len(zone_list))
     for i, z in enumerate(zone_list):
-        if orig[i] > 0:
-            pct = (orig[i] - curr[i]) / orig[i] * 100
-            ax.annotate(f'−{pct:.0f}%', xy=(x[i] + w/2, curr[i]),
-                       xytext=(0, 5), textcoords='offset points',
-                       ha='center', fontsize=9, color='red', fontweight='bold')
-    
+        orig = zones_data[z]['est_original_yew_ha']
+        curr = max(zones_data[z]['current_yew_ha'], 1.0)        # avoid log(0)
+        c = ZONE_COLORS.get(z, '#888888')
+        ax.plot([curr, orig], [i, i], color='#bbbbbb', lw=2.5, zorder=1, solid_capstyle='round')
+        ax.scatter(orig, i, s=95, color=c, alpha=0.40, edgecolor='black', linewidth=0.5, zorder=2)
+        ax.scatter(curr, i, s=95, color=c, edgecolor='black', linewidth=0.5, zorder=3)
+        pct = (orig - zones_data[z]['current_yew_ha']) / orig * 100 if orig > 0 else 0
+        ax.text(orig * 1.18, i, f'−{pct:.0f}%', va='center', fontsize=9.5,
+                color='#a01010', fontweight='bold')
+
+    ax.set_xscale('log')
+    ax.set_yticks(y)
+    ax.set_yticklabels(zone_list, fontsize=11)
+    ax.set_xlim(20, 500_000)
+    ax.set_xlabel('Yew habitat (ha, probability mass — log scale)', fontsize=12)
+    ax.set_title('Pacific Yew Habitat: Estimated Historical → Current Remaining\n'
+                 'by Major BEC Zone (% = decline)', fontsize=14)
+    ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f'{x:,.0f}'))
+    ax.grid(axis='x', alpha=0.3, which='both')
+
+    handles = [
+        Line2D([], [], marker='o', ls='', ms=10, mfc='#888', mec='black', alpha=0.4,
+               label='Estimated original habitat'),
+        Line2D([], [], marker='o', ls='', ms=10, mfc='#444', mec='black',
+               label='Current remaining habitat'),
+    ]
+    ax.legend(handles=handles, fontsize=10, loc='lower right', framealpha=0.95)
+
     fig.tight_layout()
     fig.savefig(OUT_DIR / 'fig1_zone_comparison.png', dpi=300, bbox_inches='tight')
     fig.savefig(OUT_DIR / 'fig1_zone_comparison.pdf', bbox_inches='tight')
     plt.close(fig)
-    print("  ✓ Figure 1: Zone comparison")
+    print("  ✓ Figure 1: Zone comparison (dumbbell, log x)")
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -718,117 +724,139 @@ def fig14_model_performance():
 # FIGURE 15: Threats summary infographic
 # ══════════════════════════════════════════════════════════════════════
 def fig15_threats_summary(rows):
-    """Horizontal stacked bar showing quantified vs estimated threats."""
+    """Two-panel threats figure: direct habitat loss (log ha) + demographic impacts.
+
+    The original single linear bar made logging (~107k ha) dwarf every other
+    threat into invisibility and left three threats as empty bars. Here the
+    area-quantified threats use a log x-axis (so fire/erosion/sea-level remain
+    legible) and the demographic threats are shown on their own % axis with
+    literature ranges, since they are not expressible in hectares.
+    """
     zones_data = aggregate_by_zone(rows)
     total_original = sum(d['est_original_yew_ha'] for d in zones_data.values())
     total_remaining = sum(d['current_yew_ha'] for d in zones_data.values())
     total_fire = sum(d['fire_suppressed_ha'] for d in zones_data.values())
-    total_elev = sum(d['elev_suppressed_ha'] for d in zones_data.values())
-    total_logging_loss = total_original - total_remaining
-    
-    fig, ax = plt.subplots(figsize=(14, 7))
-    
-    threats = [
-        'Clear-cut logging\n(modelled)',
-        'Wildfire\n(modelled)',
-        'Stream erosion\n(estimated 2–3%)',
-        'Sea-level rise\n(estimated <1%)',
-        'Yew big bud mite\n(estimated 20–25% bud mortality)',
-        'Ungulate browsing\n(60–80% seedling mortality)',
-        'Taxol bark harvest\n(historical, 1989–1993)',
+    logging_loss = total_original - total_remaining
+
+    fig, (axA, axB) = plt.subplots(2, 1, figsize=(11, 8.5),
+                                   gridspec_kw={'height_ratios': [1, 0.85]})
+
+    # ── Panel A: area-quantified threats (log x) ──────────────────────────
+    quant = [
+        ('Clear-cut logging\n(modelled)', logging_loss, '#CD5C5C'),
+        ('Stream erosion, 30 m buffer\n(modelled, 42-tile subset)', 1717, '#DAA520'),
+        ('Wildfire, historical\n(modelled)', total_fire, '#FF8C00'),
+        ('Sea-level rise\n(projected, <1%)', 240, '#4682B4'),
     ]
-    
-    # Quantified values (ha)
-    quantified = [total_logging_loss, total_fire, 
-                  total_remaining * 0.025,  # 2.5% stream erosion mid-estimate
-                  total_remaining * 0.005,  # 0.5% sea level
-                  0, 0, 0]  # Not quantifiable in ha
-    
-    # Color: green = modelled, orange = estimated, gray = not quantified
-    colors = ['#CD5C5C', '#FF8C00', '#DAA520', '#4682B4', '#9370DB', '#8B4513', '#A9A9A9']
-    cats = ['Modelled', 'Modelled', 'Estimated', 'Estimated', 
-            'Growth/fecundity impact', 'Regeneration barrier', 'Historical']
-    
-    bars = ax.barh(range(len(threats)), quantified[:len(threats)], 
-                   color=colors[:len(threats)], edgecolor='black', linewidth=0.5)
-    ax.set_yticks(range(len(threats)))
-    ax.set_yticklabels(threats, fontsize=11)
-    ax.set_xlabel('Estimated Impact (ha of yew habitat)', fontsize=12)
-    ax.set_title('Threats to Pacific Yew Populations in British Columbia\n'
-                '(quantified where modelled; qualitative estimates for secondary threats)', fontsize=13)
-    ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f'{x:,.0f}'))
-    ax.grid(axis='x', alpha=0.3)
-    ax.invert_yaxis()
-    
-    # Annotate bars with values
-    for i, (bar, val) in enumerate(zip(bars, quantified[:len(threats)])):
-        if val > 100:
-            ax.text(bar.get_width() + 200, bar.get_y() + bar.get_height()/2,
-                   f'{val:,.0f} ha', va='center', fontsize=10)
-        elif i >= 4:
-            ax.text(500, bar.get_y() + bar.get_height()/2,
-                   'Not quantified in ha\n(growth/recruitment impact)', 
-                   va='center', fontsize=9, style='italic', color='#666')
-    
+    names = [q[0] for q in quant]
+    vals = [q[1] for q in quant]
+    yA = range(len(quant))
+    axA.barh(list(yA), vals, color=[q[2] for q in quant], edgecolor='black', linewidth=0.5)
+    axA.set_yticks(list(yA))
+    axA.set_yticklabels(names, fontsize=10)
+    axA.set_xscale('log')
+    axA.set_xlim(50, 300_000)
+    axA.set_xlabel('Direct habitat loss (ha of yew habitat — log scale)', fontsize=11)
+    axA.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f'{x:,.0f}'))
+    axA.grid(axis='x', alpha=0.3, which='both')
+    axA.invert_yaxis()
+    axA.set_title('Direct habitat loss (area-quantified)', fontsize=12)
+    for i, v in enumerate(vals):
+        axA.text(v * 1.25, i, f'{v:,.0f} ha', va='center', fontsize=9.5)
+
+    # ── Panel B: demographic / fecundity threats (% impact ranges) ────────
+    demo = [
+        ('Ungulate browsing\n(seedling/sapling mortality)', 60, 80, '#8B4513'),
+        ('Yew big bud mite\n(seed/aril production loss)', 20, 25, '#9370DB'),
+        ('Yew big bud mite\n(terminal bud mortality)', 20, 25, '#B19CD9'),
+    ]
+    yB = range(len(demo))
+    for i, (lab, lo, hi, c) in enumerate(demo):
+        axB.barh(i, hi - lo, left=lo, color=c, edgecolor='black', linewidth=0.5, height=0.5)
+        axB.text(hi + 1.5, i, f'{lo}–{hi}%', va='center', fontsize=9.5)
+    axB.set_yticks(list(yB))
+    axB.set_yticklabels([d[0] for d in demo], fontsize=10)
+    axB.set_xlim(0, 100)
+    axB.set_xlabel('Literature-estimated impact (% of affected cohort)', fontsize=11)
+    axB.grid(axis='x', alpha=0.3)
+    axB.invert_yaxis()
+    axB.set_title('Demographic / fecundity threats (not expressible in ha)', fontsize=12)
+    axB.text(0.99, -0.32, 'Historical taxol bark harvest (1989–1993): ~360,000 mature '
+             'trees/yr felled across the Pacific Northwest — not spatially documented.',
+             transform=axB.transAxes, ha='right', va='top', fontsize=8.5,
+             style='italic', color='#555')
+
+    fig.suptitle('Threats to Pacific Yew Populations in British Columbia', fontsize=14, y=1.0)
     fig.tight_layout()
     fig.savefig(OUT_DIR / 'fig15_threats_summary.png', dpi=300, bbox_inches='tight')
     fig.savefig(OUT_DIR / 'fig15_threats_summary.pdf', bbox_inches='tight')
     plt.close(fig)
-    print("  ✓ Figure 15: Threats summary")
+    print("  ✓ Figure 15: Threats summary (2-panel)")
 
 
 # ══════════════════════════════════════════════════════════════════════
 # FIGURE 16: Heatmap of yew probability by subzone
 # ══════════════════════════════════════════════════════════════════════
 def fig16_heatmap(rows):
-    """Heatmap showing key metrics across subzones."""
-    # Filter to subzones with meaningful data
+    """Standardised (z-score) heatmap of complementary subzone metrics.
+
+    The original max-normalised three habitat-area columns were near-duplicates
+    (large subzones large everywhere) and colours were not comparable across
+    columns of different units. Here the columns are chosen to be complementary
+    — prevalence, original size, % decline, % logged — and each is standardised
+    (z-score) so colour means the same thing in every column: how far above (red)
+    or below (blue) the cross-subzone average a subzone sits. Printed cells show
+    the raw values.
+    """
     filtered = [r for r in rows if r['est_original_yew_ha'] > 10]
     filtered.sort(key=lambda r: r['destroyed_yew_ha'], reverse=True)
-    filtered = filtered[:25]  # Top 25
-    
-    fig, ax = plt.subplots(figsize=(12, 10))
-    
+    filtered = filtered[:25]
+
+    def pct_decline(r):
+        return r['destroyed_yew_ha'] / r['est_original_yew_ha'] * 100 if r['est_original_yew_ha'] > 0 else 0
+
+    def pct_logged(r):
+        denom = r['total_ha'] - r.get('water_ha', 0) - r.get('alpine_ha', 0)
+        return r['logged_ha'] / denom * 100 if denom > 0 else 0
+
+    cols = [
+        ('OG yew\nprevalence', [r['yew_rate_oldgrowth'] for r in filtered], '{:.2f}'),
+        ('Est. original\nhabitat (ha)', [r['est_original_yew_ha'] for r in filtered], '{:,.0f}'),
+        ('Habitat\ndecline (%)', [pct_decline(r) for r in filtered], '{:.0f}'),
+        ('Forest area\nlogged (%)', [pct_logged(r) for r in filtered], '{:.0f}'),
+    ]
     labels = [r['bec_subzone'] for r in filtered]
-    metrics = ['yew_rate_oldgrowth', 'est_original_yew_ha', 'current_yew_ha', 
-               'destroyed_yew_ha', 'fire_suppressed_ha']
-    metric_labels = ['OG Yew Rate', 'Est. Original (ha)', 'Current (ha)', 
-                     'Destroyed (ha)', 'Fire Loss (ha)']
-    
-    data = np.array([[r[m] for m in metrics] for r in filtered])
-    
-    # Normalize each column for display
-    data_norm = data.copy()
-    for j in range(data.shape[1]):
-        col_max = data[:, j].max()
-        if col_max > 0:
-            data_norm[:, j] = data[:, j] / col_max
-    
-    im = ax.imshow(data_norm, cmap='YlOrRd', aspect='auto')
-    ax.set_xticks(range(len(metric_labels)))
-    ax.set_xticklabels(metric_labels, rotation=30, ha='right', fontsize=10)
+    raw = np.array([c[1] for c in cols], dtype=float).T          # (n_subzone, n_col)
+
+    # z-score per column
+    z = np.zeros_like(raw)
+    for j in range(raw.shape[1]):
+        mu, sd = raw[:, j].mean(), raw[:, j].std()
+        z[:, j] = (raw[:, j] - mu) / sd if sd > 0 else 0.0
+    vmax = np.abs(z).max()
+
+    fig, ax = plt.subplots(figsize=(8.5, 10))
+    im = ax.imshow(z, cmap='RdBu_r', aspect='auto', vmin=-vmax, vmax=vmax)
+    ax.set_xticks(range(len(cols)))
+    ax.set_xticklabels([c[0] for c in cols], fontsize=10)
     ax.set_yticks(range(len(labels)))
     ax.set_yticklabels(labels, fontsize=9)
-    
-    # Annotate with actual values
+
     for i in range(len(labels)):
-        for j in range(len(metrics)):
-            val = data[i, j]
-            if j == 0:
-                text = f'{val:.2f}'
-            else:
-                text = f'{val:,.0f}'
-            ax.text(j, i, text, ha='center', va='center', fontsize=7,
-                   color='white' if data_norm[i, j] > 0.5 else 'black')
-    
-    ax.set_title('Top 25 BEC Subzones by Yew Habitat Loss', fontsize=14)
-    fig.colorbar(im, ax=ax, shrink=0.8, label='Normalized intensity')
-    
+        for j in range(len(cols)):
+            ax.text(j, i, cols[j][2].format(raw[i, j]), ha='center', va='center',
+                    fontsize=7.5, color='white' if abs(z[i, j]) > vmax * 0.55 else '#222')
+
+    ax.set_title('Top 25 BEC Subzones by Yew Habitat Loss\n'
+                 '(colour = z-score within column; cells = raw values)', fontsize=12)
+    cb = fig.colorbar(im, ax=ax, shrink=0.7, pad=0.02)
+    cb.set_label('Standard deviations from cross-subzone mean', fontsize=10)
+
     fig.tight_layout()
     fig.savefig(OUT_DIR / 'fig16_heatmap.png', dpi=300, bbox_inches='tight')
     fig.savefig(OUT_DIR / 'fig16_heatmap.pdf', bbox_inches='tight')
     plt.close(fig)
-    print("  ✓ Figure 16: Heatmap")
+    print("  ✓ Figure 16: Heatmap (z-score, complementary metrics)")
 
 
 # ══════════════════════════════════════════════════════════════════════

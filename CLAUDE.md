@@ -55,7 +55,17 @@ Fig1→fig1_zone_comparison, Fig2→fig12_suppression_waterfall, Fig3→fig2_cwh
 Fig4→fig5_percent_decline, Fig5→fig18_study_area_map, Fig6→fig14_model_performance,
 Fig7→tree_size_distribution; S1→fig3, S2→fig4, S3→fig6, S4→fig7, S5→fig8, S6→fig9,
 S7→fig10, S8→fig11, S9→fig13, S10→fig15, S11→fig16, S12→fig17, S13→fig19.
-Known broken: `fig18_study_area_map.png` renders empty (no points/coastline).
+
+Newer figures live in `scripts/analysis/figures_enhanced.py` (use `yew_pytorch`
+env; join `tiles.json` + `protected_area_all_tiles.json` + BC boundary):
+Fig8→figA_habitat_protection_map, Fig9→figB_protection_breakdown,
+Fig10→figC_geographic_panels (2×2 small-multiples map: habitat / %logged /
+%old-growth / %protected). The full caption→file map is in
+`scripts/paper/render_paper_pdf.py` (`FIGURE_MAP`), which embeds each image above
+its caption when building the PDF.
+
+Note: water-dilation/erosion risk exists only as a province-aggregate
+(`docs/tiles/water_stats.json`), not per tile, so it cannot be mapped per-tile.
 
 ## Geospatial data sources (BC Data Catalogue WFS)
 
@@ -100,8 +110,12 @@ the 42 cached grids, so its totals are a biased subset. Prefer the all-tiles scr
 mass). Protected-area coverage (all 99 tiles, suppressed P≥0.5 = 37,885 ha):
 **5.6% in provincial parks, 11.0% across all designations** (conservancies add 4.2%,
 national parks 1.2%). Population structure: large-tree deficit, binomial p≈4e-9,
-population q≈2.0 (CI 1.6–2.7). These live in `results/analysis/protected_area_all_tiles.json`
-and `data/sample_tree_size.csv` (n=120 field stems).
+population q≈2.0 (CI 1.6–2.7), field sample n=120. FAIB PSP independently confirms:
+461 unique TW stems (753 raw − 292 repeat visits), q≈2.73 (CI 2.13–3.70), p≈1.2e-43.
+Conditional mature density (DBH≥10 cm, FAIB plots with TW present): median 10 stems/ha
+(IQR 4.9–24.7) across 34 plots → population estimate ~375,000–475,000 mature individuals.
+These live in `results/analysis/protected_area_all_tiles.json`,
+`data/sample_tree_size.csv` (n=120 field stems), and `data/raw/faib_tree_detail.csv`.
 
 ## Conventions & gotchas
 

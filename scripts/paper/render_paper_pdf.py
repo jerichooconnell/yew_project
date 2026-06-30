@@ -21,6 +21,12 @@ FIGURE_MAP = {
     "Figure 5": _PFIG / "fig18_study_area_map.png",
     "Figure 6": _PFIG / "fig14_model_performance.png",
     "Figure 7": _FIG / "tree_size_distribution.png",
+    "Figure 8": _PFIG / "figA_habitat_protection_map.png",
+    "Figure 9": _PFIG / "figB_protection_breakdown.png",
+    "Figure 10": _PFIG / "figC_geographic_panels.png",
+    "Figure 11": _PFIG / "figD_tile_imagery_map.png",
+    "Figure 12": _PFIG / "figE_tile_imagery_north.png",
+    "Figure 13": _PFIG / "figF_prob_vs_logging.png",
     "Figure S1": _PFIG / "fig3_ich_subzones.png",
     "Figure S2": _PFIG / "fig4_cdf_detail.png",
     "Figure S3": _PFIG / "fig6_overall_pie.png",
@@ -34,6 +40,7 @@ FIGURE_MAP = {
     "Figure S11": _PFIG / "fig16_heatmap.png",
     "Figure S12": _PFIG / "fig17_og_logged_ratio.png",
     "Figure S13": _PFIG / "fig19_zone_waterfall.png",
+    "Figure S14": ROOT / "results" / "figures" / "faib_size_distribution.png",
 }
 
 
