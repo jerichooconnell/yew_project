@@ -181,7 +181,7 @@ In addition to the quantitative logging and fire analysis, we reviewed the scien
 
 #### 2.6.1 Stream Erosion and Riparian Habitat Loss
 
-Pacific yew preferentially occupies moist riparian zones (Busing et al. 1995). Logging-driven hydrological changes increase peak flows by 20–50% (Hartman & Scrivener 1990), causing channel widening proportional to $W \propto Q^{0.5}$ (Leopold & Maddock 1953). A water buffer sensitivity analysis was run across all 41 tiles with available grid data: applying binary morphological dilation (3 pixels = 30 m) to all water category pixels, then summing yew probability mass in the buffered old-growth pixels. This yielded **1,717 ha** of yew probability mass at risk from riparian erosion (5.9% of the 29,028 ha of remaining yew probability mass in those 42 tiles — a subset of the full 47,534 ha, restricted to the tiles for which the VRI water-category grid was available).
+Pacific yew preferentially occupies moist riparian zones (Busing et al. 1995). Logging-driven hydrological changes increase peak flows by 20–50% (Hartman & Scrivener 1990), causing channel widening proportional to $W \propto Q^{0.5}$ (Leopold & Maddock 1953). A water buffer sensitivity analysis was run across all 41 tiles with available grid data: applying binary morphological dilation (3 pixels = 30 m) to all water category pixels, then summing yew probability mass in the buffered old-growth pixels. This yielded **1,717 ha** of yew probability mass at risk from riparian erosion (5.9% of the 29,028 ha of remaining yew probability mass in those 41 tiles — a subset of the full 47,534 ha, restricted to the tiles for which the VRI water-category grid was available).
 
 #### 2.6.2 Sea-Level Rise and Saltwater Intrusion
 
@@ -330,7 +330,7 @@ The threats to Pacific yew are not independent, logging creates the conditions f
 
 1. **Spectral similarity**: The classifier cannot distinguish Pacific yew understorey from spectrally similar moist-forest conditions; probabilities represent habitat suitability rather than confirmed presence. A probability surface was used in preference to a binary map because it is threshold-free and propagates uncertainty throughout the analysis (§2.5.4).
 2. **VRI accuracy**: Stand-age assignments have known errors, particularly for multi-cohort stands and post-fire regeneration, which could lead to misclassification of some second-growth as old-growth or vice versa.
-3. **Spatial coverage**: 98 tiles represent a random sample; extrapolation to province-wide totals requires caution.
+3. **Spatial coverage**: the 98 tiles are a purposive (non-random) sample selected to span the diversity of BC yew habitat (§2.1), not a probability sample of the provincial range; province-wide extrapolation therefore requires caution and the headline decline figure is reported as conditional on the sampled tiles (§4.1).
 4. **Static analysis**: The study represents a snapshot as of 2024; ongoing logging and climate change will alter the estimates.
 5. **No systematic field validation**: Model predictions have not been validated against independent field surveys across the full study extent. The crowd-sourced field reporting interface on the web map (§2.8) could enable community-based validation over time.
 
