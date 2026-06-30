@@ -681,39 +681,40 @@ def fig13_logging_age_classes(rows):
 # FIGURE 14: Model performance summary
 # ══════════════════════════════════════════════════════════════════════
 def fig14_model_performance():
-    """Grouped bar chart comparing classifiers (AUC-ROC, Accuracy, F1)."""
+    """Grouped bar chart comparing classifiers (AUC-ROC, Accuracy)."""
     models = [
-        ('XGBoost\n(production)', 0.9957, 0.989, 0.947),
-        ('MLP +\nStandardScaler', 0.9961, 0.986, 0.977),
-        ('MLP raw', 0.9962, 0.976, 0.960),
-        ('Random\nForest', 0.9896, 0.984, 0.974),
-        ('kNN (k=3)', 0.9909, 0.911, 0.833),
-        ('Logistic\nRegression', 0.9165, 0.813, 0.562),
+        ('XGBoost\n(production)', 0.9957, 0.989),
+        ('MLP +\nStandardScaler', 0.9961, 0.986),
+        ('MLP raw', 0.9962, 0.976),
+        ('Random\nForest', 0.9896, 0.984),
+        ('kNN (k=3)', 0.9909, 0.911),
+        ('Logistic\nRegression', 0.9165, 0.813),
     ]
     names = [m[0] for m in models]
-    metrics = ['AUC-ROC', 'Accuracy', 'F1 Score']
-    colors = ['#009E73', '#5B9BD5', '#E8A33D']
-    vals = np.array([[m[1], m[2], m[3]] for m in models])
+    metrics = ['AUC-ROC', 'Accuracy']
+    colors = ['#009E73', '#0072B2']
+    vals = np.array([[m[1], m[2]] for m in models])
 
     x = np.arange(len(models))
-    w = 0.26
+    w = 0.36
     fig, ax = plt.subplots(figsize=(11, 5.5))
     for k, (metric, c) in enumerate(zip(metrics, colors)):
-        bars = ax.bar(x + (k - 1) * w, vals[:, k], w, label=metric, color=c,
+        bars = ax.bar(x + (k - 0.5) * w, vals[:, k], w, label=metric, color=c,
                       edgecolor='white', linewidth=0.5, zorder=3)
         for b, v in zip(bars, vals[:, k]):
             ax.text(b.get_x() + b.get_width() / 2, v + 0.004, f'{v:.3f}',
                     ha='center', va='bottom', fontsize=7.5, rotation=90)
 
-    # Zoom y to 0.5–1.0 so the near-ceiling differences are visible
-    ax.set_ylim(0.5, 1.03)
+    # Zoom y to 0.5–1.0 so the near-ceiling differences are visible; leave
+    # headroom above the rotated value labels for the production-model marker
+    ax.set_ylim(0.5, 1.11)
     ax.set_xticks(x)
     ax.set_xticklabels(names, fontsize=10)
     ax.set_ylabel('Score', fontsize=12)
     ax.set_title('Classifier Performance on 64-band AlphaEarth Embeddings\n'
                  '(held-out validation set; y-axis truncated at 0.5)', fontsize=13)
     ax.axvline(0.5, color='#009E73', ls=':', lw=1.2, alpha=0.7, zorder=1)
-    ax.annotate('production model', xy=(0, 1.005), fontsize=8.5, color='#009E73',
+    ax.annotate('production model', xy=(0, 1.085), fontsize=8.5, color='#009E73',
                 ha='center', style='italic')
     ax.legend(fontsize=10, loc='lower left', framealpha=0.95)
     ax.grid(axis='y', alpha=0.3, zorder=0)

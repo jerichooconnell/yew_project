@@ -436,7 +436,7 @@ The interactive web map is available at [jerichooconnell.github.io/yew_project](
 
 **Figure 3.** Location map of the 98 study tiles across British Columbia (coastal CWH/CDF tiles = circles; ICH interior tiles = triangles), overlaid on biogeoclimatic zone boundaries.
 
-**Figure 4.** Classifier performance comparison for six models trained on the 64-dimensional AlphaEarth satellite embeddings (held-out validation set). AUC-ROC is shown alongside accuracy and F1; the production XGBoost model (AUC 0.996) is statistically indistinguishable from the best neural models.
+**Figure 4.** Classifier performance comparison for six models trained on the 64-dimensional AlphaEarth satellite embeddings (held-out validation set). AUC-ROC is shown alongside accuracy; the production XGBoost model (AUC 0.996) is statistically indistinguishable from the best neural models.
 
 **Figure 5.** Single-tile threat diagnostics for one representative CWH tile (Sechelt Peninsula, ~10 × 10 km): (a) RGB context; (b) raw yew habitat probability; (c) VRI stand-age (logging) classes; (d) historical fire perimeters by recency; (e) 30 m riparian-erosion buffer intersected with old-growth habitat; (f) protected areas over mapped habitat. Predicted habitat (b) tracks the riparian corridor, and only ~1% of the tile's habitat falls inside a protected area.
 
