@@ -83,7 +83,7 @@ in this environment — use the BC WFS national-parks layer instead.
 
 ## The tile cache gotcha (read before any per-tile analysis)
 
-There are **99 study tiles** (85 coastal + 14 ICH), but:
+There are **98 study tiles** (84 coastal + 14 ICH; the Stewart Lowlands tile at lon −130.75°W was removed — it is in Alaska and had no BC VRI coverage), but:
 
 - Raw `.npy` grids + embeddings exist for only **42** tiles in
   `results/analysis/cwh_spot_comparisons/tile_cache/` (`{slug}_grid.npy`,

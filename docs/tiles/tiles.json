@@ -1326,40 +1326,6 @@
     }
   },
   {
-    "slug": "stewart_lowlands",
-    "name": "Stewart Lowlands",
-    "desc": "Far north CWHvh3 near Stewart BC",
-    "lat": 55.25,
-    "lon": -130.75,
-    "bbox": {
-      "south": 55.205084,
-      "north": 55.294916,
-      "west": -130.8288,
-      "east": -130.6712
-    },
-    "stats": {
-      "mean": 0.01979067362844944,
-      "median": 0.002571232384070754,
-      "max": 0.942062497138977,
-      "p30_ha": 141.3,
-      "p50_ha": 26.13,
-      "p70_ha": 5.75,
-      "h": 1001,
-      "w": 1755
-    },
-    "png": "stewart_lowlands.png",
-    "logging_png": "stewart_lowlands_logging.png",
-    "logging_stats": {
-      "water_pct": 0.0,
-      "logged_lt20_pct": 0.0,
-      "logged_20_40_pct": 0.0,
-      "logged_40_80_pct": 0.0,
-      "forest_80_150_pct": 0.0,
-      "alpine_pct": 0.0,
-      "oldgrowth_pct": 0.0
-    }
-  },
-  {
     "slug": "smith_sound",
     "name": "Smith Sound",
     "desc": "Mid-coast CWHvm2 mainland fjord",
