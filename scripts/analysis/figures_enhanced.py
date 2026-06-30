@@ -21,12 +21,17 @@ Run:  conda run -n yew_pytorch python scripts/analysis/figures_enhanced.py
 import json
 from pathlib import Path
 
+import sys
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib import cm, colors
+
+sys.path.insert(0, str(Path(__file__).parent))
+from figure_style import apply_style, PALETTE
+apply_style()
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "results" / "figures" / "paper"
@@ -214,10 +219,9 @@ def figC_geographic_panels():
 # ── shared helpers for tile-imagery maps ──────────────────────────────────────
 from matplotlib.colors import LinearSegmentedColormap
 YEWCMAP = LinearSegmentedColormap.from_list('yew', [
-    (0.00, (0.20, 0.70, 0.20)), (0.17, (0.45, 0.85, 0.05)),
-    (0.33, (1.00, 0.90, 0.00)), (0.50, (1.00, 0.60, 0.00)),
-    (0.67, (0.90, 0.40, 0.10)), (0.83, (0.80, 0.15, 0.30)),
-    (1.00, (0.65, 0.00, 0.45))], N=256)
+    (0.00, (0.85, 0.90, 0.85)), (0.25, (0.40, 0.75, 0.55)),
+    (0.50, (0.95, 0.78, 0.20)), (0.75, (0.84, 0.37, 0.00)),
+    (1.00, (0.55, 0.10, 0.40))], N=256)
 
 # VRI logging-category colours (match export_tiles_for_web.py LOG_RGBA)
 LOG_LEGEND = [

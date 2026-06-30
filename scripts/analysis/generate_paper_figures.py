@@ -23,6 +23,10 @@ from matplotlib.lines import Line2D
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib import ticker
 
+sys.path.insert(0, str(Path(__file__).parent))
+from figure_style import apply_style, PALETTE
+apply_style()
+
 # ── paths ──────────────────────────────────────────────────────────────
 ROOT = Path(__file__).resolve().parents[2]
 CSV_PATH = ROOT / "results" / "analysis" / "yew_logging_impact_by_bec.csv"
@@ -33,38 +37,39 @@ OUT_DIR = ROOT / "results" / "figures" / "paper"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # ── color palettes ─────────────────────────────────────────────────────
+# Zone colours drawn from the shared Okabe-Ito palette (colourblind-safe)
 ZONE_COLORS = {
-    'CWH': '#2E8B57',   # sea green
-    'ICH': '#D2691E',   # chocolate
-    'CDF': '#DAA520',   # goldenrod 
-    'ESSF': '#4682B4',  # steel blue
-    'MH':  '#9370DB',   # medium purple
-    'IDF': '#CD853F',   # peru
-    'CMA': '#708090',   # slate gray
-    'MS':  '#8B4513',   # saddle brown
-    'IMA': '#A9A9A9',   # dark gray
-    'SBS': '#556B2F',   # dark olive green
-    'BAF': '#BC8F8F',   # rosy brown
+    'CWH': PALETTE['green'],
+    'ICH': PALETTE['vermillion'],
+    'CDF': PALETTE['orange'],
+    'ESSF': PALETTE['blue'],
+    'MH':  PALETTE['purple'],
+    'IDF': PALETTE['yellow'],
+    'CMA': PALETTE['grey'],
+    'MS':  PALETTE['sky'],
+    'IMA': '#bbbbbb',
+    'SBS': '#5a7d2a',
+    'BAF': '#b08968',
 }
 
 # Yew probability colormap matching web map
 YEW_CMAP = LinearSegmentedColormap.from_list('yew', [
     (0.0, '#00000000'),
-    (0.02, '#00640040'),
+    (0.02, '#0072B240'),
     (0.33, '#228B2280'),
-    (0.50, '#FFD700B0'),
-    (0.83, '#FF8C00D0'),
-    (1.0, '#FF00FFE0'),
+    (0.50, '#F0E442B0'),
+    (0.83, '#E69F00D0'),
+    (1.0, '#CC79A7E0'),
 ])
 
 LOG_CMAP = LinearSegmentedColormap.from_list('logging', [
     (0.0, '#0000FF80'),  # water
-    (0.143, '#FF000090'),  # <20yr
-    (0.286, '#FF660090'),  # 20-40yr
-    (0.429, '#FFAA0080'),  # 40-80yr
-    (0.571, '#90EE9080'),  # 80-150yr
-    (0.714, '#00640000'),  # alpine (transparent)
-    (1.0, '#006400B0'),    # old-growth
+    (0.143, '#D55E0090'),  # <20yr
+    (0.286, '#D55E0090'),  # 20-40yr
+    (0.429, '#E69F0080'),  # 40-80yr
+    (0.571, '#7FD1B080'),  # 80-150yr
+    (0.714, '#0072B200'),  # alpine (transparent)
+    (1.0, '#0072B2B0'),    # old-growth
 ])
 
 
@@ -130,7 +135,7 @@ def fig1_zone_comparison(rows):
         ax.scatter(curr, i, s=95, color=c, edgecolor='black', linewidth=0.5, zorder=3)
         pct = (orig - zones_data[z]['current_yew_ha']) / orig * 100 if orig > 0 else 0
         ax.text(orig * 1.18, i, f'−{pct:.0f}%', va='center', fontsize=9.5,
-                color='#a01010', fontweight='bold')
+                color='#A33A00', fontweight='bold')
 
     ax.set_xscale('log')
     ax.set_yticks(y)
@@ -171,8 +176,8 @@ def fig2_cwh_subzone_detail(rows):
     remaining = [r['current_yew_ha'] for r in cwh]
     
     x = np.arange(len(labels))
-    ax.bar(x, remaining, label='Current remaining', color='#2E8B57', edgecolor='black', linewidth=0.5)
-    ax.bar(x, destroyed, bottom=remaining, label='Destroyed by logging', color='#CD5C5C', alpha=0.8,
+    ax.bar(x, remaining, label='Current remaining', color='#009E73', edgecolor='black', linewidth=0.5)
+    ax.bar(x, destroyed, bottom=remaining, label='Destroyed by logging', color='#D55E00', alpha=0.8,
            edgecolor='black', linewidth=0.5)
     
     ax.set_xlabel('CWH Subzone', fontsize=12)
@@ -206,7 +211,7 @@ def fig3_ich_subzone_detail(rows):
     
     x = np.arange(len(labels))
     ax.bar(x, remaining, label='Current remaining', color='#D2691E', edgecolor='black', linewidth=0.5)
-    ax.bar(x, destroyed, bottom=remaining, label='Destroyed by logging', color='#CD5C5C', alpha=0.8,
+    ax.bar(x, destroyed, bottom=remaining, label='Destroyed by logging', color='#D55E00', alpha=0.8,
            edgecolor='black', linewidth=0.5)
     
     ax.set_xlabel('ICH Subzone', fontsize=12)
@@ -242,7 +247,7 @@ def fig4_cdf_detail(rows):
     # Left: land use breakdown
     categories = ['Old-growth\n(>150 yr)', 'Logged\n(<80 yr)', 'Water', 'Alpine/\nBarren']
     values = [r['oldgrowth_ha'], r['logged_ha'], r['water_ha'], r['alpine_ha']]
-    colors = ['#006400', '#CD5C5C', '#4169E1', '#A9A9A9']
+    colors = ['#0072B2', '#D55E00', '#0072B2', '#A9A9A9']
     ax1.bar(categories, values, color=colors, edgecolor='black', linewidth=0.5)
     ax1.set_ylabel('Area (ha)', fontsize=12)
     ax1.set_title('CDF Zone Land Cover', fontsize=13)
@@ -252,7 +257,7 @@ def fig4_cdf_detail(rows):
     # Right: yew habitat
     cats2 = ['Estimated\nOriginal', 'Current\nRemaining', 'Destroyed\nby Logging']
     vals2 = [r['est_original_yew_ha'], r['current_yew_ha'], r['destroyed_yew_ha']]
-    cols2 = ['#DAA520', '#2E8B57', '#CD5C5C']
+    cols2 = ['#E69F00', '#009E73', '#D55E00']
     bars = ax2.bar(cats2, vals2, color=cols2, edgecolor='black', linewidth=0.5)
     ax2.set_ylabel('Yew habitat (ha)', fontsize=12)
     ax2.set_title('CDF Yew Habitat: 99% Decline', fontsize=13)
@@ -328,7 +333,7 @@ def fig6_overall_pie(rows):
     # Left: overall status
     labels1 = ['Remaining habitat', 'Destroyed by logging', 'Fire suppression', 'Elevation suppression']
     sizes1 = [total_remaining, max(0, total_logging), total_fire, total_elev]
-    colors1 = ['#2E8B57', '#CD5C5C', '#FF8C00', '#4682B4']
+    colors1 = ['#009E73', '#D55E00', '#E69F00', '#0072B2']
     explode1 = (0.05, 0.02, 0.02, 0.02)
     
     wedges1, texts1, autotexts1 = ax1.pie(
@@ -376,7 +381,7 @@ def fig7_three_zone_comparison(rows):
         
         categories = ['Old-growth', 'Logged', 'Water', 'Alpine']
         values = [d['oldgrowth_ha'], d['logged_ha'], d['water_ha'], d['alpine_ha']]
-        colors = ['#006400', '#CD5C5C', '#4169E1', '#A9A9A9']
+        colors = ['#0072B2', '#D55E00', '#0072B2', '#A9A9A9']
         
         ax.bar(categories, values, color=colors, edgecolor='black', linewidth=0.5)
         ax.set_title(f'{zone} Zone\n({d["total_ha"]:,.0f} ha total)', fontsize=13,
@@ -500,9 +505,9 @@ def fig10_fire_by_decade():
     suppressed = [d.get('yew_suppressed_ha', 0) for d in decade_list]
     
     x = np.arange(len(decades))
-    ax.bar(x, burned, label='Total burned area (ha)', color='#FF8C00', alpha=0.5,
+    ax.bar(x, burned, label='Total burned area (ha)', color='#E69F00', alpha=0.5,
            edgecolor='black', linewidth=0.5)
-    ax.bar(x, suppressed, label='Yew habitat suppressed (ha)', color='#CD5C5C',
+    ax.bar(x, suppressed, label='Yew habitat suppressed (ha)', color='#D55E00',
            edgecolor='black', linewidth=0.5)
     
     ax.set_xlabel('Decade', fontsize=12)
@@ -607,7 +612,7 @@ def fig12_suppression_waterfall(rows):
             total_raw - total_logging_suppression - total_fire - total_elev,
             total_current]
     
-    colors = ['#4682B4', '#FF8C00', '#CD5C5C', '#8B4513', '#2E8B57']
+    colors = ['#0072B2', '#E69F00', '#D55E00', '#8B4513', '#009E73']
     
     bars = ax.bar(range(len(steps)), vals, color=colors, edgecolor='black', linewidth=0.5)
     ax.set_xticks(range(len(steps)))
@@ -649,11 +654,11 @@ def fig13_logging_age_classes(rows):
     a20_40 = [zones_data.get(z, {}).get('logged_20_40yr_ha', 0) for z in target]
     a40_80 = [zones_data.get(z, {}).get('logged_40_80yr_ha', 0) for z in target]
     
-    ax.bar(x - w, lt20, w, label='<20 yr (clearcut)', color='#FF0000', alpha=0.8,
+    ax.bar(x - w, lt20, w, label='<20 yr (clearcut)', color='#D55E00', alpha=0.8,
            edgecolor='black', linewidth=0.5)
-    ax.bar(x, a20_40, w, label='20–40 yr', color='#FF6600', alpha=0.8,
+    ax.bar(x, a20_40, w, label='20–40 yr', color='#D55E00', alpha=0.8,
            edgecolor='black', linewidth=0.5)
-    ax.bar(x + w, a40_80, w, label='40–80 yr', color='#FFAA00', alpha=0.8,
+    ax.bar(x + w, a40_80, w, label='40–80 yr', color='#E69F00', alpha=0.8,
            edgecolor='black', linewidth=0.5)
     
     ax.set_xlabel('BEC Zone', fontsize=12)
@@ -687,7 +692,7 @@ def fig14_model_performance():
     ]
     names = [m[0] for m in models]
     metrics = ['AUC-ROC', 'Accuracy', 'F1 Score']
-    colors = ['#2E8B57', '#5B9BD5', '#E8A33D']
+    colors = ['#009E73', '#5B9BD5', '#E8A33D']
     vals = np.array([[m[1], m[2], m[3]] for m in models])
 
     x = np.arange(len(models))
@@ -707,8 +712,8 @@ def fig14_model_performance():
     ax.set_ylabel('Score', fontsize=12)
     ax.set_title('Classifier Performance on 64-band AlphaEarth Embeddings\n'
                  '(held-out validation set; y-axis truncated at 0.5)', fontsize=13)
-    ax.axvline(0.5, color='#2E8B57', ls=':', lw=1.2, alpha=0.7, zorder=1)
-    ax.annotate('production model', xy=(0, 1.005), fontsize=8.5, color='#2E8B57',
+    ax.axvline(0.5, color='#009E73', ls=':', lw=1.2, alpha=0.7, zorder=1)
+    ax.annotate('production model', xy=(0, 1.005), fontsize=8.5, color='#009E73',
                 ha='center', style='italic')
     ax.legend(fontsize=10, loc='lower left', framealpha=0.95)
     ax.grid(axis='y', alpha=0.3, zorder=0)
@@ -743,10 +748,10 @@ def fig15_threats_summary(rows):
 
     # ── Panel A: area-quantified threats (log x) ──────────────────────────
     quant = [
-        ('Clear-cut logging\n(modelled)', logging_loss, '#CD5C5C'),
-        ('Stream erosion, 30 m buffer\n(modelled, 42-tile subset)', 1717, '#DAA520'),
-        ('Wildfire, historical\n(modelled)', total_fire, '#FF8C00'),
-        ('Sea-level rise\n(projected, <1%)', 240, '#4682B4'),
+        ('Clear-cut logging\n(modelled)', logging_loss, '#D55E00'),
+        ('Stream erosion, 30 m buffer\n(modelled, 42-tile subset)', 1717, '#E69F00'),
+        ('Wildfire, historical\n(modelled)', total_fire, '#E69F00'),
+        ('Sea-level rise\n(projected, <1%)', 240, '#0072B2'),
     ]
     names = [q[0] for q in quant]
     vals = [q[1] for q in quant]
@@ -875,9 +880,9 @@ def fig17_og_logged_ratio(rows):
     og_vals = [zones_data.get(z, {}).get('oldgrowth_ha', 0) for z in target]
     log_vals = [zones_data.get(z, {}).get('logged_ha', 0) for z in target]
     
-    ax.bar(x - w/2, og_vals, w, label='Old-growth (>150 yr)', color='#006400',
+    ax.bar(x - w/2, og_vals, w, label='Old-growth (>150 yr)', color='#0072B2',
            edgecolor='black', linewidth=0.5)
-    ax.bar(x + w/2, log_vals, w, label='Logged (<150 yr)', color='#CD5C5C',
+    ax.bar(x + w/2, log_vals, w, label='Logged (<150 yr)', color='#D55E00',
            edgecolor='black', linewidth=0.5)
     
     ax.set_xlabel('BEC Zone', fontsize=12)
@@ -996,7 +1001,7 @@ def fig19_zone_waterfall(rows):
         cumulative = [est_orig, est_orig - logging_loss, est_orig - logging_loss - fire,
                      est_orig - logging_loss - fire - elev, current]
         
-        colors = [ZONE_COLORS.get(zone, '#888'), '#CD5C5C', '#FF8C00', '#4682B4', '#2E8B57']
+        colors = [ZONE_COLORS.get(zone, '#888'), '#D55E00', '#E69F00', '#0072B2', '#009E73']
         
         ax.bar(range(len(cats)), cumulative, color=colors, edgecolor='black', linewidth=0.5)
         ax.set_xticks(range(len(cats)))
