@@ -30,6 +30,7 @@ FIGURE_MAP = {
     "Figure S2": _PFIG / "fig3_ich_subzones.png",
     "Figure S3": _PFIG / "figB_protection_breakdown.png",
     "Figure S4": _PFIG / "figE_tile_imagery_north.png",
+    "Figure S5": _PFIG / "fig_pva.png",
 }
 
 
