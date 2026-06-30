@@ -21,6 +21,7 @@ habitat (154,483 ha province / cached-tile historical mass).
 Run:
     conda run -n yew_pytorch python scripts/analysis/fire_independent_loss.py
 """
+import sys
 import json
 from pathlib import Path
 import numpy as np
@@ -29,6 +30,9 @@ import rasterio.features
 from rasterio.transform import from_bounds as rio_bounds
 from shapely.geometry import box as sbox
 
+sys.path.insert(0, str(Path(__file__).parent))
+from fire_recovery import busing_fire_modifier, BURN_FRAC
+
 ROOT       = Path("/home/jericho/yew_project")
 CACHE      = ROOT / "results/analysis/cwh_spot_comparisons/tile_cache"
 TILES_JSON = ROOT / "docs/tiles/tiles.json"
@@ -36,35 +40,47 @@ FIRE_JSON  = ROOT / "docs/tiles/fire_contours.geojson"
 HA_PER_PX  = 0.01
 FIRE_YEAR_NOW, FIRE_SPAN = 2024, 124.0
 PROVINCE_HISTORICAL_HA = 154_483.0       # headline original-habitat estimate (98 tiles)
+PIPELINE_FIRE_HA       = 692.0           # current linear-model pipeline fire loss (98 tiles)
 
 OG_CAT      = 7
 LOGGED_CATS = (2, 3, 4, 5)               # non-old-growth forest = "logged"
 
 
-def fire_modifier(H, W, bb, fires):
-    """Pipeline fire modifier raster: clip((2024 − fire_year)/124, 0, 1)."""
+def fire_year_raster(H, W, bb, fires):
+    """Year of most recent fire per pixel (0 = unburned)."""
     box = sbox(bb["west"], bb["south"], bb["east"], bb["north"])
     local = fires[fires.intersects(box)].sort_values("FIRE_YEAR")  # newer overwrites older
     if local.empty:
-        return np.ones((H, W), np.float32)
+        return np.zeros((H, W), np.int32)
     transform = rio_bounds(bb["west"], bb["south"], bb["east"], bb["north"], W, H)
     shapes = [(r.geometry, int(r.FIRE_YEAR)) for _, r in local.iterrows()
               if r.geometry and not r.geometry.is_empty]
-    fy = rasterio.features.rasterize(shapes, (H, W), transform=transform,
-                                     fill=0, dtype="int32")
+    return rasterio.features.rasterize(shapes, (H, W), transform=transform,
+                                       fill=0, dtype="int32")
+
+
+def linear_modifier(fy):
+    """Old arbitrary modifier: clip((2024 − fire_year)/124, 0, 1)."""
     return np.where(fy > 0, np.clip((FIRE_YEAR_NOW - fy) / FIRE_SPAN, 0, 1),
                     1.0).astype(np.float32)
+
+
+def busing_modifier(fy):
+    """New modifier: 75% burn + Busing-matrix recovery of the mature cohort."""
+    yrs = np.where(fy > 0, FIRE_YEAR_NOW - fy, -1)
+    return busing_fire_modifier(yrs)
 
 
 def main():
     tiles = {t["slug"]: t for t in json.load(open(TILES_JSON))}
     fires = gpd.read_file(str(FIRE_JSON))
-    print(f"{len(tiles)} tiles, {len(fires)} fire perimeters\n")
+    print(f"{len(tiles)} tiles, {len(fires)} fire perimeters")
+    print(f"New fire model: {BURN_FRAC:.0%} burn within perimeter + Busing recovery\n")
 
-    hist_mass = 0.0          # original-habitat footprint mass (cached tiles)
-    fire_og   = 0.0          # fire loss in old-growth pixels
-    fire_log  = 0.0          # fire loss in already-logged pixels
-    pipe_og   = 0.0          # pipeline-style fire loss (OG only, after logging) — for comparison
+    hist_mass = 0.0
+    # accumulators: [linear, busing] × [og, logged]
+    acc = {("lin", "og"): 0.0, ("lin", "log"): 0.0,
+           ("bus", "og"): 0.0, ("bus", "log"): 0.0}
     n = 0
     per_tile = []
 
@@ -75,47 +91,52 @@ def main():
         grid = np.load(gp).astype(np.float32)
         lg   = np.load(lp)
         H, W = grid.shape
-        fm   = fire_modifier(H, W, t["bbox"], fires)
+        fy   = fire_year_raster(H, W, t["bbox"], fires)
+        mods = {"lin": linear_modifier(fy), "bus": busing_modifier(fy)}
 
         og_mask  = (lg == OG_CAT)
         log_mask = np.isin(lg, LOGGED_CATS)
+        hist_mass += float((grid * (og_mask | log_mask)).sum())
 
-        og_raw   = float((grid * og_mask).sum())
-        log_raw  = float((grid * log_mask).sum())
-        og_loss  = float((grid * og_mask  * (1 - fm)).sum())
-        log_loss = float((grid * log_mask * (1 - fm)).sum())
-
-        hist_mass += og_raw + log_raw
-        fire_og   += og_loss
-        fire_log  += log_loss
-        pipe_og   += og_loss        # OG-only loss == pipeline fire effect on surviving OG
+        for key, fm in mods.items():
+            acc[(key, "og")]  += float((grid * og_mask  * (1 - fm)).sum())
+            acc[(key, "log")] += float((grid * log_mask * (1 - fm)).sum())
         n += 1
-        per_tile.append((t["name"], (og_loss + log_loss) * HA_PER_PX))
+        per_tile.append((t["name"],
+                         float((grid * (og_mask | log_mask) * (1 - mods["bus"])).sum()) * HA_PER_PX))
 
     scale = PROVINCE_HISTORICAL_HA / (hist_mass * HA_PER_PX)
-    fire_indep_41 = (fire_og + fire_log) * HA_PER_PX
-    fire_indep_98 = fire_indep_41 * scale
-    fire_og_98    = fire_og * HA_PER_PX * scale
-    fire_log_98   = fire_log * HA_PER_PX * scale
+
+    def ha(key, part):  # scaled to 98 tiles
+        return acc[(key, part)] * HA_PER_PX * scale
 
     print(f"Cached tiles analysed: {n}")
-    print(f"Original-habitat footprint (41 tiles): {hist_mass*HA_PER_PX:,.0f} ha")
+    print(f"Original-habitat footprint (cached): {hist_mass*HA_PER_PX:,.0f} ha")
     print(f"Scale factor to 98-tile province total: ×{scale:.3f}\n")
 
-    print("=== Fire loss INDEPENDENT of logging (fire applied to raw grid) ===")
-    print(f"  41-tile fire loss:        {fire_indep_41:,.0f} ha")
-    print(f"  Scaled to 98 tiles:       {fire_indep_98:,.0f} ha "
-          f"({fire_indep_98/PROVINCE_HISTORICAL_HA*100:.1f}% of 154,483 ha original)")
-    print(f"    – in old-growth pixels: {fire_og_98:,.0f} ha")
-    print(f"    – in logged pixels:     {fire_log_98:,.0f} ha "
-          f"({fire_log_98/fire_indep_98*100:.0f}% — dual-threatened)")
-    print(f"\nFor comparison, pipeline fire (after logging, all 98 tiles): 692 ha")
-    print(f"Independent estimate is ~{fire_indep_98/692:.1f}× the pipeline figure.")
+    # Pipeline-style fire loss = OG-only (after logging). Calibrate the new model
+    # to the known 692 ha linear pipeline figure via the OG-only ratio.
+    ratio_og = acc[("bus", "og")] / acc[("lin", "og")]
+    new_pipeline = PIPELINE_FIRE_HA * ratio_og
+
+    print("=== Pipeline-style fire loss (old-growth only, after logging) ===")
+    print(f"  Linear model (= 692 ha calibration):  OG {ha('lin','og'):,.0f} ha (cached-scaled)")
+    print(f"  Busing model:                         OG {ha('bus','og'):,.0f} ha (cached-scaled)")
+    print(f"  New-model / linear OG ratio: {ratio_og:.2f}")
+    print(f"  → New pipeline fire estimate (98 tiles): {new_pipeline:,.0f} ha "
+          f"(was {PIPELINE_FIRE_HA:.0f} ha)\n")
+
+    print("=== Fire loss INDEPENDENT of logging (fire on raw original footprint) ===")
+    for key, lab in (("lin", "Linear model "), ("bus", "Busing model ")):
+        tot = ha(key, "og") + ha(key, "log")
+        print(f"  {lab}: {tot:,.0f} ha total  "
+              f"(OG {ha(key,'og'):,.0f} + logged {ha(key,'log'):,.0f}; "
+              f"{tot/PROVINCE_HISTORICAL_HA*100:.1f}% of original)")
 
     per_tile.sort(key=lambda r: -r[1])
-    print("\nTop cached tiles by independent fire loss (ha):")
-    for name, ha in per_tile[:8]:
-        print(f"  {name:28s} {ha:6.1f}")
+    print("\nTop cached tiles by Busing-model fire loss (ha):")
+    for name, hav in per_tile[:8]:
+        print(f"  {name:28s} {hav:6.1f}")
 
 
 if __name__ == "__main__":
