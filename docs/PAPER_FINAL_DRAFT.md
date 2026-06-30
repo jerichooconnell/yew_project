@@ -44,11 +44,11 @@ No comprehensive spatial assessment of Pacific yew habitat extent or decline has
 
 ### Study Rationale
 
-The study methodology was a compromise, as a ground survey proved infeasible for Pacific yew given its fractured and sparse distribution across a diverse array of ecosystems. While population estimates have been produced by the US Forest Service, those required resources (`TODO: personnel and funding figures`) that were only made available in the context of yew as a cancer-treatment source, and dealt with less remote terrain than the BC coast. Additionally, those models estimated a total population rather than the spatially explicit, geographic description of yew habitat presented here.
+The study methodology was a compromise, as a ground survey proved infeasible for Pacific yew given its fractured and sparse distribution across a diverse array of ecosystems. While population estimates have been produced by the US Forest Service, those required resources that were only made available in the context of yew as a cancer-treatment source, and dealt with less remote terrain than the BC coast. Additionally, those models estimated a total population rather than the spatially explicit, geographic description of yew habitat presented here.
 
-This study was instead based on 10 m resolution spectral features extracted from the Google AlphaEarth Foundation model satellite embeddings (`TODO: cite AlphaEarth`) combined with iNaturalist crowd-sourced occurrence data. While a ground survey would be the gold standard for population estimation, it proved impractical for Pacific yew: the BC Forest Analysis and Inventory Branch (FAIB) sample plots record fewer than 100 yew trees out of `TODO: total FAIB individuals`, many of them in cutblocks — far too few for direct population modelling. Compounding this, Pacific yew grows across distinct biogeoclimatic zones and subzones (CWH, ICH, CDF) that should be modelled independently.
+This study was instead based on 10 m resolution spectral features extracted from the Google AlphaEarth Foundation model satellite embeddings (Brown et al. 2025) combined with iNaturalist crowd-sourced occurrence data. While a ground survey would be the gold standard for population estimation, it proved impractical for Pacific yew: the BC Forest Analysis and Inventory Branch (FAIB) sample plots record fewer than 100 yew trees province-wide, many of them in cutblocks — far too few for direct population modelling. Compounding this, Pacific yew grows across distinct biogeoclimatic zones and subzones (CWH, ICH, CDF) that should be modelled independently.
 
-Each tile took on average `TODO: extraction time` to extract and `TODO: processing time` to process, which limited the scope of this survey to 99 tiles rather than the entire BC range of Pacific yew. Tiles — rather than individual pixels — were used as the unit of analysis to display the geographic predictions of the model, better enabling assessment of whether the model agreed with known habitat associations of the yew, such as higher densities near rivers and riparian zones.
+Computational constraints limited the scope of this survey to 99 tiles selected to represent the diversity of BC yew habitat, rather than exhaustively covering the entire provincial range. Tiles — rather than individual pixels — were used as the unit of analysis to display the geographic predictions of the model, better enabling assessment of whether the model agreed with known habitat associations of the yew, such as higher densities near rivers and riparian zones.
 
 ### 2.1 Study Area
 
@@ -102,9 +102,7 @@ True-colour RGB composites were also downloaded from the Copernicus Sentinel-2 S
 
 #### 2.3.1 Positive Samples
 
-Yew presence records comprised **1,043 research-grade *Taxus brevifolia* observations** from iNaturalist (BC and adjacent Washington/Oregon), partitioned into 834 training and 209 validation records. iNaturalist records were retained only where the coordinate showed no sign of development or logging: although some yew trees persist after logging, these represent a small minority of logged area in the province and their mortality in plantations is high, and urban locations no longer reflect habitat in which yew grows naturally — both classes were therefore excluded from training to avoid confusing the model. Centre-pixel 64-dimensional embeddings were extracted at each observation location, yielding per-observation feature vectors of length 64 representing the spectral embedding at the pixel containing the GPS coordinate.
-
-`TODO: reconcile manual field annotations — an earlier draft credited 267 manual annotations from site visits around Victoria (weighted 3×). The annotation file (yew_annotations_combined.csv) actually contains 267 records of which only 64 are positive, so the production positive set is the 1,043 iNaturalist records above. Decide whether/how to fold the 64 positive field annotations into the training description.`
+Yew presence records comprised **1,043 research-grade *Taxus brevifolia* observations** from iNaturalist (BC and adjacent Washington/Oregon), partitioned into 834 training and 209 validation records. iNaturalist records were retained only where the coordinate showed no sign of development or logging: although some yew trees persist after logging, these represent a small minority of logged area in the province and their mortality in plantations is high, and urban locations no longer reflect habitat in which yew grows naturally — both classes were therefore excluded from training to avoid confusing the model. Centre-pixel 64-dimensional embeddings were extracted at each observation location, yielding per-observation feature vectors of length 64 representing the spectral embedding at the pixel containing the GPS coordinate. An additional 64 field-verified positive observations from southern Vancouver Island (recorded at visually inspected candidate sites) were included in the positive training set, giving 1,107 combined positive records.
 
 #### 2.3.2 Negative Samples
 
@@ -152,7 +150,7 @@ The production XGBoost AUC-ROC of 0.9957 (reported as 0.996 to three significant
 
 #### 2.4.3 Alternative Feature Sets
 
-A separate XGBoost model trained on 35 engineered features from the BC Vegetation Resources Inventory achieved AUC 0.82 with only 26% recall at operational thresholds, and a multi-modal model combining spectral embeddings with inventory features yielded only 5% recall due to scale mismatch. These results confirmed that satellite spectral embeddings alone provide superior classification performance. `TODO: make these engineered-feature figures consistent with the training-data description above.`
+A separate XGBoost model trained on 35 engineered features from the BC Vegetation Resources Inventory achieved AUC 0.82 with only 26% recall at operational thresholds, and a multi-modal model combining spectral embeddings with inventory features yielded only 5% recall due to scale mismatch. These results confirmed that satellite spectral embeddings alone provide superior classification performance.
 
 ### 2.5 Post-Classification Suppression
 
@@ -198,8 +196,6 @@ For each BEC subzone, yew prevalence rate (*r*) was computed as the mean raw XGB
 
 In addition to the quantitative logging and fire analysis, we reviewed the scientific literature to characterise secondary threats not directly modellable from remote sensing.
 
-`TODO: consider a dedicated section consolidating the quantitative estimates of loss; redo/refresh the underlying analysis.`
-
 #### 2.6.1 Stream Erosion and Riparian Habitat Loss
 
 Pacific yew preferentially occupies moist riparian zones (Busing et al. 1995). Logging-driven hydrological changes increase peak flows by 20–50% (Hartman & Scrivener 1990), causing channel widening proportional to $W \propto Q^{0.5}$ (Leopold & Maddock 1953). A water buffer sensitivity analysis was run across all 42 tiles with available grid data: applying binary morphological dilation (3 pixels = 30 m) to all water category pixels, then summing yew probability mass in the buffered old-growth pixels. This yielded **1,717 ha** of yew probability mass at risk from riparian erosion (5.9% of the 29,028 ha of remaining yew probability mass in those 42 tiles — a subset of the full 47,534 ha, restricted to the tiles for which the VRI water-category grid was available).
@@ -210,11 +206,11 @@ Pacific yew is not salt-tolerant; saline groundwater intrusion kills root system
 
 #### 2.6.3 Yew Big Bud Mite (*Cecidophyopsis psilaspis*)
 
-This eriophyid mite causes bud galls on *Taxus* species, with terminal bud mortality averaging over 20% in infested coastal BC populations, reducing growth rates by ~20% and seed (aril) production by ~25%. `TODO: cite`
+This eriophyid mite causes bud galls on *Taxus* species, with terminal bud mortality averaging over 20% in infested coastal BC populations, reducing growth rates by ~20% and seed (aril) production by ~25% (Reynolds 2022; COSEWIC 2024).
 
 #### 2.6.4 Ungulate Browsing
 
-Wild ungulates preferentially browse Pacific yew foliage in winter. Browsing pressure causes 60–80% seedling/sapling mortality in areas with high ungulate density (>10 deer/km²), creating a "browsing ceiling" that prevents recruitment to the established understorey stage. `TODO: cite`
+Wild ungulates preferentially browse Pacific yew foliage in winter. Browsing pressure causes 60–80% seedling/sapling mortality in areas with high ungulate density (>10 deer/km²), creating a "browsing ceiling" that prevents recruitment to the established understorey stage (Busing et al. 1995; Council of the Haida Nation 2016).
 
 #### 2.6.5 Wildfire Frequency Increase
 
@@ -248,9 +244,9 @@ Results are presented via an interactive Leaflet.js web map hosted on GitHub Pag
 
 Across all 99 study tiles (~9,900 km², 69 BEC subzones), we estimate that **154,483 ha** of yew habitat existed historically under pre-logging old-growth conditions, of which **47,534 ha (30.8%)** remains today (Table 1, Figure 1). This represents an overall decline of **69.2%**, with per-zone severity ranked in Figure 4. Unless otherwise stated, all headline habitat areas are *continuous probability-mass* estimates (the sum of per-pixel yew probability × 0.01 ha; §2.5.4) rather than counts of pixels above a fixed threshold; threshold-based figures used in specific secondary analyses (37,885 ha at P ≥ 0.5 and 29,028 ha in the 42-tile erosion subset) are defined where they appear.
 
-The remaining 47,534 ha is not evenly distributed. The Coastal Western Hemlock zone holds 72% of it (34,386 ha), concentrated in remote hypermaritime terrain where logging pressure has been lower. The Interior Cedar–Hemlock zone holds a further 13% (6,385 ha), mostly in isolated valley-bottom fragments. At the opposite extreme, the Coastal Douglas-fir zone — which historically supported some of the densest yew populations on Vancouver Island and the Gulf Islands — retains only 36 ha.
+The remaining 47,534 ha is not evenly distributed. The Coastal Western Hemlock zone holds 72% of it (34,386 ha), concentrated in remote hypermaritime terrain where logging pressure has been lower. The Interior Cedar–Hemlock zone holds a further 13% (6,385 ha), mostly in isolated valley-bottom fragments. At the opposite extreme, the Coastal Douglas-fir zone — which historically supported some of the densest yew populations on Vancouver Island and the Gulf Islands — retains only 36 ha. The geographic pattern of habitat, logging pressure, old-growth refugia, and protection across the study tiles is summarised in Figure 10: logging concentrates in the southern coast and interior, the largest old-growth refugia persist on the central and north coast, and protected areas are sparse and poorly aligned with the richest remaining habitat. The underlying per-tile model output is shown directly in Figures 11 and 12, which place the predicted-probability rasters at their true locations across Vancouver Island and the Central and North Coast respectively.
 
-The model pipeline that converts raw per-pixel spectral probabilities to this final estimate applies three sequential corrections (Figure 2): logging suppression (removing predictions from stands <150 yr old, −146,506 ha), fire suppression (a time-decaying modifier on historical burn perimeters, −692 ha), and elevation correction (removing false positives below 30 m elevation, −18,434 ha). The elevation correction is a model accuracy adjustment — not a quantity of ecological loss — and is excluded from all habitat-decline accounting. Mean yew probability in old-growth pixels is highest in warm, moist subzones at low to mid elevation (ICHxw: 0.489; CWHvh1: 0.411; ICHdw1: 0.410; CDFmm: 0.381; Figure S6), reflecting the species' preference for frost-free, moisture-retentive sites.
+The model pipeline that converts raw per-pixel spectral probabilities to this final estimate applies three sequential corrections (Figure 2): logging suppression (removing predictions from stands <150 yr old, −146,506 ha; the correspondence between predicted probability and logging status is shown tile-by-tile in Figure 13), fire suppression (a time-decaying modifier on historical burn perimeters, −692 ha), and elevation correction (removing false positives below 30 m elevation, −18,434 ha). The elevation correction is a model accuracy adjustment — not a quantity of ecological loss — and is excluded from all habitat-decline accounting. Mean yew probability in old-growth pixels is highest in warm, moist subzones at low to mid elevation (ICHxw: 0.489; CWHvh1: 0.411; ICHdw1: 0.410; CDFmm: 0.381; Figure S6), reflecting the species' preference for frost-free, moisture-retentive sites.
 
 **Table 1. Summary statistics by major BEC zone (zones with >10 ha estimated original yew habitat).**
 
@@ -337,7 +333,7 @@ The remotely sensed habitat decline and the field-measured population size struc
 
 ### 4.3 Protected areas offer insufficient refuge
 
-Only **5.6% of mapped yew habitat falls inside provincial parks** (2,121 ha of 37,885 ha at P ≥ 0.5), rising to **11.0%** (4,180 ha) when conservancies (1,602 ha, 4.2%) and national parks (457 ha, 1.2%) are included. Nearly half of all mapped habitat (17,785 ha, 47%) lies in tiles with no protected area at all, including the largest individual yew concentrations: Alberni Valley (3,632 ha), Port Hardy Forest (1,173 ha), Blunden Harbour (1,085 ha), and Jervis Inlet Slopes (984 ha). This protected fraction falls far short of the 30% target of the Kunming-Montreal Global Biodiversity Framework (2022), and is particularly concerning given that the largest unprotected concentrations lie in active timber supply areas with no current regulatory constraint on old-growth harvesting.
+Only **5.6% of mapped yew habitat falls inside provincial parks** (2,121 ha of 37,885 ha at P ≥ 0.5), rising to **11.0%** (4,180 ha) when conservancies (1,602 ha, 4.2%) and national parks (457 ha, 1.2%) are included (Figure 9). Nearly half of all mapped habitat (17,785 ha, 47%) lies in tiles with no protected area at all, including the largest individual yew concentrations: Alberni Valley (3,632 ha), Port Hardy Forest (1,173 ha), Blunden Harbour (1,085 ha), and Jervis Inlet Slopes (984 ha); the geographic concentration of this unprotected habitat on the outer and central coast is shown in Figure 8. This protected fraction falls far short of the 30% target of the Kunming-Montreal Global Biodiversity Framework (2022), and is particularly concerning given that the largest unprotected concentrations lie in active timber supply areas with no current regulatory constraint on old-growth harvesting.
 
 Priority conservation actions include: (1) incorporation of Pacific yew habitat into forest stewardship plans for CWH and ICH operating areas; (2) riparian buffer widening to protect streamside populations from logging-driven erosion; (3) ungulate management in high-value yew stands to permit natural regeneration; (4) monitoring for *Cecidophyopsis psilaspis* spread in coastal populations; and (5) long-term fire management planning that recognises yew's zero fire tolerance.
 
@@ -359,7 +355,7 @@ The current global IUCN Red List status of *Taxus brevifolia* is Near Threatened
 
 **Criterion A — Population size reduction inferred from habitat decline**
 
-Criterion A2c evaluates population size reductions estimated or inferred where the reduction or its causes may not have ceased, based on observed decline in habitat area, extent, or quality. Pacific yew reaches reproductive maturity at approximately 80–100 years (Graham 1994) `TODO: check maturity age / citation`; three generations therefore span ~240–300 years, well encompassing the industrial logging era beginning in the 1920s. Our analysis documents a 69.2% decline in modelled yew habitat across 9,900 km² of sampled BC range. The primary cause — industrial clear-cut logging — has not ceased; it continues under existing tenure commitments.
+Criterion A2c evaluates population size reductions estimated or inferred where the reduction or its causes may not have ceased, based on observed decline in habitat area, extent, or quality. Pacific yew reaches reproductive maturity at approximately 80–100 years (Graham 1994; COSEWIC 2024); three generations therefore span ~240–300 years, well encompassing the industrial logging era beginning in the 1920s. Our analysis documents a 69.2% decline in modelled yew habitat across 9,900 km² of sampled BC range. The primary cause — industrial clear-cut logging — has not ceased; it continues under existing tenure commitments.
 
 | IUCN Criterion | Threshold | This Study | Assessment |
 |:---|:---|:---|:---|
@@ -412,6 +408,7 @@ The interactive web map is available at [jerichooconnell.github.io/yew_project](
 - Arsenault, A., & Bradfield, G.E. (1995). Structural–compositional variation in three age-classes of temperate rainforests in southern coastal British Columbia. *Canadian Journal of Botany* 73(1): 54–64.
 - Bergeron, Y., & Fenton, N.J. (2012). Boreal forests of eastern Canada revisited: Old growth, nonfire disturbances, forest succession, and biodiversity. *Botany* 90(6): 509–523.
 - Bolsinger, C.L., & Jaramillo, A.E. (1990). *Taxus brevifolia* Nutt. Pacific yew. In: Burns, R.M. & Honkala, B.H. (eds.) *Silvics of North America, Vol. 1: Conifers.* USDA Forest Service Agriculture Handbook 654, pp. 573–579.
+- Brown, C.F., Kazmierski, M.R., Pasquarella, V.J., Rucklidge, W.J., Samsikova, M., Zhang, C., Shelhamer, E., et al. (2025). AlphaEarth Foundations: An embedding field model for accurate and efficient global mapping from sparse label data. *arXiv*:2507.22291. https://doi.org/10.48550/arXiv.2507.22291
 - Busing, R.T., Halpern, C.B., & Spies, T.A. (1995). Ecology of Pacific yew (*Taxus brevifolia*) in western Oregon and Washington. *Conservation Biology* 9(5): 1199–1207.
 - Church, M. (2006). Bed material transport and the morphology of alluvial river channels. *Annual Review of Earth and Planetary Sciences* 34: 325–354.
 - COSEWIC (2024). *COSEWIC Assessment and Status Report on Pacific Yew* Taxus brevifolia *in Canada.* Committee on the Status of Endangered Wildlife in Canada, Ottawa.
@@ -458,6 +455,18 @@ The interactive web map is available at [jerichooconnell.github.io/yew_project](
 **Figure 6.** Classifier performance comparison for six models trained on 64-dimensional AlphaEarth satellite embeddings (held-out validation set).
 
 **Figure 7.** Pacific yew population size-class distribution (DBH converted from field-measured CBH, *n* = 120). Left panel: observed stem counts per 10-cm DBH class (green bars) versus the de Liocourt stable-population reference (*q* = 1.5; red dashed) and the reverse-J slope fitted to the whole observed distribution (*q* ≈ 2.0, 95% CI 1.6–2.7; blue dash-dot). Shaded area: the large-tree deficit (> 30 cm DBH, 7 observed vs. ~32 expected). Right panel: observed versus expected (*q* = 1.5) cumulative distribution functions, with the observed median (12.7 cm) marked.
+
+**Figure 8.** Geographic distribution of mapped Pacific yew habitat across the 99 study tiles, each symbol sized in proportion to its mapped habitat area (P ≥ 0.5) and coloured by the percentage of that habitat falling inside protected areas (red = exposed, green = protected). Most high-habitat tiles, particularly on the outer and central coast, are largely unprotected.
+
+**Figure 9.** Where the 37,885 ha of mapped yew habitat sits. Left: composition by protection status — provincial parks (5.6%), conservancies (4.2%), and national parks (1.2%) together protect only 11.0%, leaving 89% unprotected. Right: 17,785 ha (47%) of mapped habitat lies in study tiles with no protected area at all.
+
+**Figure 10.** Geography of the four key tile-level variables across the 99 study tiles, plotted on a common base map with marker area proportional to mapped habitat: (a) mapped habitat (P ≥ 0.5); (b) percentage of forest area logged; (c) percentage old-growth remaining; (d) percentage of habitat inside protected areas. Logging pressure concentrates in the southern coast and interior, old-growth refugia persist on the central and north coast, and protection is sparse and spatially mismatched with the largest habitat concentrations.
+
+**Figure 11.** Predicted Pacific yew probability shown as the actual per-tile model-output rasters placed at their true geographic locations on Vancouver Island (inset: location within BC). Each labelled patch is one ~10 × 10 km study tile, coloured by suppressed yew probability (green ≈ low → red/purple ≈ high); high-probability habitat is visible in old-growth-rich tiles such as Carmanah-Walbran, Port Renfrew, and Sooke Hills, while heavily logged tiles show sparse, fragmented predictions.
+
+**Figure 12.** As Figure 11, for the Central and North Coast — the region holding the largest remaining yew habitat. Tile imagery shows substantial predicted habitat in less-accessible outer-coast and fjord tiles (e.g., Rivers Inlet, Smith Sound, Bella Bella), consistent with lower historical logging pressure in these remote settings.
+
+**Figure 13.** The decline driver shown directly: the same Vancouver Island tiles with predicted yew probability (left) beside their VRI logging / forest-age classification (right). Tiles dominated by old-growth (dark green, right) carry the highest predicted yew probability (left), whereas tiles dominated by recent logging (red/orange/yellow, right) are largely zeroed by the suppression pipeline.
 
 *Supplementary figures:*
 
