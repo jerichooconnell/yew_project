@@ -655,7 +655,7 @@ LOG_SUPPRESS = {
     2: 0.00,   # logged  <20 yr     → zero out (bare ground, no yew)
     3: 0.00,   # logged 20–40 yr    → zero out (young second-growth, yew absent)
     4: 0.20,   # logged 40–80 yr    → heavily suppressed (yew slow to recover)
-    5: 0.35,   # forest 80–150 yr   → partial suppression (maturing second-growth)
+    5: 0.50,   # forest 80–150 yr   → partial suppression (maturing second-growth)
     6: 0.00,   # alpine / barren    → zero out (trees don't grow here)
     7: 1.00,   # old-growth >150 yr → unchanged
 }
