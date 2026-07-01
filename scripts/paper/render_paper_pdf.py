@@ -43,8 +43,8 @@ def embed_figures(md: str) -> str:
             return m.group(0)
         img = (f'<figure class="paper-fig"><img src="file://{path}"/></figure>\n\n')
         return img + m.group(0)
-    # Caption lines look like:  **Figure 1.** Caption text…
-    return re.sub(r"^\*\*(Figure S?\d+)\.\*\*", repl, md, flags=re.M)
+    # Caption lines look like:  Figure 1. Caption text…  (bold markers were stripped)
+    return re.sub(r"^(Figure S?\d+)\.", repl, md, flags=re.M)
 
 
 def latex_to_html(expr: str) -> str:
