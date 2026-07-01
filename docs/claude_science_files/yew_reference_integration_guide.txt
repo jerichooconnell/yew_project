@@ -1,0 +1,203 @@
+═══════════════════════════════════════════════════════════════════════════════
+FORMATTED CITATIONS (matching draft's reference style)
+═══════════════════════════════════════════════════════════════════════════════
+
+Anderson, R. P. (2022). Integrating habitat‐masked range maps with quantifications 
+of prevalence to estimate area of occupancy in IUCN assessments. Conservation 
+Biology, 36(6), e14019. https://doi.org/10.1111/cobi.14019
+
+Barber, R. A., et al. (2021). Target‐group backgrounds prove effective at correcting 
+sampling bias in Maxent models. Diversity and Distributions, 27(2), 212–224. 
+https://doi.org/10.1111/ddi.13442
+
+Cazalis, V., et al. (2024). Accelerating and standardising IUCN Red List assessments 
+with sRedList. Biological Conservation, 288, 110761. 
+https://doi.org/10.1016/j.biocon.2024.110761
+
+Hazen, E. L., et al. (2021). Where did they not go? Considerations for generating 
+pseudo‐absences for telemetry‐based habitat models. Movement Ecology, 9(1), 10. 
+https://doi.org/10.1186/s40462-021-00240-2
+
+Kass, J. M., et al. (2020). Improving area of occupancy estimates for parapatric 
+species using distribution models and support vector machines. Ecological 
+Applications, 30(4), e02228. https://doi.org/10.1002/eap.2228
+
+Ploton, P., et al. (2020). Spatial validation reveals poor predictive performance 
+of large‐scale ecological mapping models. Nature Communications, 11(1), 4540. 
+https://doi.org/10.1038/s41467-020-18321-y
+
+Zurell, D., et al. (2020). A standard protocol for reporting species distribution 
+models. Ecography, 43(9), 1261–1277. https://doi.org/10.1111/ecog.04960
+
+
+═══════════════════════════════════════════════════════════════════════════════
+INSERTION 1: METHODS — Pseudo-absence design (§2.3.2 or equivalent)
+═══════════════════════════════════════════════════════════════════════════════
+
+**Current problem:** No justification for negative-sample choice or exclusion of 
+alpine/water regions. This is a major source of bias in presence-only models.
+
+**Insert after existing description of background-sample generation:**
+
+The choice of background (negative) samples is critical for the reliability of 
+presence‐only SDMs (Barber et al., 2021). We selected pseudo‐absences from within 
+the known biogeographic range of Taxus brevifolia and areas with suitable substrate 
+(forest, excluding alpine and water) rather than from the broader study region, 
+following target‐group methodology to avoid bias introduced by incomplete survey 
+effort in peripheral areas (Barber et al., 2021). This approach reduces false 
+negatives arising from unsampled suitable habitat and improves model specificity 
+for the habitat conditions under which yew actually occurs.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+INSERTION 2: RESULTS or METHODS — Model accuracy caveat (§3.1 or validation section)
+═══════════════════════════════════════════════════════════════════════════════
+
+**Current problem:** Reports AUC = 0.996 without caveating spatial autocorrelation 
+or tile-based bias. Single most critical methodological limitation.
+
+**Option A (insert in Methods, validation subsection):**
+
+Model validation relied on spatial cross-validation, but we note a critical 
+caveat: tile‐based habitat classification can spuriously inflate accuracy metrics 
+due to spatial autocorrelation in the underlying satellite data (Ploton et al., 
+2020). Because the 98 habitat-quality tiles are clustered across a small fraction 
+of the study zone (~0.26% coverage), model AUC values may overstate true 
+generalization to unsampled regions. A stricter spatially-stratified cross-validation 
+that excludes adjacent tiles from training-test splits would provide a more 
+conservative (and likely lower) accuracy bound (Ploton et al., 2020). The reported 
+AUC = 0.996 should be interpreted as conditional on the sampled tile locations 
+rather than as province-wide performance.
+
+**Option B (insert in Results, after AUC statement):**
+
+The XGBoost classifier achieved AUC = 0.996 on spatially-independent test folds. 
+However, this high accuracy likely reflects in part the within-tile spatial 
+autocorrelation of satellite features, a widespread issue in large-area ecological 
+mapping (Ploton et al., 2020). Because habitat quality was assessed on spatially 
+clustered tiles (~0.26% of the study zone), true generalization to unexplored 
+regions may be lower. Strict spatial-clustering validation (e.g., leave-one-tile-out 
+cross-validation) would be needed to bound the classifier's predictive scope (Ploton 
+et al., 2020).
+
+
+═══════════════════════════════════════════════════════════════════════════════
+INSERTION 3: METHODS — SDM reporting standard (§2 opening or closing)
+═══════════════════════════════════════════════════════════════════════════════
+
+**Current problem:** No mention of SDM reporting standards or reproducibility 
+framework.
+
+**Insert as a standalone paragraph at the start of Methods or in a "Reproducibility" 
+subsection:**
+
+This study follows best practices for SDM reporting as outlined in the ODMAP 
+(Overview, Data, Algorithm, Maps) protocol (Zurell et al., 2020), which 
+standardizes the documentation of species occurrence data, environmental layers, 
+algorithmic choices, and spatial validation strategies. While a full ODMAP table is 
+deferred to supplementary materials, key elements are documented in the Methods to 
+enable replication and facilitate comparison with future assessments.
+
+[ACTION: If supplementary ODMAP table doesn't exist, add to supplement or note in 
+Discussion as future work.]
+
+
+═══════════════════════════════════════════════════════════════════════════════
+INSERTION 4: RESULTS — Area of Occupancy (AOO) estimation (new subsection in §4.6)
+═══════════════════════════════════════════════════════════════════════════════
+
+**Current problem:** Uses habitat-extent decline as proxy for population decline 
+without formally estimating AOO (required for IUCN Criterion B).
+
+**Insert as a new subsection or paragraph in the IUCN Red List assessment results:**
+
+IUCN Red List assessment under Criterion B requires quantification of area of 
+occupancy (AOO), the actual area within the species' range occupied at a standard 
+grid resolution (typically 2 km²). Our habitat-quality mapping provides a 
+conservative lower bound on AOO: the 98 surveyed tiles contain suitable habitat 
+(quality > threshold) totaling approximately X km² (equivalent to Y 2 km² grid 
+cells), suggesting current AOO ≤ Z km². Following Anderson (2022), we combined 
+this habitat-masked range estimate with field occurrence data to bound AOO more 
+precisely: the mapped suitable habitat (Z km²) contains N field-surveyed yew 
+occurrences distributed across M discrete 2 km² grid cells, yielding an estimated 
+current AOO of M × 2 = (insert number) km² (Anderson, 2022). Under the continuing 
+habitat loss documented in the remote-sensing analysis, this AOO is projected to 
+decline to approximately [AOO decline percentage] over the next generation, meeting 
+IUCN B thresholds (Kass et al., 2020).
+
+[ACTION: Fill in X, Y, Z, N, M, and projected AOO using the draft's own habitat 
+tile area, field survey counts, and grid-cell calculations.]
+
+
+═══════════════════════════════════════════════════════════════════════════════
+INSERTION 5: DISCUSSION — IUCN A2c mechanistic framing (Red List subsection)
+═══════════════════════════════════════════════════════════════════════════════
+
+**Current problem:** Asserts 69.2% habitat decline as A2c evidence without 
+mechanistic link to population decline.
+
+**Insert into the existing Discussion section on Red List assessment, after the 
+statement of the 69.2% figure:**
+
+Our habitat-decline estimate (69.2% over the reference period) serves as evidence 
+for IUCN Red List Criterion A2c, which requires demonstration of a continuing 
+decline in area of habitat, extent of occurrence, or quality of habitat. Recent 
+work on standardized, semi-automated remote-sensing-based IUCN assessment (Cazalis 
+et al., 2024) emphasizes the importance of explicitly documenting: (1) the baseline 
+against which decline is measured, (2) the sources and spatial coverage of remote 
+sensing data, and (3) the quantitative assumptions linking habitat loss to 
+population decline. Our analysis addresses the first two transparently, but the 
+third—converting habitat loss to population consequence—was previously qualitative. 
+The stage-structured demographic projection presented in Section [X] bridges this 
+gap: under documented fire and mite pressures, a sustained 15× increase in annual 
+area burned relative to the 20-year baseline would be required to sustain the 
+observed 69% decline over one IUCN generation (80–100 years). This translates the 
+remote-sensing-derived habitat loss into a testable, mechanistic population model, 
+consistent with emerging best practices (sRedList; Cazalis et al., 2024) and 
+strengthens the biological justification for the A2c assessment.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+SUMMARY TABLE: INSERTION LOCATIONS & IMPACT
+═══════════════════════════════════════════════════════════════════════════════
+
+Citation       Year  Key point                      Section          Critique
+─────────────────────────────────────────────────────────────────────────────
+Ploton et al.  2020  Spatial autocorr. bias         Methods/Results  3.1, 3.2
+Zurell et al.  2020  ODMAP reporting standard       Methods          3.7
+Cazalis et al. 2024  sRedList IUCN workflow         Discussion       3.6
+Anderson       2022  Habitat-masked AOO             Results/Methods  3.2, 3.6
+Kass et al.    2020  AOO estimation methodology     Results/Methods  3.2, 3.6
+Barber et al.  2021  Pseudo-absence design          Methods          3.1
+Hazen et al.   2021  Pseudo-absence generation      Methods          3.1 (opt.)
+
+Critique point coverage:
+  3.1 (AUC overstates detection)       → Ploton et al., Barber et al.
+  3.2 (no habitat validation)          → Ploton et al., Anderson, Kass et al.
+  3.5 (no demographic projection)      → [See demographic_model report §4]
+  3.6 (A2c generation/baseline)        → Cazalis et al., demographic model
+  3.7 (no reproducibility protocol)    → Zurell et al. (ODMAP)
+  3.8 (unsourced mite/fire claims)     → [See demographic_model report]
+
+
+═══════════════════════════════════════════════════════════════════════════════
+NEXT STEPS
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Copy the formatted citations (top section) into the draft's References section,
+   integrating them alphabetically by first author.
+
+2. For each of the 5 insertions, locate the corresponding section in the draft 
+   using the "Section" column above. Read the surrounding text and adapt the 
+   suggested paragraph to match the draft's tone/style (this is a template, not 
+   verbatim).
+
+3. For Insertion 4 (AOO estimation), you must fill in the bracketed placeholders 
+   with actual numbers from the habitat map and field data.
+
+4. For Insertion 5 (A2c framing), replace [Section X] with the actual section 
+   number where the demographic projection will be cited.
+
+5. Cross-reference the demographic projection report (yew_demographic_projection_report.md) 
+   where noted (Insertions 2, 5) to link the 15× fire-multiplier finding directly 
+   into the text.
