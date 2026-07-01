@@ -81,8 +81,8 @@ def main():
   .title{{font-weight:bold;margin-bottom:4px}}
 </style></head><body><div id="map"></div><script>
 var map = L.map('map').setView([51.0, -125.0], 6);
-L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png',
-  {{maxZoom:14, attribution:'© OpenStreetMap'}}).addTo(map);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{{z}}/{{y}}/{{x}}',
+  {{maxZoom:18, attribution:'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'}}).addTo(map);
 var data = {json.dumps(fc)};
 L.geoJSON(data, {{
   pointToLayer: function(f, latlng) {{
