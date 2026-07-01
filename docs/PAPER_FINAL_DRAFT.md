@@ -114,7 +114,7 @@ The production classifier is an XGBoost gradient-boosted tree ensemble trained o
 | Column sample by tree | 0.8 |
 | Number of boosting rounds | 500 (early stopping at 50) |
 
-The model was trained with spatial cross-validation using K-means clustering (10 clusters) for train/validation/test splits (70/10/20%) to mitigate spatial autocorrelation.
+The model was trained on the full expanded dataset (17,623 samples: 6,171 positives + 11,452 negatives) with an 85/15 random stratified train/validation split (random seed 42). No spatial blocking was applied to the split; the reported AUC therefore reflects random-split performance and may be marginally inflated by spatial autocorrelation between training and validation points.
 
 #### 2.4.2 Comparison Models
 
